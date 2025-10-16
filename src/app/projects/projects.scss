@@ -1,0 +1,58 @@
+.projects-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  padding: 30px 50px;
+  max-width: 100%;
+  margin: 0;
+}
+
+.project-card {
+  width: 100%;
+  justify-self: stretch;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  img {
+    height: 350px;
+    object-fit: cover;
+  }
+  
+  mat-card-content {
+    min-height: 80px;
+  }
+  
+  mat-card-actions {
+    justify-content: space-between;
+    padding: 16px;
+    
+    button {
+      color: #854e26;
+      border: none;
+      padding: 8px 16px;
+      font-weight: 500;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      
+      &:hover {
+        background-color: #854e2648;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-container {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  .project-card {
+    width: 100%;
+  }
+}

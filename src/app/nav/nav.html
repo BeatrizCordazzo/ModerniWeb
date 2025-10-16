@@ -1,0 +1,80 @@
+<!-- Navbar principal (ahora transparente y por encima del banner) -->
+<mat-toolbar class="navbar">
+  <!-- Left controls: hamburger + logo side-by-side -->
+  <div class="left-controls">
+    <button mat-icon-button class="hamburger" (click)="toggleDrawer()" aria-label="Open menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="logo-container">
+      <img src="Moderni (2).png" routerLink="/" alt="Moderni Logo" class="logo-image">
+    </div>
+  </div>
+  <!-- Solo las opciones "visibles" en la barra: profile y cart -->
+  <div class="nav-actions">
+    <!-- Moved search here so it appears next to profile icon -->
+    <div class="search-container">
+      <div class="search-box">
+        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"
+        />
+        <mat-icon class="search-icon">search</mat-icon>
+      </div>
+    </div>
+    <button mat-icon-button class="icon-btn" routerLink="/profile" aria-label="Profile">
+      <mat-icon>person</mat-icon>
+    </button>
+    <button mat-icon-button class="icon-btn" routerLink="/cart" aria-label="Cart">
+      <mat-icon>shopping_cart</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
+
+<!-- Backdrop para el drawer cuando está abierto -->
+<div class="drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()"></div>
+
+<!-- Drawer lateral personalizado -->
+<aside class="side-drawer" [class.open]="drawerOpen" role="navigation" [attr.aria-hidden]="!drawerOpen">
+  <div class="drawer-header">
+    <button mat-icon-button (click)="closeDrawer()" aria-label="Close menu"><mat-icon>close</mat-icon></button>
+    <div class="drawer-title">Menu</div>
+  </div>
+
+  <nav class="drawer-nav">
+    <ul>
+      <li>
+        <button class="drawer-item" (click)="toggleServices()">
+          Services
+          <mat-icon class="chev">expand_more</mat-icon>
+        </button>
+        <ul class="sublist" *ngIf="servicesOpen">
+          <li routerLink="/services/kitchen">Kitchen</li>
+          <li routerLink="/services/bedroom">Bedroom</li>
+          <li routerLink="/services/bathroom">Bathroom</li>
+          <li routerLink="/services/livingroom">Livingroom</li>
+          <li routerLink="/services/others">Others</li>
+        </ul>
+      </li>
+
+      <li>
+        <button class="drawer-item" (click)="toggleProjects()">
+          Projects
+          <mat-icon class="chev">expand_more</mat-icon>
+        </button>
+        <ul class="sublist" *ngIf="projectsOpen">
+          <li routerLink="/projects/kitchen">Kitchen</li>
+          <li routerLink="/projects/bedroom">Bedroom</li>
+          <li routerLink="/projects/bathroom">Bathroom</li>
+          <li routerLink="/projects/livingroom">Livingroom</li>
+          <li routerLink="/projects/others">Others</li>
+        </ul>
+      </li>
+
+      <li><a routerLink="/contact" (click)="closeDrawer()">Contact</a></li>
+      <li><a routerLink="/profile" (click)="closeDrawer()">Profile</a></li>
+      <li><a routerLink="/cart" (click)="closeDrawer()">Cart</a></li>
+    </ul>
+  </nav>
+</aside>
+
+
+
