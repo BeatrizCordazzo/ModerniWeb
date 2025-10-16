@@ -30,43 +30,55 @@
 </mat-toolbar>
 
 <!-- Backdrop para el drawer cuando está abierto -->
-<div class="drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()"></div>
+@if (drawerOpen) {
+  <div class="drawer-backdrop" (click)="closeDrawer()"></div>
+}
 
 <!-- Drawer lateral personalizado -->
 <aside class="side-drawer" [class.open]="drawerOpen" role="navigation" [attr.aria-hidden]="!drawerOpen">
   <div class="drawer-header">
     <button mat-icon-button (click)="closeDrawer()" aria-label="Close menu"><mat-icon>close</mat-icon></button>
-    <div class="drawer-title">Menu</div>
+    <a routerLink="/" class="drawer-logo" (click)="closeDrawer()" aria-label="Moderni home">
+      <img src="Moderni (2).png" alt="Moderni Logo" class="drawer-logo-img">
+    </a>
   </div>
 
   <nav class="drawer-nav">
     <ul>
       <li>
-        <button class="drawer-item" (click)="toggleServices()">
-          Services
-          <mat-icon class="chev">expand_more</mat-icon>
-        </button>
-        <ul class="sublist" *ngIf="servicesOpen">
-          <li routerLink="/services/kitchen">Kitchen</li>
-          <li routerLink="/services/bedroom">Bedroom</li>
-          <li routerLink="/services/bathroom">Bathroom</li>
-          <li routerLink="/services/livingroom">Livingroom</li>
-          <li routerLink="/services/others">Others</li>
-        </ul>
+        <div class="drawer-item">
+          <a routerLink="/services" (click)="closeDrawer()">Services</a>
+          <button class="chevron-btn" (click)="toggleServices()" aria-label="Toggle services submenu">
+            <mat-icon class="chev">expand_more</mat-icon>
+          </button>
+        </div>
+        @if (servicesOpen) {
+          <ul class="sublist">
+            <li routerLink="/services/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
+            <li routerLink="/services/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
+            <li routerLink="/services/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
+            <li routerLink="/services/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
+            <li routerLink="/services/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
+          </ul>
+        }
       </li>
 
       <li>
-        <button class="drawer-item" (click)="toggleProjects()">
-          Projects
-          <mat-icon class="chev">expand_more</mat-icon>
-        </button>
-        <ul class="sublist" *ngIf="projectsOpen">
-          <li routerLink="/projects/kitchen">Kitchen</li>
-          <li routerLink="/projects/bedroom">Bedroom</li>
-          <li routerLink="/projects/bathroom">Bathroom</li>
-          <li routerLink="/projects/livingroom">Livingroom</li>
-          <li routerLink="/projects/others">Others</li>
-        </ul>
+        <div class="drawer-item">
+          <a routerLink="/projects-page" (click)="closeDrawer()">Projects</a>
+          <button class="chevron-btn" (click)="toggleProjects()" aria-label="Toggle projects submenu">
+            <mat-icon class="chev">expand_more</mat-icon>
+          </button>
+        </div>
+        @if (projectsOpen) {
+          <ul class="sublist">
+            <li routerLink="/projects-page/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
+            <li routerLink="/projects-page/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
+            <li routerLink="/projects-page/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
+            <li routerLink="/projects-page/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
+            <li routerLink="/projects-page/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
+          </ul>
+        }
       </li>
 
       <li><a routerLink="/contact" (click)="closeDrawer()">Contact</a></li>

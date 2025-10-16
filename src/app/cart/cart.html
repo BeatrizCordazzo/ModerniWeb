@@ -1,1 +1,141 @@
-<p>cart works!</p>
+<app-nav></app-nav>
+
+<main class="cart-page">
+  <div class="cart-container">
+    <h1 class="cart-title">Mi Carrito de Compras</h1>
+
+    <div class="cart-content" *ngIf="cartItems.length > 0">
+      <!-- Lista de productos -->
+      <section class="cart-items-section">
+        <article class="cart-item" *ngFor="let item of cartItems">
+          <div class="item-image">
+            <img [src]="item.image" [alt]="item.name">
+          </div>
+
+          <div class="item-info">
+            <h3>{{item.name}}</h3>
+            <p class="item-description">{{item.description}}</p>
+            <span class="item-category">{{item.category}}</span>
+          </div>
+
+          <div class="item-price">
+            <span class="price-label">Precio unitario:</span>
+            <span class="price-value">${{item.price.toLocaleString()}}</span>
+          </div>
+
+          <div class="item-quantity">
+            <button 
+              class="quantity-btn" 
+              (click)="decreaseQuantity(item.id)"
+              [disabled]="item.quantity <= 1"
+              aria-label="Disminuir cantidad">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13H5v-2h14v2z"/>
+              </svg>
+            </button>
+            
+            <input 
+              type="number" 
+              class="quantity-input" 
+              [(ngModel)]="item.quantity"
+              (change)="updateQuantity(item.id, item.quantity)"
+              min="1"
+              max="99">
+            
+            <button 
+              class="quantity-btn" 
+              (click)="increaseQuantity(item.id)"
+              aria-label="Aumentar cantidad">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="item-subtotal">
+            <span class="subtotal-label">Subtotal:</span>
+            <span class="subtotal-value">${{(item.price * item.quantity).toLocaleString()}}</span>
+          </div>
+
+          <button 
+            class="remove-btn" 
+            (click)="removeItem(item.id)"
+            aria-label="Eliminar producto">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </button>
+        </article>
+      </section>
+
+      <!-- Resumen de compra -->
+      <aside class="cart-summary">
+        <h2>Resumen de Compra</h2>
+        
+        <div class="summary-row">
+          <span>Subtotal ({{getTotalItems()}} {{getTotalItems() === 1 ? 'artículo' : 'artículos'}}):</span>
+          <span>${{getSubtotal().toLocaleString()}}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Envío:</span>
+          <span *ngIf="getSubtotal() >= 50000" class="free-shipping">¡Gratis!</span>
+          <span *ngIf="getSubtotal() < 50000">${{shippingCost.toLocaleString()}}</span>
+        </div>
+
+        <div class="summary-row discount" *ngIf="discount > 0">
+          <span>Descuento:</span>
+          <span class="discount-value">-${{discount.toLocaleString()}}</span>
+        </div>
+
+        <div class="coupon-section">
+          <input 
+            type="text" 
+            placeholder="Código de cupón"
+            [(ngModel)]="couponCode"
+            class="coupon-input">
+          <button class="apply-coupon-btn" (click)="applyCoupon()">Aplicar</button>
+        </div>
+
+        <div class="summary-total">
+          <span>Total:</span>
+          <span class="total-amount">${{getTotal().toLocaleString()}}</span>
+        </div>
+
+        <button class="checkout-btn" (click)="proceedToCheckout()">
+          <span>Proceder al Pago</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+          </svg>
+        </button>
+
+        <button class="continue-shopping-btn" routerLink="/products">
+          Continuar Comprando
+        </button>
+
+        <div class="payment-methods">
+          <p>Métodos de pago aceptados:</p>
+          <div class="payment-icons">
+            <span class="payment-icon">💳</span>
+            <span class="payment-icon">🏦</span>
+            <span class="payment-icon">💰</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Carrito vacío -->
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+      </svg>
+      <h2>Tu carrito está vacío</h2>
+      <p>¡Agrega productos para comenzar tu compra!</p>
+      <button class="shop-now-btn" routerLink="/products">
+        Explorar Productos
+      </button>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

@@ -10,6 +10,7 @@
   justify-content: space-between;
   padding: 10px 18px;
   color: white;
+    cursor: pointer;
   background: transparent; /* transparente para dejar ver la imagen */
 }
 
@@ -22,6 +23,7 @@
 // Contenedor del logo
 .logo-container {
   display: flex;
+  cursor: pointer;
   align-items: center;
   cursor: pointer;
   flex-shrink: 0;
@@ -29,23 +31,24 @@
   .logo-image {
     height: 55px;
     width: auto;
-    
+
     @media (max-width: 768px) {
       height: 48px;
     }
+  cursor: pointer;
   }
-  
+
   .logo-icon {
     margin-right: 8px;
     font-size: 28px;
     width: 28px;
     height: 28px;
   }
-  
+
   .logo-text {
     font-size: 20px;
     font-weight: 500;
-    
+
     @media (max-width: 768px) {
       font-size: 18px;
     }
@@ -57,11 +60,11 @@
   display: flex;
   gap: 8px;
   flex-shrink: 0;
-  
+
   @media (max-width: 768px) {
     display: none;
   }
-  
+
   .nav-button {
     display: flex;
     align-items: center;
@@ -70,15 +73,15 @@
     border-radius: 4px;
     transition: background-color 0.3s ease;
     color: white;
-    
+
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
     }
-    
+
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.08);
     }
   }
 }
@@ -134,6 +137,7 @@
 // Botón hamburguesa
 .hamburger {
   margin-right: 8px;
+  cursor: pointer;
   color: white;
   display: flex;
   align-items: center;
@@ -150,27 +154,36 @@
   color: white;
 }
 
-/* Drawer y backdrop */
+/* Drawer y backdrop mejorados */
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(10, 10, 10, 0.55);
+  cursor: pointer;
   z-index: 1100;
+  backdrop-filter: blur(2px);
 }
 
 .side-drawer {
   position: fixed;
   top: 0;
-  left: -320px;
-  width: 320px;
+  left: -360px;
+  width: 360px;
+  max-width: 92%;
   height: 100vh;
-  background: #ffffff;
-  color: #222;
+  /* Fondo atenuado para mejor contraste con el contenido principal */
+  background: linear-gradient(180deg, #f7f8fb 0%, #eef1f8 100%);
+  color: #111217;
   z-index: 1250;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.2);
-  transition: left 0.28s ease;
+  box-shadow: 6px 12px 30px rgba(9, 10, 15, 0.18);
+  transition: transform 0.32s cubic-bezier(.2,.9,.2,1), left 0.32s ease;
   display: flex;
+  cursor: pointer;
   flex-direction: column;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  overflow: hidden;
+  transform: translateX(0);
 }
 
 .side-drawer.open {
@@ -181,17 +194,47 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(31,34,48,0.06);
+  /* Sutil fondo para separar header del contenido */
+  background: linear-gradient(90deg, rgba(195,35,125,0.04), rgba(103,58,183,0.02));
 }
 
 .drawer-title {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 18px;
+  color: #1f2230;
+}
+
+.drawer-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c3237d, #673ab7);
+  color: white;
+  font-weight: 700;
+}
+
+.drawer-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.drawer-logo-img {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 
 .drawer-nav {
-  padding: 12px 8px;
+  padding: 10px 6px;
   overflow: auto;
+  flex: 1 1 auto;
 }
 
 .drawer-nav ul {
@@ -201,15 +244,66 @@
 }
 
 .drawer-item {
-  background: none;
+  background: transparent;
   border: none;
   width: 100%;
   text-align: left;
-  padding: 12px 16px;
-  font-size: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 10px;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+  
+  a {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.18s ease, transform 0.12s ease;
+    
+    &:hover {
+      background: linear-gradient(90deg, rgba(195,35,125,0.08), rgba(103,58,183,0.05));
+      transform: translateX(6px);
+    }
+  }
+  
+  .chevron-btn {
+    background: transparent;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+    
+    mat-icon {
+      color: #444557;
+      transition: transform 0.18s ease;
+    }
+    
+    &:hover {
+      background: rgba(103,58,183,0.10);
+      
+      mat-icon {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.drawer-item:hover {
+  background: rgba(31,34,48,0.03);
+}
+
+/* Estado activo más visible */
+.drawer-item.active {
+  background: linear-gradient(90deg, rgba(103,58,183,0.12), rgba(195,35,125,0.06));
+  color: white;
+  transform: none;
 }
 
 .drawer-nav a, .drawer-nav li {
@@ -217,29 +311,74 @@
   padding: 10px 16px;
   color: inherit;
   text-decoration: none;
+  border-radius: 8px;
+}
+
+.drawer-nav a:hover, .drawer-nav li:hover {
+  background: rgba(31,34,48,0.06);
 }
 
 .sublist {
-  padding-left: 16px;
-  border-left: 2px solid rgba(0,0,0,0.04);
+  /* Aumentar sangría para indicar jerarquía respecto al drawer item padre */
+  padding-left: 28px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.sublist li {
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #444557;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+  /* Aumentar margen izquierdo para separar visualmente del padre */
+  margin-left: 30px;
+}
+
+.sublist li:hover {
+  /* Hover más visible y contraste incremental */
+  background: rgba(103,58,183,0.10);
+  color: #0f1720;
+  transform: translateX(4px);
+}
+
+/* Estilos para iconos insertados en la sublista */
+.sublist li .item-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin-right: 10px;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: inherit;
+  font-size: 18px; /* tamaño del mat-icon */
+}
+
+.sublist li mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
 }
 
 // Estilos para el menú desplegable móvil
 ::ng-deep .mobile-nav-menu {
   .mat-mdc-menu-content {
     padding: 8px 0;
-    
+
     .mat-mdc-menu-item {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
       min-height: 48px;
-      
+
       mat-icon {
         color: rgba(0, 0, 0, 0.6);
       }
-      
+
       span {
         font-weight: 400;
       }
@@ -254,7 +393,7 @@
         margin-left: 10px;
     }
   }
-  
+
   .navbar {
     padding: 0 4px;
   }

@@ -36,3 +36,123 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// Estilos específicos para el navbar en la página principal (home)
+app-home {
+  app-nav mat-toolbar.navbar {
+    background: transparent !important;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+
+      // Cambiar colores de los elementos al hacer hover en el navbar
+      button,
+      .hamburger,
+      .icon-btn {
+        mat-icon {
+          color: #333 !important;
+        }
+      }
+
+      .search-box {
+        border-bottom-color: rgba(0, 0, 0, 0.2) !important;
+
+        input {
+          color: #333 !important;
+
+          &::placeholder {
+            color: rgba(0, 0, 0, 0.5) !important;
+          }
+        }
+
+        .search-icon {
+          color: #333 !important;
+        }
+      }
+
+      .logo-image {
+        filter: brightness(0.5);
+      }
+    }
+  }
+}
+
+// Estilos específicos para el navbar en la página de services
+app-services {
+  app-nav mat-toolbar.navbar {
+    background: rgba(101, 67, 33, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    color: white !important;
+  }
+
+  app-nav button {
+    color: white !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+    }
+  }
+
+  app-nav mat-icon {
+    color: white !important;
+  }
+
+  app-nav .search-box {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+
+    input {
+      color: white !important;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+    }
+  }
+
+  app-nav .logo-container {
+    color: white !important;
+  }
+}
+
+// Estilos específicos para el navbar en la página de projects-page
+app-projects-page {
+  app-nav mat-toolbar.navbar {
+    background: rgba(101, 67, 33, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    color: white !important;
+  }
+
+  app-nav button {
+    color: white !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+    }
+  }
+
+  app-nav mat-icon {
+    color: white !important;
+  }
+
+  app-nav .search-box {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+
+    input {
+      color: white !important;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+    }
+  }
+
+  app-nav .logo-container {
+    color: white !important;
+  }
+}

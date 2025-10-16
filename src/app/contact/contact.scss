@@ -1,0 +1,325 @@
+.contact-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+}
+
+.contact-hero {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+              url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1200');
+  background-size: cover;
+  background-position: center;
+  padding: 6rem 2rem 4rem;
+  text-align: center;
+  color: white;
+  height: 100px;
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin: 0 0 1rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+
+      @media (max-width: 768px) {
+        font-size: 2.5rem;
+      }
+    }
+
+    p {
+      font-size: 1.3rem;
+      margin: 0;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+
+      @media (max-width: 768px) {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+.contact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.contact-options {
+  margin-bottom: 4rem;
+
+  h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #f5f5dc;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-card {
+  background: linear-gradient(135deg, #f5f5dc 0%, #f0e6d2 100%);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid rgba(139, 115, 85, 0.2);
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(65, 43, 21, 0.4);
+    border-color: rgba(139, 115, 85, 0.4);
+  }
+
+  .icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    svg {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  &.whatsapp {
+    .icon {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: white;
+    }
+
+    &:hover .icon {
+      transform: scale(1.15);
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    }
+  }
+
+  &.instagram {
+    .icon {
+      background: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #F77737 100%);
+      color: white;
+    }
+
+    &:hover .icon {
+      transform: scale(1.15);
+      box-shadow: 0 8px 20px rgba(131, 58, 180, 0.4);
+    }
+  }
+
+  &.email {
+    .icon {
+      background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+      color: white;
+    }
+
+    &:hover .icon {
+      transform: scale(1.15);
+      box-shadow: 0 8px 20px rgba(101, 67, 33, 0.4);
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    color: #3e2723;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #6d4c41;
+    margin: 0 0 1rem;
+  }
+
+  .link-text {
+    display: inline-block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #654321;
+    padding: 0.5rem 1rem;
+    background: rgba(139, 115, 85, 0.15);
+    border-radius: 20px;
+  }
+}
+
+.contact-form-section {
+  background: linear-gradient(135deg, #f5f5dc 0%, #f0e6d2 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
+  border: 2px solid rgba(139, 115, 85, 0.2);
+
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3e2723;
+    margin: 0 0 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .form-intro {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6d4c41;
+    margin: 0 0 2.5rem;
+  }
+}
+
+.contact-form {
+  max-width: 800px;
+  margin: 0 auto;
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #3e2723;
+      margin-bottom: 0.5rem;
+    }
+
+    input,
+    textarea {
+      padding: 0.875rem 1rem;
+      border: 2px solid rgba(139, 115, 85, 0.3);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+
+      &:focus {
+        outline: none;
+        border-color: #8B7355;
+        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15);
+        background: white;
+      }
+
+      &::placeholder {
+        color: #a1887f;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(101, 67, 33, 0.5);
+      background: linear-gradient(135deg, #9d8466 0%, #754d2a 100%);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.success-message {
+  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+  animation: slideIn 0.3s ease-out;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

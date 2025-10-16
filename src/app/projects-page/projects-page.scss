@@ -1,0 +1,138 @@
+/* Projects page styles */
+
+.projects-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: inherit;
+  color: #222;
+}
+
+.projects-hero {
+  background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+  padding: 80px 0 48px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+
+  .inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .lead {
+    margin: 0;
+    color: #4b5563;
+  }
+}
+
+.projects-grid-section {
+  padding: 36px 0 80px 0;
+
+  .inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  .project-card {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    outline: none;
+
+    &:hover,
+    &:focus {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(16,24,40,0.08);
+      border-color: rgba(15,23,42,0.12);
+
+      .media {
+        transform: scale(1.1);
+      }
+    }
+
+    .media {
+      width: 100%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.3s ease;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease;
+      }
+
+      &.kitchen {
+        background-image: url('https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=500');
+      }
+
+      &.bathroom {
+        background-image: url('https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=500');
+      }
+
+      &.livingroom {
+        background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500');
+      }
+
+      &.bedroom {
+        background-image: url('https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=500');
+      }
+
+      &.other {
+        background-image: url('https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=500');
+      }
+    }
+
+    &:hover .media::after {
+      opacity: 0.7;
+    }
+
+    .project-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 16px 16px 8px 16px;
+      color: #1f2937;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      margin: 0 16px 16px 16px;
+      color: #6b7280;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-grid-section .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
