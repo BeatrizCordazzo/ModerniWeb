@@ -1,1 +1,193 @@
-<p>others works!</p>
+<div class="others-page">
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Individual Furniture</h1>
+    <p>Discover our collection of standalone furniture pieces</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="loadError && !isLoading" class="error-container">
+    <p class="error-message">{{ loadError }}</p>
+    <button class="retry-button" (click)="loadProducts()">Retry</button>
+  </div>
+
+  <!-- Content (only show when loaded successfully) -->
+  <div *ngIf="!isLoading && !loadError">
+    <!-- Category Carousel -->
+    <div class="category-carousel">
+      <h2>Browse by Category</h2>
+      <div class="carousel-wrapper">
+        <div class="carousel-container">
+          <div 
+            *ngFor="let category of categories" 
+            class="category-card"
+            [class.active]="selectedCategory === category.id"
+            (click)="selectCategory(category.id)">
+            <div class="category-image">
+              <img [src]="category.image" [alt]="category.name">
+            </div>
+            <h3>{{ category.name }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <div class="results-info">
+        <span class="product-count">{{ filteredProducts.length }} products</span>
+        <span *ngIf="getActiveFiltersCount() > 0" class="active-filters">
+          ({{ getActiveFiltersCount() }} filters applied)
+        </span>
+      </div>
+      
+      <div class="filter-actions">
+        <select [(ngModel)]="sortBy" (change)="applyFilters()" class="sort-select">
+          <option value="popular">Sort by: Popular</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name">Name: A to Z</option>
+        </select>
+        
+        <button class="filter-toggle" (click)="showFilters = !showFilters">
+          <i class="filter-icon">⚙</i> Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" [class.show]="showFilters">
+      <div class="filter-group">
+        <h4>Price Range</h4>
+        <div class="price-inputs">
+          <input 
+            type="number" 
+            [(ngModel)]="currentMinPrice" 
+            (change)="applyFilters()"
+            [min]="minPrice"
+            [max]="currentMaxPrice"
+            placeholder="Min">
+          <span>-</span>
+          <input 
+            type="number" 
+            [(ngModel)]="currentMaxPrice" 
+            (change)="applyFilters()"
+            [min]="currentMinPrice"
+            [max]="maxPrice"
+            placeholder="Max">
+        </div>
+        <div class="price-range">
+          <input 
+            type="range" 
+            [(ngModel)]="currentMinPrice" 
+            (input)="applyFilters()"
+            [min]="minPrice" 
+            [max]="maxPrice"
+            class="range-slider">
+          <input 
+            type="range" 
+            [(ngModel)]="currentMaxPrice" 
+            (input)="applyFilters()"
+            [min]="minPrice" 
+            [max]="maxPrice"
+            class="range-slider">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Colors</h4>
+        <div class="color-options">
+          <label *ngFor="let color of allColors" class="color-option">
+            <input 
+              type="checkbox" 
+              [checked]="isColorSelected(color)"
+              (change)="toggleColor(color)">
+            <span>{{ color }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Availability</h4>
+        <label class="checkbox-option">
+          <input type="checkbox" [(ngModel)]="onlyInStock" (change)="applyFilters()">
+          <span>In Stock Only</span>
+        </label>
+      </div>
+
+      <div class="filter-actions-buttons">
+        <button class="btn-clear" (click)="clearFilters()">Clear All</button>
+        <button class="btn-apply" (click)="applyFilters()">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-grid">
+    <div *ngFor="let product of filteredProducts" class="product-card">
+      <div class="product-image">
+        <img [src]="product.image" [alt]="product.name">
+        <span *ngIf="!product.inStock" class="out-of-stock-badge">Out of Stock</span>
+        <span *ngIf="product.oldPrice" class="discount-badge">
+          -{{ ((product.oldPrice - product.price) / product.oldPrice * 100).toFixed(0) }}%
+        </span>
+      </div>
+      
+      <div class="product-info">
+        <span class="product-collection">{{ product.collection }}</span>
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        
+        <div class="product-price">
+          <span class="current-price">€{{ product.price.toFixed(2) }}</span>
+          <span *ngIf="product.oldPrice" class="old-price">€{{ product.oldPrice.toFixed(2) }}</span>
+        </div>
+
+        <div class="product-colors">
+          <span class="colors-label">Colors:</span>
+          <div class="color-swatches">
+            <div 
+              *ngFor="let color of product.colors; let i = index" 
+              class="color-swatch"
+              [class.selected]="selectedProductColors[product.id] === i"
+              [style.backgroundColor]="color.code"
+              [title]="color.name"
+              (click)="selectColor(product.id, i); $event.stopPropagation()">
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredProducts.length === 0" class="no-products">
+      <div class="no-products-content">
+        <i class="no-products-icon">🔍</i>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or browse all categories</p>
+        <button class="btn-reset" (click)="clearFilters()">Reset Filters</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Cart Confirmation Modal -->
+<app-cart-confirmation-modal
+  [isOpen]="showModal"
+  [item]="modalItem"
+  (confirm)="confirmAddToCart()"
+  (cancel)="closeModal()">
+</app-cart-confirmation-modal>
+
+<!-- Toast Notification -->
+<app-toast-notification
+  *ngIf="showToast"
+  [message]="toastMessage"
+  type="success">
+</app-toast-notification>

@@ -29,27 +29,27 @@ export class Cart {
   cartItems: CartItem[] = [
     {
       id: 1,
-      name: 'Mesa de Comedor Moderna',
-      description: 'Mesa de madera maciza con diseño minimalista',
-      category: 'Comedor',
+      name: 'Modern Dining Table',
+      description: 'Solid wood table with minimalist design',
+      category: 'Dining Room',
       price: 45000,
       quantity: 1,
       image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300'
     },
     {
       id: 2,
-      name: 'Sillón Escandinavo',
-      description: 'Sillón de estilo nórdico con tapizado premium',
-      category: 'Living',
+      name: 'Scandinavian Armchair',
+      description: 'Nordic style armchair with premium upholstery',
+      category: 'Living Room',
       price: 35000,
       quantity: 2,
       image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300'
     },
     {
       id: 3,
-      name: 'Lámpara de Pie Moderna',
-      description: 'Iluminación LED regulable con diseño contemporáneo',
-      category: 'Iluminación',
+      name: 'Modern Floor Lamp',
+      description: 'Adjustable LED lighting with contemporary design',
+      category: 'Lighting',
       price: 12000,
       quantity: 1,
       image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300'
@@ -96,21 +96,21 @@ export class Cart {
   }
 
   applyCoupon(): void {
-    // Lógica simple de cupones
-    if (this.couponCode.toUpperCase() === 'DESCUENTO10') {
+    // Simple coupon logic
+    if (this.couponCode.toUpperCase() === 'DISCOUNT10') {
       this.discount = this.getSubtotal() * 0.1;
-      alert('¡Cupón aplicado! 10% de descuento');
+      alert('Coupon applied! 10% discount');
     } else if (this.couponCode.toUpperCase() === 'WELCOME20') {
       this.discount = this.getSubtotal() * 0.2;
-      alert('¡Cupón aplicado! 20% de descuento');
+      alert('Coupon applied! 20% discount');
     } else if (this.couponCode) {
-      alert('Cupón no válido');
+      alert('Invalid coupon');
     }
   }
 
   proceedToCheckout(): void {
-    console.log('Procediendo al pago...');
-    alert('¡Redirigiendo al proceso de pago!');
-    // Aquí iría la lógica para proceder al checkout
+    console.log('Proceeding to checkout...');
+    alert('Redirecting to checkout!');
+    // Checkout logic would go here
   }
 }

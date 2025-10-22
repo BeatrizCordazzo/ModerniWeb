@@ -1,1 +1,356 @@
-<p>bedroom works!</p>
+<div class="bedroom-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Your Dream Bedroom</h1>
+      <p>Create the perfect sanctuary for rest and relaxation</p>
+      <div class="mode-toggle">
+        <button 
+          [class.active]="viewMode === 'sets'" 
+          (click)="switchToSets()">
+          <i class="fas fa-layer-group"></i> Pre-Designed Sets
+        </button>
+        <button 
+          [class.active]="viewMode === 'custom'" 
+          (click)="switchToCustom()">
+          <i class="fas fa-ruler-combined"></i> Make It Your Own
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading bedroom sets...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="loadError && !isLoading" class="error-container">
+    <p class="error-message">{{ loadError }}</p>
+    <button class="retry-button" (click)="loadBedroomSets()">Retry</button>
+  </div>
+
+  <!-- Pre-Designed Sets View -->
+  <section class="sets-section" *ngIf="viewMode === 'sets' && !isLoading && !loadError">
+    <div class="container">
+      <!-- Selected Set Detail View -->
+      <div class="selected-set-detail" *ngIf="selectedSet && showColorPicker">
+        <button class="back-button" (click)="selectedSet = null; showColorPicker = false">
+          <i class="fas fa-arrow-left"></i> Back to All Sets
+        </button>
+        
+        <div class="detail-content">
+          <div class="detail-image">
+            <img [src]="selectedSet.image" [alt]="selectedSet.name">
+          </div>
+          
+          <div class="detail-info">
+            <h2>{{ selectedSet.name }}</h2>
+            <p class="style-tag">{{ selectedSet.style }}</p>
+            <p class="description">{{ selectedSet.description }}</p>
+            
+            <div class="price-tag">
+              <span class="price-label">Starting at:</span>
+              <span class="price">�{{ selectedSet.basePrice.toFixed(2) }}</span>
+            </div>
+
+            <div class="dimensions-section">
+              <h3>Standard Dimensions</h3>
+              <div class="dimensions-grid">
+                <div class="dimension-item">
+                  <span class="label">Width:</span>
+                  <span class="value">{{ selectedSet.dimensions.width }}</span>
+                </div>
+                <div class="dimension-item">
+                  <span class="label">Height:</span>
+                  <span class="value">{{ selectedSet.dimensions.height }}</span>
+                </div>
+                <div class="dimension-item">
+                  <span class="label">Depth:</span>
+                  <span class="value">{{ selectedSet.dimensions.depth }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="includes-section">
+              <h3>Includes:</h3>
+              <ul>
+                <li *ngFor="let item of selectedSet.includes">
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="color-picker-section">
+              <h3>Choose Your Color</h3>
+              <div class="color-options">
+                <div 
+                  *ngFor="let color of selectedSet.availableColors"
+                  class="color-option"
+                  [class.selected]="selectedSetColor?.name === color.name"
+                  (click)="selectSetColor(color)">
+                  <div class="color-swatch" [style.backgroundColor]="color.code"></div>
+                  <span class="color-name">{{ color.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="btn-primary" (click)="addSetToCart()">
+                Add to Cart - �{{ selectedSet.basePrice.toFixed(2) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sets Grid -->
+      <div class="sets-grid" *ngIf="!selectedSet || !showColorPicker">
+        <h2 class="section-title">Choose Your Bedroom Style</h2>
+        <p class="section-subtitle">Select from our curated bedroom collections</p>
+        
+        <div class="grid">
+          <div 
+            *ngFor="let set of bedroomSets"
+            class="set-card"
+            (click)="selectSet(set)">
+            <div class="card-image">
+              <img [src]="set.image" [alt]="set.name">
+            </div>
+            <div class="card-content">
+              <h3>{{ set.name }}</h3>
+              <p class="style">{{ set.style }}</p>
+              <div class="price">
+                <span class="from">From</span>
+                <span class="amount">�{{ set.basePrice.toFixed(2) }}</span>
+              </div>
+              <div class="color-preview">
+                <span>Available in:</span>
+                <div class="color-dots">
+                  <div 
+                    *ngFor="let color of set.availableColors"
+                    class="color-dot"
+                    [style.backgroundColor]="color.code"
+                    [title]="color.name">
+                  </div>
+                </div>
+              </div>
+              <button class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
+                <i class="fas fa-shopping-bag"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Custom Bedroom Builder -->
+  <section class="custom-section" *ngIf="viewMode === 'custom'">
+    <div class="container">
+      <h2 class="section-title">Create Your Custom Bedroom</h2>
+      <p class="section-subtitle">Design furniture tailored to your exact space and style</p>
+
+      <!-- Step 1: Space Dimensions -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3>Enter Your Bedroom Dimensions</h3>
+        </div>
+        <div class="step-content">
+          <div class="dimensions-input">
+            <div class="input-group">
+              <label>
+                <i class="fas fa-arrows-alt-h"></i>
+                Width (cm)
+              </label>
+              <input 
+                type="number" 
+                [(ngModel)]="customSpaceWidth" 
+                placeholder="e.g., 400"
+                min="200"
+                max="800">
+            </div>
+            <div class="input-group">
+              <label>
+                <i class="fas fa-arrows-alt-v"></i>
+                Height (cm)
+              </label>
+              <input 
+                type="number" 
+                [(ngModel)]="customSpaceHeight" 
+                placeholder="e.g., 260"
+                min="200"
+                max="400">
+            </div>
+            <div class="input-group">
+              <label>
+                <i class="fas fa-arrows-alt"></i>
+                Depth (cm)
+              </label>
+              <input 
+                type="number" 
+                [(ngModel)]="customSpaceDepth" 
+                placeholder="e.g., 400"
+                min="200"
+                max="800">
+            </div>
+          </div>
+          <div class="validation-message" *ngIf="!isCustomSpaceValid() && (customSpaceWidth || customSpaceHeight || customSpaceDepth)">
+            <i class="fas fa-exclamation-circle"></i>
+            Please enter all three dimensions
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Select Furniture -->
+      <div class="step-card" [class.disabled]="!isCustomSpaceValid()">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h3>Select Furniture Items</h3>
+        </div>
+        <div class="step-content">
+          <div class="furniture-grid">
+            <div 
+              *ngFor="let furniture of customFurnitureOptions"
+              class="furniture-card"
+              [class.disabled]="!isCustomSpaceValid()"
+              (click)="isCustomSpaceValid() && addCustomFurniture(furniture)">
+              <img [src]="furniture.image" [alt]="furniture.name">
+              <div class="furniture-info">
+                <h4>{{ furniture.name }}</h4>
+                <p class="base-price">From �{{ furniture.basePrice.toFixed(2) }}</p>
+                <button class="add-btn" [disabled]="!isCustomSpaceValid()">
+                  <i class="fas fa-plus"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Customize Selected Items -->
+      <div class="step-card" *ngIf="customSelections.length > 0">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h3>Customize Your Selections ({{ customSelections.length }} items)</h3>
+        </div>
+        <div class="step-content">
+          <div class="selections-list">
+            <div 
+              *ngFor="let selection of customSelections; let i = index"
+              class="selection-item">
+              <div class="selection-header">
+                <h4>{{ selection.furniture.name }}</h4>
+                <button class="remove-btn" (click)="removeCustomSelection(i)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div class="selection-body">
+                <div class="dimension-inputs">
+                  <div class="input-group">
+                    <label>Width (cm)</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="selection.customWidth"
+                      [min]="selection.furniture.dimensions.minWidth"
+                      [max]="selection.furniture.dimensions.maxWidth"
+                      (ngModelChange)="calculateCustomPrice(selection)">
+                    <span class="range-hint">
+                      {{ selection.furniture.dimensions.minWidth }}-{{ selection.furniture.dimensions.maxWidth }}cm
+                    </span>
+                  </div>
+
+                  <div class="input-group">
+                    <label>Height (cm)</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="selection.customHeight"
+                      [min]="selection.furniture.dimensions.minHeight"
+                      [max]="selection.furniture.dimensions.maxHeight"
+                      (ngModelChange)="calculateCustomPrice(selection)">
+                    <span class="range-hint">
+                      {{ selection.furniture.dimensions.minHeight }}-{{ selection.furniture.dimensions.maxHeight }}cm
+                    </span>
+                  </div>
+
+                  <div class="input-group">
+                    <label>Quantity</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="selection.quantity"
+                      min="1"
+                      max="10"
+                      (ngModelChange)="calculateCustomPrice(selection)">
+                  </div>
+                </div>
+
+                <div class="color-selection">
+                  <label>Color:</label>
+                  <div class="color-options">
+                    <div 
+                      *ngFor="let color of selection.furniture.availableColors"
+                      class="color-option"
+                      [class.selected]="selection.selectedColor.name === color.name"
+                      (click)="selection.selectedColor = color"
+                      [style.background-color]="color.code"
+                      [title]="color.name">
+                      <i class="fas fa-check" *ngIf="selection.selectedColor.name === color.name"></i>
+                    </div>
+                  </div>
+                  <span class="selected-color-name">{{ selection.selectedColor.name }}</span>
+                </div>
+
+                <div class="selection-price">
+                  <span class="label">Price for this item:</span>
+                  <span class="price">�{{ calculateCustomPrice(selection).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total and Submit -->
+          <div class="total-section">
+            <div class="total-row">
+              <span class="label">Total Bedroom Cost:</span>
+              <span class="total-price">�{{ getTotalCustomPrice().toFixed(2) }}</span>
+            </div>
+            <button 
+              class="btn-submit"
+              (click)="sendCustomOrderToCarpenters()"
+              [disabled]="!isCustomSpaceValid() || customSelections.length === 0">
+              <i class="fas fa-paper-plane"></i> Send Order to Our Carpenters
+            </button>
+            <p class="submit-note">
+              <i class="fas fa-info-circle"></i>
+              Our team will review your custom design and contact you within 24 hours with a detailed quote
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="customSelections.length === 0 && isCustomSpaceValid()">
+        <i class="fas fa-couch"></i>
+        <p>Start by selecting furniture items above</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Cart Confirmation Modal -->
+<app-cart-confirmation-modal
+  [isOpen]="showModal"
+  [item]="modalItem"
+  (confirm)="confirmAddToCart()"
+  (cancel)="closeModal()">
+</app-cart-confirmation-modal>
+
+<!-- Toast Notification -->
+<app-toast-notification
+  *ngIf="showToast"
+  [message]="toastMessage"
+  type="success">
+</app-toast-notification>

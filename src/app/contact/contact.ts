@@ -29,8 +29,22 @@ export class Contact {
     message: ''
   };
 
+  isFormValid(): boolean {
+    return !!(
+      this.formData.name.trim() &&
+      this.formData.email.trim() &&
+      this.formData.phone.trim() &&
+      this.formData.message.trim()
+    );
+  }
+
   onSubmit(event: Event) {
     event.preventDefault();
+    
+    if (!this.isFormValid()) {
+      return;
+    }
+    
     console.log('Form submitted:', this.formData);
     
     // Aquí iría la lógica para enviar el formulario

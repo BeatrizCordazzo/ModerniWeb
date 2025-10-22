@@ -1,7 +1,11 @@
 .cart-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
-  padding: 2rem 0 4rem;
+  background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+  padding: 6rem 0 4rem;
+
+  @media (max-width: 768px) {
+    padding: 5rem 0 3rem;
+  }
 }
 
 .cart-container {
@@ -14,9 +18,8 @@
   text-align: center;
   font-size: 3rem;
   font-weight: 800;
-  color: #f5f5dc;
+  color: #3e2723;
   margin: 0 0 2rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -42,15 +45,15 @@
 }
 
 .cart-item {
-  background: linear-gradient(135deg, #f5f5dc 0%, #f0e6d2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
   border-radius: 20px;
   padding: 1.5rem;
   display: grid;
   grid-template-columns: 120px 1fr auto auto auto auto;
   gap: 1.5rem;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(65, 43, 21, 0.2);
-  border: 2px solid rgba(139, 115, 85, 0.2);
+  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.2);
+  border: 2px solid rgba(139, 115, 85, 0.15);
   transition: all 0.3s ease;
 
   &:hover {
@@ -289,11 +292,11 @@
 
 // Resumen de compra
 .cart-summary {
-  background: linear-gradient(135deg, #f5f5dc 0%, #f0e6d2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
-  border: 2px solid rgba(139, 115, 85, 0.2);
+  box-shadow: 0 10px 30px rgba(139, 115, 85, 0.25);
+  border: 2px solid rgba(139, 115, 85, 0.15);
   position: sticky;
   top: 2rem;
 
@@ -393,7 +396,7 @@
 .checkout-btn {
   width: 100%;
   padding: 1.25rem 2rem;
-  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -405,7 +408,7 @@
   justify-content: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
   transition: all 0.3s ease;
 
   svg {
@@ -415,8 +418,8 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(101, 67, 33, 0.5);
-    background: linear-gradient(135deg, #9d8466 0%, #754d2a 100%);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
   }
 
   &:active {
@@ -428,8 +431,8 @@
   width: 100%;
   padding: 1rem;
   background: white;
-  color: #8B7355;
-  border: 2px solid #8B7355;
+  color: #2196F3;
+  border: 2px solid #2196F3;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
@@ -437,7 +440,8 @@
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(139, 115, 85, 0.1);
+    background: #2196F3;
+    color: white;
   }
 }
 
@@ -472,12 +476,12 @@
 
 // Carrito vacío
 .empty-cart {
-  background: linear-gradient(135deg, #f5f5dc 0%, #f0e6d2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
   border-radius: 20px;
   padding: 4rem 2rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
-  border: 2px solid rgba(139, 115, 85, 0.2);
+  box-shadow: 0 10px 30px rgba(139, 115, 85, 0.25);
+  border: 2px solid rgba(139, 115, 85, 0.15);
 
   svg {
     width: 120px;
@@ -501,7 +505,7 @@
 
   .shop-now-btn {
     padding: 1rem 2.5rem;
-    background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -509,11 +513,12 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(101, 67, 33, 0.5);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+      background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
     }
   }
 }

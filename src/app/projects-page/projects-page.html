@@ -3,46 +3,67 @@
 <main class="projects-page">
   <section class="projects-hero">
     <div class="inner">
-      <h1 class="title">Nuestros Proyectos</h1>
-      <p class="lead">Explora nuestros trabajos realizados por ambiente. Selecciona una categoría para ver los proyectos.</p>
+      <h1 class="title">Our Projects</h1>
+      <p class="lead">Explore our completed works by room. Select a category to view the projects.</p>
     </div>
   </section>
 
   <section class="projects-grid-section">
     <div class="inner">
-      <div class="projects-grid" role="list">
-        <article class="project-card" role="listitem" routerLink="/projects-page/kitchen" tabindex="0" aria-label="Kitchen">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading projects...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage && !isLoading" class="error-container">
+        <p class="error-message">{{ errorMessage }}</p>
+        <button class="retry-button" (click)="retryLoad()">Retry</button>
+      </div>
+
+      <!-- Projects Grid -->
+      <div *ngIf="!isLoading && !errorMessage" class="projects-grid" role="list">
+        <article class="project-card" role="listitem" routerLink="kitchen" tabindex="0" aria-label="Kitchen">
           <div class="media kitchen" aria-hidden="true"></div>
-          <h3 class="project-name">Cocina</h3>
-          <p class="project-desc">Diseños modernos y funcionales</p>
+          <h3 class="project-name">Kitchen</h3>
+          <p class="project-desc">Modern and functional designs</p>
+          <span class="project-count">{{ categoryCounts['kitchen'] }} projects</span>
         </article>
 
-        <article class="project-card" role="listitem" routerLink="/projects-page/bathroom" tabindex="0" aria-label="Bathroom">
+        <article class="project-card" role="listitem" routerLink="bathroom" tabindex="0" aria-label="Bathroom">
           <div class="media bathroom" aria-hidden="true"></div>
-          <h3 class="project-name">Baño</h3>
-          <p class="project-desc">Espacios de confort</p>
+          <h3 class="project-name">Bathroom</h3>
+          <p class="project-desc">Comfort spaces</p>
+          <span class="project-count">{{ categoryCounts['bathroom'] }} projects</span>
         </article>
 
-        <article class="project-card" role="listitem" routerLink="/projects-page/livingroom" tabindex="0" aria-label="Living room">
+        <article class="project-card" role="listitem" routerLink="livingroom" tabindex="0" aria-label="Living room">
           <div class="media livingroom" aria-hidden="true"></div>
-          <h3 class="project-name">Living</h3>
-          <p class="project-desc">Ambientes acogedores</p>
+          <h3 class="project-name">Living Room</h3>
+          <p class="project-desc">Cozy environments</p>
+          <span class="project-count">{{ categoryCounts['livingroom'] }} projects</span>
         </article>
 
-        <article class="project-card" role="listitem" routerLink="/projects-page/bedroom" tabindex="0" aria-label="Bedroom">
+        <article class="project-card" role="listitem" routerLink="bedroom" tabindex="0" aria-label="Bedroom">
           <div class="media bedroom" aria-hidden="true"></div>
-          <h3 class="project-name">Dormitorio</h3>
-          <p class="project-desc">Espacios de descanso</p>
+          <h3 class="project-name">Bedroom</h3>
+          <p class="project-desc">Rest spaces</p>
+          <span class="project-count">{{ categoryCounts['bedroom'] }} projects</span>
         </article>
 
-        <article class="project-card" role="listitem" routerLink="/projects-page/others" tabindex="0" aria-label="Others">
+        <article class="project-card" role="listitem" routerLink="others" tabindex="0" aria-label="Others">
           <div class="media other" aria-hidden="true"></div>
-          <h3 class="project-name">Otros</h3>
-          <p class="project-desc">Muebles personalizados</p>
+          <h3 class="project-name">Others</h3>
+          <p class="project-desc">Custom furniture</p>
+          <span class="project-count">{{ categoryCounts['others'] }} projects</span>
         </article>
       </div>
     </div>
   </section>
+
+  <!-- Outlet para las rutas hijas -->
+  <router-outlet></router-outlet>
 </main>
 
 <app-footer></app-footer>

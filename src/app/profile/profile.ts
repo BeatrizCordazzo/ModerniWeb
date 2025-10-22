@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { Datos } from '../datos';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
@@ -37,36 +39,63 @@ interface FavoriteItem {
 
 @Component({
   selector: 'app-profile',
-  imports: [Nav, Footer, CommonModule, FormsModule],
+  imports: [Nav, Footer, CommonModule, FormsModule, RouterLink],
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
-export class Profile {
+export class Profile implements OnInit {
   activeTab: 'credentials' | 'orders' | 'favorites' = 'credentials';
+  user: User | null = null;
+  originalUser: User | null = null;
+  isLoading = true;
+  notLogged = false;
 
-  user: User = {
-    name: 'Juan Pérez',
-    email: 'juan.perez@email.com',
-    phone: '+54 9 11 1234-5678',
-    address: 'Av. Corrientes 1234, CABA',
-    avatar: 'https://ui-avatars.com/api/?name=Juan+Perez&size=200&background=667eea&color=fff',
-    memberSince: 'Enero 2024'
-  };
+  constructor(private router: Router, private datosService: Datos) {}
+
+  ngOnInit(): void {
+    this.datosService.getLoggedUser().subscribe({
+      next: (user: any) => {
+        if (user && user.email) {
+          this.user = user;
+          this.originalUser = { ...user };
+          this.isLoading = false;
+        } else {
+          this.notLogged = true;
+          this.isLoading = false;
+        }
+      },
+      error: () => {
+        this.notLogged = true;
+        this.isLoading = false;
+      }
+    });
+  }
+
+  hasChanges(): boolean {
+    return !!(this.user && this.originalUser && JSON.stringify(this.user) !== JSON.stringify(this.originalUser));
+  }
+
+  saveChanges(): void {
+    if (this.user) {
+      this.originalUser = { ...this.user };
+      console.log('Changes saved:', this.user);
+    }
+  }
 
   orders: Order[] = [
     {
       id: 1001,
-      date: '15 de Octubre, 2025',
+      date: 'October 15, 2025',
       status: 'delivered',
       items: [
         {
-          name: 'Mesa de Comedor Moderna',
+          name: 'Modern Dining Table',
           quantity: 1,
           price: 45000,
           image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=200'
         },
         {
-          name: 'Sillas (Set de 6)',
+          name: 'Chairs (Set of 6)',
           quantity: 1,
           price: 32000,
           image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=200'
@@ -76,11 +105,11 @@ export class Profile {
     },
     {
       id: 1002,
-      date: '10 de Octubre, 2025',
+      date: 'October 10, 2025',
       status: 'processing',
       items: [
         {
-          name: 'Escritorio de Oficina',
+          name: 'Office Desk',
           quantity: 1,
           price: 28000,
           image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=200'
@@ -93,19 +122,19 @@ export class Profile {
   favorites: FavoriteItem[] = [
     {
       id: 1,
-      name: 'Sillón Escandinavo',
+      name: 'Scandinavian Armchair',
       price: 35000,
       image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300'
     },
     {
       id: 2,
-      name: 'Lámpara de Pie',
+      name: 'Floor Lamp',
       price: 12000,
       image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300'
     },
     {
       id: 3,
-      name: 'Estantería Modular',
+      name: 'Modular Shelving',
       price: 42000,
       image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=300'
     }
@@ -113,10 +142,10 @@ export class Profile {
 
   getStatusText(status: string): string {
     const statusMap: { [key: string]: string } = {
-      'pending': 'Pendiente',
-      'processing': 'En Proceso',
-      'shipped': 'Enviado',
-      'delivered': 'Entregado'
+      'pending': 'Pending',
+      'processing': 'Processing',
+      'shipped': 'Shipped',
+      'delivered': 'Delivered'
     };
     return statusMap[status] || status;
   }

@@ -1,11 +1,11 @@
 .contact-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+  background: linear-gradient(135deg, #f5f5dc 0%, #e8dcc8 100%);
 }
 
 .contact-hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-              url('https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1200');
+  background: linear-gradient(rgba(139, 115, 85, 0.85), rgba(101, 67, 33, 0.85)), 
+              url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200');
   background-size: cover;
   background-position: center;
   padding: 6rem 2rem 4rem;
@@ -53,7 +53,7 @@
     text-align: center;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #f5f5dc;
+    color: #5d4037;
     margin-bottom: 2rem;
 
     @media (max-width: 768px) {
@@ -256,7 +256,7 @@
   .submit-btn {
     width: 100%;
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
     color: white;
     border: none;
     border-radius: 10px;
@@ -269,27 +269,34 @@
     gap: 0.5rem;
     margin-top: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 
     svg {
       width: 24px;
       height: 24px;
     }
 
-    &:hover {
+    &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(101, 67, 33, 0.5);
-      background: linear-gradient(135deg, #9d8466 0%, #754d2a 100%);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+      background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
     }
 
-    &:active {
+    &:active:not(:disabled) {
       transform: translateY(0);
+    }
+
+    &:disabled {
+      background: linear-gradient(135deg, #c8c8c8 0%, #a8a8a8 100%);
+      cursor: not-allowed;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      opacity: 0.6;
     }
   }
 }
 
 .success-message {
-  background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 10px;
@@ -297,7 +304,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 4px 15px rgba(101, 67, 33, 0.4);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
   animation: slideIn 0.3s ease-out;
 
   svg {

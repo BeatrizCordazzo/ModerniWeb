@@ -1,0 +1,50 @@
+<section class="preview-section">
+  <div class="preview-container">
+    <div class="preview-header">
+      <h2 class="preview-title">Our Services</h2>
+      <p class="preview-subtitle">Explore our range of interior design services</p>
+    </div>
+    
+    <div class="carousel-navigation">
+      <button 
+        class="carousel-arrow left" 
+        (click)="scrollLeft()"
+        aria-label="Scroll left"
+        [disabled]="!canScrollLeft">
+        <span>‹</span>
+      </button>
+      
+      <div class="carousel-wrapper" #carouselWrapper (scroll)="onScroll()">
+        <div class="carousel-container">
+          <article 
+            class="service-card" 
+            *ngFor="let service of services"
+            (click)="navigateToService(service.route)"
+            (keypress.enter)="navigateToService(service.route)"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'View ' + service.title + ' services'">
+            <div class="service-image">
+              <img [src]="service.image" [alt]="service.title">
+              <div class="service-overlay">
+                <span class="view-more-text">View Details</span>
+              </div>
+            </div>
+            <div class="service-content">
+              <h3>{{service.title}}</h3>
+              <p>{{service.description}}</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      
+      <button 
+        class="carousel-arrow right" 
+        (click)="scrollRight()"
+        aria-label="Scroll right"
+        [disabled]="!canScrollRight">
+        <span>›</span>
+      </button>
+    </div>
+  </div>
+</section>

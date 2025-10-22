@@ -1,1 +1,226 @@
-<p>kitchen works!</p>
+<section class="projects-category">
+  <div class="container">
+    <div class="category-header">
+      <h2 class="category-title">Kitchen Projects</h2>
+      <p class="category-subtitle">Explore our completed kitchen renovations and designs</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading kitchen projects...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <p class="error-message">{{ errorMessage }}</p>
+      <button class="retry-button" (click)="retryLoad()">Retry</button>
+    </div>
+
+    <!-- Projects Grid -->
+    <div *ngIf="!isLoading && !errorMessage && projects.length > 0" class="projects-grid">
+      <article *ngFor="let project of projects" class="project-card" (click)="viewProject(project)">
+        <div class="project-image">
+          <img [src]="project.imagenes[0]" [alt]="project.titulo" loading="lazy">
+          <span *ngIf="project.destacado" class="featured-badge">Featured</span>
+        </div>
+        <div class="project-content">
+          <h3 class="project-title">{{ project.titulo }}</h3>
+          <p class="project-location">{{ project.ubicacion }}</p>
+          <p class="project-style">{{ project.estilo }}</p>
+          <div class="project-meta">
+            <span class="meta-item"><i>📅</i> {{ project.fecha_completado | date: 'MMM yyyy' }}</span>
+            <span class="meta-item"><i>📐</i> {{ project.area_m2 }}m²</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !errorMessage && projects.length === 0" class="empty-state">
+      <p>No kitchen projects available at the moment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Project Detail Modal -->
+<div *ngIf="selectedProject" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeModal()">&times;</button>
+    
+    <div class="modal-images">
+      <img *ngFor="let imagen of selectedProject.imagenes" [src]="imagen" [alt]="selectedProject.titulo" loading="lazy">
+    </div>
+
+    <div class="modal-details">
+      <!-- Header Section -->
+      <div class="modal-header-section">
+        <h2 class="modal-title">{{ selectedProject.titulo }}</h2>
+        <span *ngIf="selectedProject.destacado" class="featured-tag">⭐ Proyecto Destacado</span>
+      </div>
+      
+      <p class="modal-description">{{ selectedProject.descripcion }}</p>
+
+      <!-- Quick Stats Cards -->
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <span class="stat-label">Completado</span>
+            <span class="stat-value">{{ selectedProject.fecha_completado | date: 'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-content">
+            <span class="stat-label">Duración</span>
+            <span class="stat-value">{{ selectedProject.duracion_dias }} días</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📐</div>
+          <div class="stat-content">
+            <span class="stat-label">Área Total</span>
+            <span class="stat-value">{{ selectedProject.area_m2 }} m²</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎨</div>
+          <div class="stat-content">
+            <span class="stat-label">Estilo</span>
+            <span class="stat-value">{{ selectedProject.estilo }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client & Location Info -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <span class="title-icon">👤</span>
+          Información del Cliente
+        </h3>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-label">Cliente</div>
+            <div class="info-value">{{ selectedProject.cliente }}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">Ubicación</div>
+            <div class="info-value">📍 {{ selectedProject.ubicacion }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Section -->
+      <div class="timeline-section">
+        <h3 class="section-title">
+          <span class="title-icon">📊</span>
+          Detalles del Proyecto
+        </h3>
+        <div class="timeline-items">
+          <div class="timeline-item">
+            <div class="timeline-marker">🚀</div>
+            <div class="timeline-content">
+              <strong>Inicio del Proyecto</strong>
+              <span>{{ getStartDate(selectedProject.fecha_completado, selectedProject.duracion_dias) | date: 'dd MMMM yyyy' }}</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">🔨</div>
+            <div class="timeline-content">
+              <strong>Fase de Ejecución</strong>
+              <span>{{ selectedProject.duracion_dias }} días de trabajo intensivo</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">✅</div>
+            <div class="timeline-content">
+              <strong>Finalización</strong>
+              <span>{{ selectedProject.fecha_completado | date: 'dd MMMM yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials Section -->
+      <div class="materials-section">
+        <h3 class="section-title">
+          <span class="title-icon">🛠️</span>
+          Materiales Utilizados
+        </h3>
+        <p class="section-subtitle">Materiales premium seleccionados cuidadosamente para este proyecto</p>
+        <ul class="materials-list">
+          <li *ngFor="let material of selectedProject.materiales">{{ material }}</li>
+        </ul>
+      </div>
+
+      <!-- Technical Specs -->
+      <div class="specs-section">
+        <h3 class="section-title">
+          <span class="title-icon">📋</span>
+          Especificaciones Técnicas
+        </h3>
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-icon">📏</div>
+            <div class="spec-details">
+              <span class="spec-label">Dimensiones</span>
+              <span class="spec-value">{{ selectedProject.area_m2 }} metros cuadrados</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-icon">🎯</div>
+            <div class="spec-details">
+              <span class="spec-label">Categoría</span>
+              <span class="spec-value">{{ getCategoryName(selectedProject.categoria) }}</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-icon">⚡</div>
+            <div class="spec-details">
+              <span class="spec-label">Tiempo de Instalación</span>
+              <span class="spec-value">{{ selectedProject.duracion_dias }} días laborables</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-icon">🌟</div>
+            <div class="spec-details">
+              <span class="spec-label">Estado</span>
+              <span class="spec-value">Completado y Entregado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget Section -->
+      <div class="budget-section">
+        <h3 class="section-title">
+          <span class="title-icon">💰</span>
+          Inversión del Proyecto
+        </h3>
+        <div class="budget-card">
+          <div class="budget-details">
+            <div class="budget-label">Presupuesto Total Invertido</div>
+            <div class="budget-breakdown">
+              <span class="budget-note">Incluye materiales, mano de obra e instalación</span>
+            </div>
+          </div>
+          <div class="budget-amount">{{ selectedProject.presupuesto | currency: 'EUR' }}</div>
+        </div>
+        <div class="budget-note-footer">
+          <p>💡 <strong>Nota:</strong> Este presupuesto es orientativo y corresponde a un proyecto real. Cada proyecto es único y el costo puede variar según especificaciones y materiales seleccionados.</p>
+        </div>
+      </div>
+
+      <!-- Call to Action -->
+      <div class="cta-section">
+        <h3 class="cta-title">¿Te gustaría un proyecto similar?</h3>
+        <p class="cta-text">Nuestro equipo puede crear un diseño personalizado para tu espacio</p>
+        <div class="cta-buttons">
+          <button class="cta-button primary" (click)="closeModal()">Solicitar Presupuesto</button>
+          <button class="cta-button secondary" (click)="closeModal()">Contactar Ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

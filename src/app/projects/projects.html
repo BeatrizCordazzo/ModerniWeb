@@ -1,9 +1,15 @@
-<div class="projects-container">
-  <mat-card class="project-card" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>Modern Kitchen</mat-card-title>
-      <mat-card-subtitle>Interior Design</mat-card-subtitle>
-    </mat-card-header>
+<div class="projects-section">
+  <div class="projects-header">
+    <h2 class="projects-title">Some of Our Projects</h2>
+    <p class="projects-subtitle">Discover our latest interior design work</p>
+  </div>
+  
+  <div class="projects-container">
+    <mat-card class="project-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Modern Kitchen</mat-card-title>
+        <mat-card-subtitle>Interior Design</mat-card-subtitle>
+      </mat-card-header>
     <img mat-card-image src="cocina.jpg" alt="Modern kitchen with contemporary design">
     <mat-card-content>
       <p>
@@ -12,7 +18,7 @@
       </p>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-button>VIEW MORE</button>
+      <button mat-button routerLink="/projects-page">VIEW MORE</button>
       <button mat-button routerLink="/contact">CONTACT</button>
     </mat-card-actions>
   </mat-card>
@@ -30,7 +36,7 @@
       </p>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-button>VIEW MORE</button>
+      <button mat-button routerLink="/projects-page">VIEW MORE</button>
       <button mat-button routerLink="/contact">CONTACT</button>
     </mat-card-actions>
   </mat-card>
@@ -48,8 +54,9 @@
       </p>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-button>VIEW MORE</button>
+      <button mat-button routerLink="/projects-page">VIEW MORE</button>
       <button mat-button routerLink="/contact">CONTACT</button>
     </mat-card-actions>
   </mat-card>
+  </div>
 </div>

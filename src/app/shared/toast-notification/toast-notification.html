@@ -1,0 +1,18 @@
+<div class="toast-container" 
+     [class.visible]="isVisible"
+     [class.exiting]="isExiting"
+     [class.success]="type === 'success'"
+     [class.error]="type === 'error'"
+     [class.info]="type === 'info'"
+     [class.warning]="type === 'warning'">
+  <div class="toast-icon">
+    <span *ngIf="type === 'success'">✓</span>
+    <span *ngIf="type === 'error'">✕</span>
+    <span *ngIf="type === 'info'">ℹ</span>
+    <span *ngIf="type === 'warning'">⚠</span>
+  </div>
+  <div class="toast-message">{{ message }}</div>
+  <button class="toast-close" (click)="hide()" aria-label="Close notification">
+    <span>×</span>
+  </button>
+</div>

@@ -11,35 +11,38 @@
   <section class="services-grid-section">
     <div class="inner">
       <div class="services-grid" role="list">
-        <article class="service-card" role="listitem" tabindex="0" aria-label="Kitchen">
+        <article class="service-card" role="listitem" tabindex="0" aria-label="Kitchen" routerLink="kitchen">
           <div class="media kitchen" aria-hidden="true"></div>
           <h3 class="service-name">Kitchen</h3>
         </article>
 
-        <article class="service-card" role="listitem" tabindex="0" aria-label="Bathroom">
+        <article class="service-card" role="listitem" tabindex="0" aria-label="Bathroom" routerLink="bathroom">
           <div class="media bathroom" aria-hidden="true"></div>
           <h3 class="service-name">Bathroom</h3>
         </article>
 
-        <article class="service-card" role="listitem" tabindex="0" aria-label="Living room">
+        <article class="service-card" role="listitem" tabindex="0" aria-label="Living room" routerLink="livingroom">
           <div class="media livingroom" aria-hidden="true"></div>
           <h3 class="service-name">Living room</h3>
         </article>
 
-        <article class="service-card" role="listitem" tabindex="0" aria-label="Bedroom">
+        <article class="service-card" role="listitem" tabindex="0" aria-label="Bedroom" routerLink="bedroom">
           <div class="media bedroom" aria-hidden="true"></div>
           <h3 class="service-name">Bedroom</h3>
         </article>
 
-        <article class="service-card" role="listitem" tabindex="0" aria-label="Other">
+        <article class="service-card" role="listitem" tabindex="0" aria-label="Other" routerLink="others">
           <div class="media other" aria-hidden="true"></div>
           <h3 class="service-name">Other (single piece)</h3>
         </article>
       </div>
 
-      <p class="note">Tip: Use keyboard to navigate (Tab) and Enter to select — behaviour will be added later.</p>
+      <p class="note">Tip: Click on any service to view details.</p>
     </div>
   </section>
+
+  <!-- Outlet para las rutas hijas -->
+  <router-outlet></router-outlet>
 </main>
 
 <app-footer></app-footer>
