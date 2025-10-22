@@ -13,7 +13,7 @@
       <h2>Debes iniciar sesión para ver tu perfil</h2>
       <p>Por favor, inicia sesión o regístrate para acceder a tu perfil y pedidos.</p>
       <div class="not-logged-actions">
-        <a routerLink="/login" class="login-btn">Iniciar Sesión</a>
+        <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesión</a>
         <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
       </div>
     </div>
@@ -34,6 +34,9 @@
           <h1>{{user.name}}</h1>
           <p class="user-email">{{user.email}}</p>
           <p class="member-since">Member since {{user.memberSince}}</p>
+          <div class="profile-actions">
+            <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
+          </div>
         </div>
       </section>
 

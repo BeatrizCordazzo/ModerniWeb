@@ -52,6 +52,28 @@ export class Profile implements OnInit {
 
   constructor(private router: Router, private datosService: Datos) {}
 
+  logout(): void {
+    // Call backend to clear cookie/session
+    this.datosService.logout().subscribe({
+      next: (res: any) => {
+        console.log('Logout response:', res);
+      },
+      error: (err) => {
+        console.warn('Error during logout request:', err);
+      },
+      complete: () => {
+        // Clear client-side stored user data
+        try { localStorage.removeItem('loggedUser'); } catch (e) { /* ignore */ }
+        this.user = null;
+        this.originalUser = null;
+        this.notLogged = true;
+        this.isLoading = false;
+        // Optionally navigate to profile root to refresh UI
+        this.router.navigate(['/profile']);
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.datosService.getLoggedUser().subscribe({
       next: (user: any) => {
@@ -65,6 +87,29 @@ export class Profile implements OnInit {
         }
       },
       error: () => {
+        // Try fallback to localStorage if server-side check fails
+        try {
+          const stored = localStorage.getItem('loggedUser');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            // Map backend field names to frontend User interface if needed
+            this.user = {
+              name: parsed.nombre || parsed.name || '',
+              email: parsed.email || '',
+              phone: parsed.telefono || parsed.phone || '',
+              address: parsed.direccion || parsed.address || '',
+              avatar: parsed.avatar || '',
+              memberSince: parsed.fecha_registro || parsed.memberSince || ''
+            };
+            this.originalUser = { ...this.user };
+            this.isLoading = false;
+            this.notLogged = false;
+            return;
+          }
+        } catch (e) {
+          console.warn('Error leyendo loggedUser desde localStorage:', e);
+        }
+
         this.notLogged = true;
         this.isLoading = false;
       }

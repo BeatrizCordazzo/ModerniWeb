@@ -77,6 +77,10 @@ export class Datos {
     return this.http.post(this.url + 'signup.php', signupData)
   }
 
+  logout(): Observable<any> {
+    return this.http.post(this.url + 'logout.php', {}, { withCredentials: true });
+  }
+
   // Get all products or filter by category
   getProducts(category?: string): Observable<Product[]> {
     let endpoint = this.url + 'get_products.php';

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -24,14 +24,33 @@ import { Datos } from '../datos';
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
-export class Login {
+export class Login implements OnInit {
   loginForm: FormGroup;
   hidePassword = true;
+  returnUrl: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router, private datosService: Datos) {
+  constructor(private fb: FormBuilder, private router: Router, private datosService: Datos, private route: ActivatedRoute) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
+    });
+  }
+
+  ngOnInit(): void {
+    // Read optional returnUrl query param (e.g. /login?returnUrl=/profile)
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
+    // If user already logged in, redirect immediately to returnUrl or profile
+    this.datosService.getLoggedUser().subscribe({
+      next: (user: any) => {
+        if (user && user.email) {
+          const dest = this.returnUrl || '/profile';
+          this.router.navigate([dest]);
+        }
+      },
+      error: () => {
+        // ignore errors here; user will see login form
+      }
     });
   }
 
@@ -44,8 +63,45 @@ export class Login {
         next: (response: any) => {
           if (response.success) {
             console.log('Login exitoso:', response.mensaje);
-            // Navigate to home page after successful login
-            this.router.navigate(['']);
+            // Confirm the server-side cookie/session by requesting the logged user
+            // If backend returned user in the login response, store it locally for immediate use
+            if ((response as any).user) {
+              try {
+                localStorage.setItem('loggedUser', JSON.stringify((response as any).user));
+              } catch (e) {
+                console.warn('No se pudo guardar usuario en localStorage:', e);
+              }
+            }
+
+            // Try to validate server-side session; if it fails, fallback to localStorage data
+            this.datosService.getLoggedUser().subscribe({
+              next: (user: any) => {
+                if (user && user.email) {
+                  const dest = this.returnUrl || '/profile';
+                  this.router.navigate([dest]);
+                } else {
+                  // Fallback to localStorage
+                  const stored = localStorage.getItem('loggedUser');
+                  if (stored) {
+                    const dest = this.returnUrl || '/profile';
+                    this.router.navigate([dest]);
+                  } else {
+                    alert('Inicio de sesión registrado, pero no se pudo validar la sesión en el servidor. Intenta recargar.');
+                  }
+                }
+              },
+              error: (err) => {
+                console.error('Error validando sesión tras login:', err);
+                // On error, try localStorage fallback
+                const stored = localStorage.getItem('loggedUser');
+                if (stored) {
+                  const dest = this.returnUrl || '/profile';
+                  this.router.navigate([dest]);
+                } else {
+                  alert('Inicio de sesión registrado, pero no se pudo validar la sesión. Intenta recargar la página.');
+                }
+              }
+            });
           } else {
             console.error('Error en login:', response.mensaje);
             alert(response.mensaje);

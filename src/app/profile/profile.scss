@@ -616,3 +616,30 @@
     }
   }
 }
+
+/* Logout button styles */
+.profile-actions {
+  margin-top: 0.75rem;
+
+  .logout-btn {
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(229, 57, 53, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(198, 40, 40, 0.35);
+    }
+
+    &:active {
+      transform: translateY(0);
+      opacity: 0.95;
+    }
+  }
+}
