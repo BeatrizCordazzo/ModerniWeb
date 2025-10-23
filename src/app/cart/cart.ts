@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { CartService, SimpleCartItem } from '../shared/cart.service';
+import { Subscription } from 'rxjs';
 
 interface CartItem {
   id: number;
@@ -25,36 +27,23 @@ export class Cart {
   shippingCost = 5000;
   discount = 0;
   couponCode = '';
+  cartItems: CartItem[] = [];
+  private sub: Subscription | null = null;
 
-  cartItems: CartItem[] = [
-    {
-      id: 1,
-      name: 'Modern Dining Table',
-      description: 'Solid wood table with minimalist design',
-      category: 'Dining Room',
-      price: 45000,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=300'
-    },
-    {
-      id: 2,
-      name: 'Scandinavian Armchair',
-      description: 'Nordic style armchair with premium upholstery',
-      category: 'Living Room',
-      price: 35000,
-      quantity: 2,
-      image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300'
-    },
-    {
-      id: 3,
-      name: 'Modern Floor Lamp',
-      description: 'Adjustable LED lighting with contemporary design',
-      category: 'Lighting',
-      price: 12000,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300'
-    }
-  ];
+  constructor(private cartService: CartService) {
+    this.sub = this.cartService.items$.subscribe(items => {
+      // Map SimpleCartItem to CartItem used by template
+      this.cartItems = items.map((it, idx) => ({
+        id: idx,
+        name: it.name,
+        description: it.description || '',
+        category: '',
+        price: it.price,
+        quantity: it.quantity || 1,
+        image: it.image
+      }));
+    });
+  }
 
   getTotalItems(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -71,28 +60,29 @@ export class Cart {
   }
 
   increaseQuantity(itemId: number): void {
-    const item = this.cartItems.find(i => i.id === itemId);
+    const idx = itemId;
+    const item = this.cartItems[idx];
     if (item && item.quantity < 99) {
-      item.quantity++;
+      this.cartService.updateQuantity(idx, item.quantity + 1);
     }
   }
 
   decreaseQuantity(itemId: number): void {
-    const item = this.cartItems.find(i => i.id === itemId);
+    const idx = itemId;
+    const item = this.cartItems[idx];
     if (item && item.quantity > 1) {
-      item.quantity--;
+      this.cartService.updateQuantity(idx, item.quantity - 1);
     }
   }
 
   updateQuantity(itemId: number, newQuantity: number): void {
-    const item = this.cartItems.find(i => i.id === itemId);
-    if (item) {
-      item.quantity = Math.max(1, Math.min(99, newQuantity));
-    }
+    const idx = itemId;
+    this.cartService.updateQuantity(idx, newQuantity);
   }
 
   removeItem(itemId: number): void {
-    this.cartItems = this.cartItems.filter(item => item.id !== itemId);
+    const idx = itemId;
+    this.cartService.removeItem(idx);
   }
 
   applyCoupon(): void {
@@ -112,5 +102,10 @@ export class Cart {
     console.log('Proceeding to checkout...');
     alert('Redirecting to checkout!');
     // Checkout logic would go here
+  }
+
+  // Cleanup subscription if component destroyed
+  ngOnDestroy(): void {
+    if (this.sub) this.sub.unsubscribe();
   }
 }

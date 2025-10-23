@@ -354,3 +354,11 @@
   [message]="toastMessage"
   type="success">
 </app-toast-notification>
+
+<!-- Custom Order Confirmation Modal -->
+<app-custom-order-confirmation-modal
+  [isOpen]="showCustomModal"
+  [order]="customOrderData"
+  (confirm)="confirmSendCustomOrder()"
+  (cancel)="closeCustomModal()">
+</app-custom-order-confirmation-modal>

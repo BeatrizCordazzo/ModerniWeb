@@ -348,6 +348,14 @@
   (cancel)="closeModal()">
 </app-cart-confirmation-modal>
 
+<!-- Custom Order Confirmation Modal -->
+<app-custom-order-confirmation-modal
+  [isOpen]="showCustomModal"
+  [order]="customOrderData"
+  (confirm)="confirmSendCustomOrder()"
+  (cancel)="closeCustomModal()">
+</app-custom-order-confirmation-modal>
+
 <!-- Toast Notification -->
 <app-toast-notification
   *ngIf="showToast"

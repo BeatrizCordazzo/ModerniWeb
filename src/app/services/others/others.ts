@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
 import { Datos, Product as ApiProduct, Color } from '../../datos';
+import { CartService } from '../../shared/cart.service';
+import { Router } from '@angular/router';
 
 interface FurnitureCategory {
   id: string;
@@ -76,7 +78,7 @@ export class Others implements OnInit {
   // Available filter options
   allColors: string[] = [];
 
-  constructor(private datosService: Datos) {}
+  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
 
   ngOnInit() {
     this.loadProducts();
@@ -235,19 +237,50 @@ export class Others implements OnInit {
     if (this.modalItem) {
       this.currentProductName = this.modalItem.name;
       console.log('Adding to cart:', this.modalItem);
-      // TODO: Implement actual cart functionality
-      
-      // Close modal first
-      this.closeModal();
-      
-      // Show success toast
-      this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
-      this.showToast = true;
-      
-      // Reset toast after it's shown
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3500);
+      this.datosService.getLoggedUser().subscribe({
+        next: (user) => {
+          const isLogged = user && user.email;
+          if (isLogged) {
+            this.cartService.addItem({
+              name: this.modalItem!.name,
+              description: this.modalItem!.description,
+              price: this.modalItem!.price,
+              image: this.modalItem!.image,
+              selectedColor: this.modalItem!.selectedColor
+            });
+            this.closeModal();
+            this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
+            this.showToast = true;
+            setTimeout(() => { this.showToast = false; }, 3500);
+          } else {
+            this.closeModal();
+            alert('You must be logged in to add items to the cart. Please log in first.');
+            try { this.router.navigate(['/login']); } catch (e) {}
+          }
+        },
+        error: () => {
+          try {
+            const raw = localStorage.getItem('loggedUser');
+            if (raw) {
+              this.cartService.addItem({
+                name: this.modalItem!.name,
+                description: this.modalItem!.description,
+                price: this.modalItem!.price,
+                image: this.modalItem!.image,
+                selectedColor: this.modalItem!.selectedColor
+              });
+              this.closeModal();
+              this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
+              this.showToast = true;
+              setTimeout(() => { this.showToast = false; }, 3500);
+              return;
+            }
+          } catch (e) { /* ignore */ }
+          this.closeModal();
+          alert('You must be logged in to add items to the cart. Please log in first.');
+          try { this.router.navigate(['/login']); } catch (e) {}
+        }
+      });
     }
   }
 

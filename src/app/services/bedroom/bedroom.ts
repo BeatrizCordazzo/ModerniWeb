@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
+import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirmation-modal/custom-order-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
 import { Datos, Product as ApiProduct, Color } from '../../datos';
+import { CartService } from '../../shared/cart.service';
+import { Router } from '@angular/router';
 
 interface BedroomSet {
   id: number;
@@ -47,7 +50,7 @@ interface CustomSelection {
 
 @Component({
   selector: 'app-bedroom',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification],
+  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal],
   templateUrl: './bedroom.html',
   styleUrl: './bedroom.scss'
 })
@@ -60,6 +63,9 @@ export class Bedroom implements OnInit {
   showToast = false;
   toastMessage = '';
   currentProductName = '';
+  // Custom order modal state
+  showCustomModal = false;
+  customOrderData: any = null;
   
   // Loading state
   isLoading = true;
@@ -67,7 +73,7 @@ export class Bedroom implements OnInit {
   
   bedroomSets: BedroomSet[] = [];
 
-  constructor(private datosService: Datos) {}
+  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
 
   ngOnInit() {
     this.loadBedroomSets();
@@ -323,13 +329,30 @@ export class Bedroom implements OnInit {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Sending custom order to carpenters:', orderData);
-    alert(`Custom bedroom order sent to our carpenters!\n\nTotal: $${this.getTotalCustomPrice().toFixed(2)}\n\nOur team will contact you within 24 hours.`);
-    
+    // open confirmation modal with order details
+    this.customOrderData = orderData;
+    this.showCustomModal = true;
+  }
+
+  confirmSendCustomOrder(): void {
+    if (!this.customOrderData) return;
+    console.log('Sending custom order to carpenters:', this.customOrderData);
+    this.toastMessage = `Custom bedroom order sent! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 3500);
+
+    // reset
     this.customSelections = [];
     this.customSpaceWidth = 0;
     this.customSpaceHeight = 0;
     this.customSpaceDepth = 0;
+
+    this.closeCustomModal();
+  }
+
+  closeCustomModal(): void {
+    this.showCustomModal = false;
+    this.customOrderData = null;
   }
 
   addSetToCart() {
@@ -374,19 +397,50 @@ export class Bedroom implements OnInit {
     if (this.modalItem) {
       this.currentProductName = this.modalItem.name;
       console.log('Adding to cart:', this.modalItem);
-      // TODO: Implement actual cart functionality
-      
-      // Close modal first
-      this.closeModal();
-      
-      // Show success toast
-      this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
-      this.showToast = true;
-      
-      // Reset toast after it's shown
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3500);
+      this.datosService.getLoggedUser().subscribe({
+        next: (user) => {
+          const isLogged = user && user.email;
+          if (isLogged) {
+            this.cartService.addItem({
+              name: this.modalItem!.name,
+              description: this.modalItem!.description,
+              price: this.modalItem!.price,
+              image: this.modalItem!.image,
+              selectedColor: this.modalItem!.selectedColor
+            });
+            this.closeModal();
+            this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
+            this.showToast = true;
+            setTimeout(() => { this.showToast = false; }, 3500);
+          } else {
+            this.closeModal();
+            alert('You must be logged in to add items to the cart. Please log in first.');
+            try { this.router.navigate(['/login']); } catch (e) {}
+          }
+        },
+        error: () => {
+          try {
+            const raw = localStorage.getItem('loggedUser');
+            if (raw) {
+              this.cartService.addItem({
+                name: this.modalItem!.name,
+                description: this.modalItem!.description,
+                price: this.modalItem!.price,
+                image: this.modalItem!.image,
+                selectedColor: this.modalItem!.selectedColor
+              });
+              this.closeModal();
+              this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
+              this.showToast = true;
+              setTimeout(() => { this.showToast = false; }, 3500);
+              return;
+            }
+          } catch (e) { /* ignore */ }
+          this.closeModal();
+          alert('You must be logged in to add items to the cart. Please log in first.');
+          try { this.router.navigate(['/login']); } catch (e) {}
+        }
+      });
     }
   }
 
