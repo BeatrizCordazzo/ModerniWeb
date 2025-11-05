@@ -26,6 +26,15 @@ interface Product {
   inStock: boolean;
 }
 
+type ModalCartItem = CartItem & {
+  id?: number;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    depth?: string;
+  } | null;
+};
+
 @Component({
   selector: 'app-others',
   imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification],
@@ -35,7 +44,10 @@ interface Product {
 export class Others implements OnInit {
   // Modal state
   showModal = false;
-  modalItem: CartItem | null = null;
+  modalItem: ModalCartItem | null = null;
+  modalAdminMode = false;
+  isAdmin = false;
+  modalProductId: number | null = null;
   selectedProductColors: { [productId: number]: number } = {};
   
   // Toast notification state
@@ -82,6 +94,13 @@ export class Others implements OnInit {
 
   ngOnInit() {
     this.loadProducts();
+    this.datosService.getLoggedUser().subscribe({
+      next: (u: any) => {
+        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
+      },
+      error: () => { this.isAdmin = false; }
+    });
   }
 
   loadProducts() {
@@ -217,9 +236,11 @@ export class Others implements OnInit {
     
     // Get selected color or default to first color
     const colorIndex = this.selectedProductColors[product.id] ?? 0;
-    const selectedColor = product.colors[colorIndex];
-    
+    const selectedColor = product.colors?.[colorIndex] || product.colors?.[0] || { name: 'Default', code: '#000000' };
+
+    this.modalProductId = product.id;
     this.modalItem = {
+      id: product.id,
       name: product.name,
       description: product.description,
       price: product.price,
@@ -227,9 +248,10 @@ export class Others implements OnInit {
       selectedColor: {
         name: selectedColor.name,
         code: selectedColor.code
-      }
+      },
+      dimensions: (product as any).dimensions ?? null
     };
-    
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -246,7 +268,8 @@ export class Others implements OnInit {
               description: this.modalItem!.description,
               price: this.modalItem!.price,
               image: this.modalItem!.image,
-              selectedColor: this.modalItem!.selectedColor
+              selectedColor: this.modalItem!.selectedColor,
+              dimensions: (this.modalItem as any).dimensions || null
             });
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -267,7 +290,8 @@ export class Others implements OnInit {
                 description: this.modalItem!.description,
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
-                selectedColor: this.modalItem!.selectedColor
+                selectedColor: this.modalItem!.selectedColor,
+                dimensions: (this.modalItem as any).dimensions || null
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -287,6 +311,76 @@ export class Others implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.modalItem = null;
+    this.modalProductId = null;
+  }
+
+  saveModified(edited: any) {
+    if (!edited) return;
+
+    this.modalItem = { ...(this.modalItem ?? {}), ...edited } as ModalCartItem;
+    this.showModal = false;
+
+    const targetId = this.modalProductId;
+    if (targetId == null) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const idx = this.allProducts.findIndex(p => p.id === targetId);
+    if (idx === -1) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const current = this.allProducts[idx];
+    let updatedPrice = current.price;
+    if (edited.price !== undefined && edited.price !== null && edited.price !== '') {
+      const parsedPrice = Number(edited.price);
+      if (!Number.isNaN(parsedPrice)) {
+        updatedPrice = parsedPrice;
+      }
+    }
+    if (this.modalItem) {
+      this.modalItem.price = updatedPrice;
+    }
+    const updatedProduct: Product = {
+      ...current,
+      name: edited.name ?? current.name,
+      price: updatedPrice,
+      image: edited.image ?? current.image
+    };
+    this.allProducts[idx] = updatedProduct;
+    this.applyFilters();
+
+    const payload: any = {
+      id: updatedProduct.id,
+      name: updatedProduct.name,
+      price: updatedProduct.price,
+      image: updatedProduct.image
+    };
+
+    if (edited.dimensions) {
+      payload.dimensions = edited.dimensions;
+    }
+
+    console.log('Others.saveModified: calling updateProduct with payload', payload);
+    this.datosService.updateProduct(payload).subscribe({
+      next: () => {
+        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 2000);
+      },
+      error: (err) => {
+        console.error('Error updating product', err);
+        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 4000);
+      }
+    });
   }
 
   addToCart(product: Product) {

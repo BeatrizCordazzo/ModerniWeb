@@ -3,7 +3,7 @@ import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CartService, SimpleCartItem } from '../shared/cart.service';
 import { Subscription } from 'rxjs';
 
@@ -30,7 +30,7 @@ export class Cart {
   cartItems: CartItem[] = [];
   private sub: Subscription | null = null;
 
-  constructor(private cartService: CartService) {
+  constructor(private cartService: CartService, private router: Router) {
     this.sub = this.cartService.items$.subscribe(items => {
       // Map SimpleCartItem to CartItem used by template
       this.cartItems = items.map((it, idx) => ({
@@ -99,9 +99,8 @@ export class Cart {
   }
 
   proceedToCheckout(): void {
-    console.log('Proceeding to checkout...');
-    alert('Redirecting to checkout!');
-    // Checkout logic would go here
+    // Navigate to a dedicated checkout / payment page
+    this.router.navigate(['/checkout']);
   }
 
   // Cleanup subscription if component destroyed

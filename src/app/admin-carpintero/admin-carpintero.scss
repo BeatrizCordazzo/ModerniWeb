@@ -1,0 +1,75 @@
+.admin-container {
+  padding: 1.25rem 2.5rem;
+  background: #f5f7fb;
+  min-height: calc(100vh - 120px);
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.admin-header h1 { margin: 0; font-size: 1.5rem; color: #222; }
+.controls { display:flex; gap:0.5rem; align-items:center; }
+
+.btn { padding: 0.45rem 0.75rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+.btn-ghost { background: transparent; border: 1px solid #ddd; color: #333; }
+.btn-primary { background: #1565c0; color: #fff; }
+.btn-accept { background: #2e7d32; color: #fff; }
+.btn-reject { background: #c62828; color: #fff; }
+
+.panel { background: linear-gradient(180deg,#fff,#fbfdff); padding: 1rem; border-radius: 8px; box-shadow: 0 6px 18px rgba(16,24,40,0.06); }
+/* Ensure panel body expands even when there are few items */
+.panel { min-height: 60vh; display: flex; flex-direction: column; gap: 1rem; }
+
+.lista-wrapper { overflow-x: auto; }
+.lista { width: 100%; border-collapse: collapse; min-width: 720px; }
+.lista th, .lista td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #eef2f6; }
+.lista thead th { color: #586069; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.02em; }
+.lista tbody tr:hover { background: #fbfdff; }
+
+.actions-cell { display:flex; gap:0.4rem; }
+.actions-cell button { padding: 0.35rem 0.6rem; border-radius: 5px; font-size: 0.875rem; }
+
+.project-list { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.project-card { border-radius: 8px; padding: 1rem; background: #fff; box-shadow: 0 4px 12px rgba(16,24,40,0.04); display:flex; flex-direction: column; }
+.project-row { display:flex; justify-content: space-between; gap: 1rem; align-items: center; }
+.project-meta { color:#555; font-size:0.95rem; }
+.project-desc { margin-top: 0.5rem; color:#444; }
+
+.presupuesto-block { margin-top: 0.75rem; padding: 0.65rem; border-radius:6px; background: #fbfbff; border: 1px solid #eef3fb; }
+.presupuesto-block .small-muted { color: #6b7280; }
+.detalle-list ul { margin: 6px 0 0 18px; padding: 0; }
+.detalle-list li { margin-bottom: 4px; color: #333; font-size: 0.95rem; }
+
+.progress-controls { margin-top: 0.5rem; display:flex; align-items:center; gap:0.75rem; }
+.progress-controls select { padding: 0.4rem 0.5rem; border-radius: 6px; border: 1px solid #dfe7f0; background: #fff; }
+
+.tabs { display:inline-flex; gap:0.5rem; vertical-align: middle; }
+.tabs .btn { background: transparent; border: 1px solid transparent; padding: 0.5rem 0.75rem; }
+.tabs .btn.active { border-color: rgba(15,23,42,0.06); background: rgba(15,23,42,0.03); }
+
+/* Columns layout for To-Do tab */
+.columns-wrapper { display:flex; flex-direction:column; gap:1rem; }
+.column { background: transparent; padding: 0; }
+.column h3 { margin:0 0 0.5rem 0; font-size:1.05rem; }
+.column .project-card { margin-bottom: 0.75rem; }
+
+@media (min-width: 900px) {
+  .columns-wrapper { flex-direction: row; }
+  .column { flex: 1; }
+}
+
+/* Responsive */
+@media (min-width: 900px) {
+  .project-list { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .admin-container { padding: 1rem; }
+  .lista { min-width: 600px; }
+}
+
+.small-muted { font-size: 0.85rem; color: #6b7280; }

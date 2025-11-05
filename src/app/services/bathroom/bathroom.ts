@@ -48,6 +48,15 @@ interface CustomSelection {
   quantity: number;
 }
 
+type ModalCartItem = CartItem & {
+  id?: number;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    depth?: string;
+  } | null;
+};
+
 @Component({
   selector: 'app-bathroom',
   imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal],
@@ -57,7 +66,10 @@ interface CustomSelection {
 export class Bathroom implements OnInit {
   // Modal state
   showModal = false;
-  modalItem: CartItem | null = null;
+  modalAdminMode = false;
+  isAdmin = false;
+  modalItem: ModalCartItem | null = null;
+  modalProductId: number | null = null;
   
   // Toast notification state
   showToast = false;
@@ -77,6 +89,28 @@ export class Bathroom implements OnInit {
 
   ngOnInit() {
     this.loadBathroomSets();
+    this.datosService.getLoggedUser().subscribe({
+      next: (u: any) => {
+        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
+      },
+      error: () => { this.isAdmin = false; }
+    });
+    // Update local list when a product is changed elsewhere
+    this.datosService.productUpdated$.subscribe((prod: any) => {
+      if (!prod || !prod.id) return;
+      const idx = this.bathroomSets.findIndex(s => s.id === prod.id);
+      if (idx !== -1) {
+        this.bathroomSets[idx] = {
+          ...this.bathroomSets[idx],
+          name: prod.name ?? this.bathroomSets[idx].name,
+          basePrice: prod.price ?? this.bathroomSets[idx].basePrice,
+          image: prod.image ?? this.bathroomSets[idx].image,
+          dimensions: prod.dimensions ?? this.bathroomSets[idx].dimensions
+        };
+        if (this.selectedSet && this.selectedSet.id === prod.id) this.selectedSet = this.bathroomSets[idx];
+      }
+    });
   }
 
   loadBathroomSets() {
@@ -306,6 +340,13 @@ export class Bathroom implements OnInit {
     }
 
     const orderData = {
+      // human readable title to store as project/pedido name
+      title: (() => {
+        const names = this.customSelections.map(s => s.furniture.name).filter(Boolean);
+        const setName = this.selectedSet?.name;
+        const base = setName || (names.length ? names.slice(0,3).join(', ') : 'Pedido personalizado');
+        return `Pedido personalizado - ${base}`;
+      })(),
       type: 'custom-bathroom',
       spaceDimensions: {
         width: this.customSpaceWidth,
@@ -316,6 +357,7 @@ export class Bathroom implements OnInit {
         name: sel.furniture.name,
         type: sel.furniture.type,
         color: sel.selectedColor.name,
+        image: sel.furniture.image || null,
         dimensions: {
           width: sel.customWidth,
           height: sel.customHeight,
@@ -324,6 +366,8 @@ export class Bathroom implements OnInit {
         quantity: sel.quantity,
         price: this.calculateCustomPrice(sel)
       })),
+      // collect images selected/associated with the furniture items so carpintero can preview them
+      images: Array.from(new Set(this.customSelections.map(s => s.furniture.image).filter(Boolean))),
       totalPrice: this.getTotalCustomPrice(),
       timestamp: new Date().toISOString()
     };
@@ -336,16 +380,24 @@ export class Bathroom implements OnInit {
   confirmSendCustomOrder(): void {
     if (!this.customOrderData) return;
     console.log('Sending custom order to carpenters:', this.customOrderData);
-    this.toastMessage = `Custom bathroom order sent! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
-    this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 3500);
+    this.datosService.createCustomOrder(this.customOrderData).subscribe({
+      next: (res) => {
+        this.toastMessage = `Custom bathroom order submitted! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 3500);
 
-    this.customSelections = [];
-    this.customSpaceWidth = 0;
-    this.customSpaceHeight = 0;
-    this.customSpaceDepth = 0;
+        this.customSelections = [];
+        this.customSpaceWidth = 0;
+        this.customSpaceHeight = 0;
+        this.customSpaceDepth = 0;
 
-    this.closeCustomModal();
+        this.closeCustomModal();
+      },
+      error: (err) => {
+        console.error('Error submitting custom order', err);
+        alert('Error enviando el pedido personalizado. Intenta de nuevo.');
+      }
+    });
   }
 
   closeCustomModal(): void {
@@ -359,7 +411,9 @@ export class Bathroom implements OnInit {
       return;
     }
 
+    this.modalProductId = this.selectedSet.id;
     this.modalItem = {
+      id: this.selectedSet.id,
       name: this.selectedSet.name,
       description: this.selectedSet.description,
       price: this.selectedSet.basePrice,
@@ -367,9 +421,10 @@ export class Bathroom implements OnInit {
       selectedColor: {
         name: this.selectedSetColor.name,
         code: this.selectedSetColor.code
-      }
+      },
+      dimensions: this.selectedSet.dimensions ?? null
     };
-    
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -377,7 +432,9 @@ export class Bathroom implements OnInit {
     // Add set to cart with default/first color
     const defaultColor = set.availableColors[0];
     
+    this.modalProductId = set.id;
     this.modalItem = {
+      id: set.id,
       name: set.name,
       description: set.description,
       price: set.basePrice,
@@ -385,9 +442,10 @@ export class Bathroom implements OnInit {
       selectedColor: {
         name: defaultColor.name,
         code: defaultColor.code
-      }
+      },
+      dimensions: set.dimensions ?? null
     };
-    
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -404,7 +462,8 @@ export class Bathroom implements OnInit {
               description: this.modalItem!.description,
               price: this.modalItem!.price,
               image: this.modalItem!.image,
-              selectedColor: this.modalItem!.selectedColor
+              selectedColor: this.modalItem!.selectedColor,
+              dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
             });
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -425,7 +484,8 @@ export class Bathroom implements OnInit {
                 description: this.modalItem!.description,
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
-                selectedColor: this.modalItem!.selectedColor
+                selectedColor: this.modalItem!.selectedColor,
+                dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -445,5 +505,77 @@ export class Bathroom implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.modalItem = null;
+    this.modalProductId = null;
+  }
+
+  saveModified(edited: any) {
+    if (!edited) return;
+    this.modalItem = { ...(this.modalItem ?? {}), ...edited } as ModalCartItem;
+    this.showModal = false;
+
+    const targetId = this.modalProductId ?? (this.selectedSet ? this.selectedSet.id : null);
+    if (targetId == null) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const idx = this.bathroomSets.findIndex(s => s.id === targetId);
+    if (idx === -1) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const currentSet = this.bathroomSets[idx];
+    let updatedPrice = currentSet.basePrice;
+    if (edited.price !== undefined && edited.price !== null && edited.price !== '') {
+      const parsedPrice = Number(edited.price);
+      if (!Number.isNaN(parsedPrice)) {
+        updatedPrice = parsedPrice;
+      }
+    }
+    if (this.modalItem) {
+      this.modalItem.price = updatedPrice;
+    }
+
+    const updatedDimensions = edited.dimensions ?? currentSet.dimensions;
+    const updatedSet: BathroomSet = {
+      ...currentSet,
+      name: edited.name ?? currentSet.name,
+      basePrice: updatedPrice,
+      image: edited.image ?? currentSet.image,
+      dimensions: updatedDimensions
+    };
+    this.bathroomSets[idx] = updatedSet;
+    if (this.selectedSet && this.selectedSet.id === targetId) {
+      this.selectedSet = updatedSet;
+    }
+
+    const payload: any = {
+      id: targetId,
+      name: updatedSet.name,
+      price: updatedSet.basePrice,
+      image: updatedSet.image
+    };
+    if (updatedDimensions) {
+      payload.dimensions = updatedDimensions;
+    }
+    console.log('Bathroom.saveModified: calling updateProduct with payload', payload);
+    this.datosService.updateProduct(payload).subscribe({
+      next: () => {
+        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 2000);
+      },
+      error: (err) => {
+        console.error('Error updating product', err);
+        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 4000);
+      }
+    });
   }
 }

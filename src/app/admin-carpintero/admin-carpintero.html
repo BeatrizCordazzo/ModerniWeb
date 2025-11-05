@@ -1,0 +1,263 @@
+<app-nav></app-nav>
+
+<main class="admin-container">
+  <div class="admin-header">
+    <h1>Panel Carpintero / Admin</h1>
+    <div class="controls">
+      <button class="btn btn-ghost" (click)="loadPending()">Refrescar</button>
+      <!-- Mat tabs below provide the tab UI; these header buttons are kept for quick actions only -->
+    </div>
+  </div>
+
+  <div class="panel">
+    <!-- Angular Material tabs: Proyectos pendientes / To-Do -->
+    <mat-tab-group class="admin-tabs" (selectedIndexChange)="onTabChange($event)">
+      <mat-tab label="Proyectos pendientes">
+        <div class="tab-content">
+          <h2>Presupuestos pendientes</h2>
+          <div class="lista-wrapper">
+            <table class="lista">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Proyecto</th>
+                  <th>Total</th>
+                    <th>Ver</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of pendingPresupuestos">
+                  <td>{{ p.presupuesto_id }}</td>
+                  <td>{{ p.cliente_nombre }}</td>
+                  <td>{{ p.proyecto_nombre }}</td>
+                  <td>{{ p.total }}</td>
+                  <td><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
+                  <td>{{ p.fecha_creacion }}</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-accept" (click)="accept(p.presupuesto_id)">Aceptar</button>
+                    <button class="btn btn-reject" (click)="openReject(p.presupuesto_id)">Rechazar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+  <mat-tab label="To-Do">
+        <div class="tab-content">
+          <h2>To-Do - Proyectos aceptados</h2>
+          <div *ngIf="acceptedProjects.length === 0">No hay proyectos aceptados.</div>
+          <div class="columns-wrapper">
+            <div class="column">
+              <h3>To-Do</h3>
+              <div *ngIf="todoProjectsList.length === 0" class="small-muted">No hay proyectos en To-Do.</div>
+              <div *ngFor="let proj of todoProjectsList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="column">
+              <h3>In Progress</h3>
+              <div *ngIf="inProgressProjectsList.length === 0" class="small-muted">No hay proyectos en progreso.</div>
+              <div *ngFor="let proj of inProgressProjectsList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="column">
+              <h3>Done</h3>
+              <div *ngIf="doneProjectsList.length === 0" class="small-muted">No hay proyectos finalizados.</div>
+              <div *ngFor="let proj of doneProjectsList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 1rem; text-align: right;">
+            <button class="btn btn-ghost" (click)="loadAcceptedProjects()">Refrescar</button>
+            <button class="btn btn-primary" (click)="requestSaveAll()">Guardar todos</button>
+          </div>
+        </div>
+      </mat-tab>
+      
+      <mat-tab label="Pedidos">
+        <div class="tab-content">
+          <h2>Pedidos (carrito)</h2>
+          <div *ngIf="orders.length === 0">No hay pedidos.</div>
+          <div class="columns-wrapper" *ngIf="orders.length">
+            <div class="column">
+              <h3>To-Do</h3>
+              <div *ngIf="orderTodoList.length === 0" class="small-muted">No hay pedidos en To-Do.</div>
+              <div *ngFor="let o of orderTodoList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
+                    <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'pendiente' }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="column">
+              <h3>In Progress</h3>
+              <div *ngIf="orderInProgressList.length === 0" class="small-muted">No hay pedidos en progreso.</div>
+              <div *ngFor="let o of orderInProgressList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
+                    <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'in progress' }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="column">
+              <h3>Done</h3>
+              <div *ngIf="orderDoneList.length === 0" class="small-muted">No hay pedidos finalizados.</div>
+              <div *ngFor="let o of orderDoneList" class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
+                    <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
+                  </div>
+                  <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'done' }}</strong></div>
+                </div>
+                <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <app-rejection-modal *ngIf="showRejectionModal"
+    [isOpen]="showRejectionModal"
+    [(motivo)]="rejectionMotivo"
+    (confirm)="sendReject()"
+    (cancel)="closeModal()">
+  </app-rejection-modal>
+
+  <app-confirmation-modal *ngIf="showConfirmModal"
+    [isOpen]="showConfirmModal"
+    [message]="confirmMessage"
+    (confirm)="onConfirmModalConfirm()"
+    (cancel)="onConfirmModalCancel()">
+  </app-confirmation-modal>
+
+  <app-price-modal *ngIf="showPriceModal"
+    [isOpen]="showPriceModal"
+    [presupuesto]="priceModalPresupuesto"
+    (confirm)="onPriceModalConfirm($event)"
+    (cancel)="onPriceModalCancel()">
+  </app-price-modal>
+
+  <app-furniture-detail-modal *ngIf="showDetailModal"
+    [isOpen]="showDetailModal"
+    [data]="detailModalData"
+    (cancel)="closeDetails()">
+  </app-furniture-detail-modal>
+
+  <app-toast-notification *ngIf="toastVisible"
+    [message]="toastMessage"
+    [type]="toastType"
+    [duration]="toastDuration">
+  </app-toast-notification>
+
+
+  <app-footer></app-footer>
+</main>

@@ -23,8 +23,12 @@
     <button mat-icon-button class="icon-btn" routerLink="/profile" aria-label="Profile">
       <mat-icon>person</mat-icon>
     </button>
-    <button mat-icon-button class="icon-btn" routerLink="/cart" aria-label="Cart">
+    <button *ngIf="!isAdmin" mat-icon-button class="icon-btn" routerLink="/cart" aria-label="Cart">
       <mat-icon>shopping_cart</mat-icon>
+    </button>
+    <!-- Admin panel quick access (visible only when localStorage.loggedUser.rol === 'admin') -->
+    <button *ngIf="isAdmin" mat-icon-button class="icon-btn" routerLink="/admin-carpintero" aria-label="Admin Carpintero">
+      <mat-icon>admin_panel_settings</mat-icon>
     </button>
   </div>
 </mat-toolbar>
@@ -83,7 +87,7 @@
 
       <li><a routerLink="/contact" (click)="closeDrawer()">Contact</a></li>
       <li><a routerLink="/profile" (click)="closeDrawer()">Profile</a></li>
-      <li><a routerLink="/cart" (click)="closeDrawer()">Cart</a></li>
+      <li *ngIf="!isAdmin"><a routerLink="/cart" (click)="closeDrawer()">Cart</a></li>
     </ul>
   </nav>
 </aside>

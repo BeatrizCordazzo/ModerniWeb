@@ -10,24 +10,50 @@
     <div class="modal-body">
       <div class="product-preview">
         <div class="product-image">
-          <img [src]="item.image" [alt]="item.name">
+          <img [src]="(adminMode ? editItem?.image : item.image)" [alt]="(adminMode ? editItem?.name : item.name)">
         </div>
         
         <div class="product-details">
-          <h3 class="product-name">{{item.name}}</h3>
-          <p class="product-description" *ngIf="item.description">{{item.description}}</p>
+          <h3 class="product-name">{{ adminMode ? editItem?.name : item.name }}</h3>
+          <p class="product-description" *ngIf="!adminMode && item?.description">{{item.description}}</p>
+          <div *ngIf="adminMode" class="admin-edit-form">
+            <label>Nombre
+              <input type="text" [(ngModel)]="editItem.name">
+            </label>
+            <label>Precio (€)
+              <input type="number" step="0.01" [(ngModel)]="editItem.price">
+            </label>
+            <label>Imagen (URL)
+              <input type="text" [(ngModel)]="editItem.image">
+            </label>
+            <label>Color name
+              <input type="text" [(ngModel)]="editItem.selectedColor.name" (ngModelChange)="onColorNameChange($event)">
+            </label>
+            <label>Color code
+              <input type="text" [(ngModel)]="editItem.selectedColor.code">
+            </label>
+            <label>Dimensions (width cm)
+              <input type="text" [(ngModel)]="editItem.dimensions.width">
+            </label>
+            <label>Dimensions (height cm)
+              <input type="text" [(ngModel)]="editItem.dimensions.height">
+            </label>
+            <label>Dimensions (depth cm)
+              <input type="text" [(ngModel)]="editItem.dimensions.depth">
+            </label>
+          </div>
           
           <div class="product-info">
             <div class="info-row">
               <span class="label">Price:</span>
-              <span class="value price">€{{item.price.toFixed(2)}}</span>
+              <span class="value price">€{{ (adminMode ? editItem?.price : item.price)?.toFixed ? (adminMode ? editItem.price.toFixed(2) : item.price.toFixed(2)) : (adminMode ? editItem?.price : item?.price) }}</span>
             </div>
             
-            <div class="info-row" *ngIf="item.selectedColor">
+            <div class="info-row" *ngIf="(adminMode ? editItem?.selectedColor : item?.selectedColor)">
               <span class="label">Color:</span>
               <span class="value color-info">
-                <span class="color-swatch" [style.backgroundColor]="item.selectedColor.code"></span>
-                {{item.selectedColor.name}}
+                <span class="color-swatch" [style.backgroundColor]="(adminMode ? editItem?.selectedColor?.code : item?.selectedColor?.code)"></span>
+                {{ adminMode ? editItem?.selectedColor?.name : item?.selectedColor?.name }}
               </span>
             </div>
             
@@ -39,8 +65,23 @@
         </div>
       </div>
 
-      <div class="confirmation-message">
+      <div class="confirmation-message" *ngIf="!adminMode">
         <p>Do you want to add this item to your cart?</p>
+      </div>
+      <div class="confirmation-message" *ngIf="adminMode">
+        <p>Save changes to this product before continuing.</p>
+      </div>
+    </div>
+
+    <!-- Save confirmation (admin) -->
+    <div class="save-confirm-overlay" *ngIf="showSaveConfirm">
+      <div class="save-confirm-box" role="dialog" aria-modal="true" aria-label="Confirm save">
+        <h3>Confirm Save</h3>
+        <p>Are you sure you want to save the changes to this product?</p>
+        <div class="save-confirm-actions">
+          <button class="btn btn-cancel" (click)="cancelSave()">Cancel</button>
+          <button class="btn btn-confirm" (click)="confirmSave()">Yes, Save</button>
+        </div>
       </div>
     </div>
 
@@ -48,9 +89,13 @@
       <button class="btn btn-cancel" (click)="onCancel()">
         Cancel
       </button>
-      <button class="btn btn-confirm" (click)="onConfirm()">
+      <button *ngIf="!adminMode" class="btn btn-confirm" (click)="onConfirm()">
         <i class="fas fa-shopping-cart"></i>
         Add to Cart
+      </button>
+      <button *ngIf="adminMode" class="btn btn-confirm" (click)="onSave()">
+        <i class="fas fa-save"></i>
+        Save
       </button>
     </div>
   </div>

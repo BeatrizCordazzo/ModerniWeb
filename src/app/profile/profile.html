@@ -113,26 +113,54 @@
             <article class="order-card" *ngFor="let order of orders">
               <div class="order-header">
                 <div class="order-info">
-                  <h3>Order #{{order.id}}</h3>
+                  <h3>{{ order.type === 'custom' ? 'Project' : 'Order' }} #{{order.id}}</h3>
                   <span class="order-date">{{order.date}}</span>
+                  <span class="order-type" *ngIf="order.type === 'custom'">Custom request</span>
+                  <p class="order-title" *ngIf="order.name">{{order.name}}</p>
+                  <p class="order-description" *ngIf="order.description">{{order.description}}</p>
                 </div>
-                <span class="order-status" [class]="order.status">{{getStatusText(order.status)}}</span>
+                <span class="order-status" [ngClass]="statusClass(order.status)">{{order.statusLabel}}</span>
               </div>
               
+              <div class="order-progress" *ngIf="order.progressStatus">
+                <label>Production status:</label>
+                <span class="progress-pill">{{ order.progressStatusLabel || getStatusText(order.progressStatus) }}</span>
+              </div>
+
               <div class="order-items">
                 <div class="order-item" *ngFor="let item of order.items">
-                  <img [src]="item.image" [alt]="item.name">
+                  <img *ngIf="item.image" [src]="item.image" [alt]="item.name">
+                  <div class="item-image-placeholder" *ngIf="!item.image">No image</div>
                   <div class="item-details">
                     <h4>{{item.name}}</h4>
-                    <p>Quantity: {{item.quantity}}</p>
+                    <p class="item-quantity">Quantity: {{item.quantity}}</p>
+                    <p class="item-description" *ngIf="item.description">{{item.description}}</p>
+                    <div class="item-meta" *ngIf="item.dimensions">
+                      <strong>Dimensions:</strong>
+                      <span class="meta-value">
+                        <ng-container *ngIf="item.dimensions?.width">W {{item.dimensions?.width}}</ng-container>
+                        <ng-container *ngIf="item.dimensions?.height"> × H {{item.dimensions?.height}}</ng-container>
+                        <ng-container *ngIf="item.dimensions?.depth"> × D {{item.dimensions?.depth}}</ng-container>
+                      </span>
+                    </div>
+                    <div class="item-meta color-meta" *ngIf="item.color?.name || item.color?.code">
+                      <strong>Color:</strong>
+                      <span class="color-chip">
+                        <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
+                        {{item.color?.name || item.color?.code}}
+                      </span>
+                    </div>
+                    <ul class="item-includes" *ngIf="item.includes?.length">
+                      <li *ngFor="let include of item.includes">{{include}}</li>
+                    </ul>
                   </div>
-                  <span class="item-price">${{item.price}}</span>
+                  <span class="item-price">€{{item.price | number:'1.2-2'}}</span>
                 </div>
               </div>
               
               <div class="order-footer">
-                <span class="order-total">Total: ${{order.total}}</span>
-                <button class="view-details-btn">View Details</button>
+                <span class="order-total">Total: €{{order.total | number:'1.2-2'}}</span>
+                <button class="view-details-btn" type="button">View Details</button>
               </div>
             </article>
 

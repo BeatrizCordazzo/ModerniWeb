@@ -1,0 +1,10 @@
+<div class="modal-backdrop" (click)="$event.target === $event.currentTarget ? onCancel() : null">
+  <div class="modal">
+    <h3>{{ title }}</h3>
+    <div class="message">{{ message }}</div>
+    <div class="actions">
+      <button class="btn btn-primary" (click)="onConfirm()">{{ confirmLabel }}</button>
+      <button class="btn btn-ghost" (click)="onCancel()">{{ cancelLabel }}</button>
+    </div>
+  </div>
+</div>

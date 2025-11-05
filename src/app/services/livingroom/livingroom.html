@@ -97,8 +97,11 @@
             </div>
 
             <div class="action-buttons">
-              <button class="btn-primary" (click)="addSetToCart()">
+              <button *ngIf="!isAdmin" class="btn-primary" (click)="addSetToCart()">
                 Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
+              </button>
+              <button *ngIf="isAdmin" class="btn-primary admin-modify" (click)="addSetToCart()">
+                <i class="fas fa-edit"></i> Modify
               </button>
             </div>
           </div>
@@ -136,8 +139,11 @@
                   </div>
                 </div>
               </div>
-              <button class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
+              <button *ngIf="!isAdmin" class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
                 <i class="fas fa-shopping-bag"></i> Add to Cart
+              </button>
+              <button *ngIf="isAdmin" class="btn-add-to-cart admin-modify" (click)="quickAddToCart(set); $event.stopPropagation()">
+                <i class="fas fa-edit"></i> Modify
               </button>
             </div>
           </div>
@@ -344,7 +350,10 @@
 <app-cart-confirmation-modal
   [isOpen]="showModal"
   [item]="modalItem"
+  [productId]="modalProductId"
+  [adminMode]="modalAdminMode"
   (confirm)="confirmAddToCart()"
+  (save)="saveModified($event)"
   (cancel)="closeModal()">
 </app-cart-confirmation-modal>
 
@@ -362,3 +371,11 @@
   [message]="toastMessage"
   type="success">
 </app-toast-notification>
+
+<!-- Small Admin Confirmation Modal -->
+<div class="admin-confirm-backdrop" *ngIf="showAdminConfirm">
+  <div class="admin-confirm-modal">
+    <p>Cambios guardados correctamente.</p>
+    <button class="btn" (click)="showAdminConfirm = false">OK</button>
+  </div>
+</div>

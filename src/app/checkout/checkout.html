@@ -1,0 +1,59 @@
+<app-nav></app-nav>
+
+<main class="checkout-page">
+  <div class="checkout-container">
+    <h1>Checkout</h1>
+
+    <section class="checkout-items" *ngIf="cartItems.length > 0">
+      <article class="checkout-item" *ngFor="let it of cartItems">
+        <img [src]="it.image" [alt]="it.name" />
+        <div class="info">
+          <h3>{{ it.name }}</h3>
+          <p>{{ it.description }}</p>
+          <div class="meta">Cantidad: {{ it.quantity || 1 }} · Precio unitario: ${{ it.price.toLocaleString() }}</div>
+        </div>
+        <div class="line-total">${{ ((it.price || 0) * (it.quantity || 1)).toLocaleString() }}</div>
+      </article>
+    </section>
+
+    <aside class="checkout-summary">
+      <h2>Resumen</h2>
+      <div class="row"><span>Subtotal</span><span>${{ getSubtotal().toLocaleString() }}</span></div>
+      <div class="row"><span>Envio</span><span>${{ (getSubtotal() >= 50000 ? 0 : 5000).toLocaleString() }}</span></div>
+      <div class="row total"><span>Total</span><span>${{ getTotal().toLocaleString() }}</span></div>
+
+      <div class="payment-form">
+        <label>Nombre en la tarjeta</label>
+        <input type="text" [(ngModel)]="cardName" />
+
+        <label>Número de tarjeta</label>
+        <input type="text" [(ngModel)]="cardNumber" />
+
+        <div class="two-col">
+          <div>
+            <label>Vencimiento</label>
+            <input type="text" [(ngModel)]="cardExpiry" placeholder="MM/AA" />
+          </div>
+          <div>
+            <label>CVV</label>
+            <input type="text" [(ngModel)]="cardCvv" />
+          </div>
+        </div>
+
+        <button class="confirm-btn" (click)="confirmPayment()" [disabled]="loading">
+          <span *ngIf="!loading">Confirmar pago</span>
+          <span *ngIf="loading">Procesando...</span>
+        </button>
+      </div>
+    </aside>
+
+    <div *ngIf="cartItems.length === 0" class="empty">
+      <h3>Tu carrito está vacío</h3>
+      <p>Agrega servicios y vuelve a esta página para completar el pago.</p>
+    </div>
+
+    <app-toast-notification *ngIf="toastVisible" [message]="toastMessage" [type]="toastType"></app-toast-notification>
+  </div>
+</main>
+
+<app-footer></app-footer>

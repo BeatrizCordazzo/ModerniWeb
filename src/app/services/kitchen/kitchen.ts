@@ -48,6 +48,15 @@ interface CustomSelection {
   quantity: number;
 }
 
+type ModalCartItem = CartItem & {
+  id?: number;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    depth?: string;
+  } | null;
+};
+
 @Component({
   selector: 'app-kitchen',
   imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal],
@@ -57,7 +66,10 @@ interface CustomSelection {
 export class Kitchen implements OnInit {
   // Modal state
   showModal = false;
-  modalItem: CartItem | null = null;
+  modalAdminMode = false;
+  isAdmin = false;
+  modalItem: ModalCartItem | null = null;
+  modalProductId: number | null = null;
   
   // Toast notification state
   showToast = false;
@@ -78,6 +90,28 @@ export class Kitchen implements OnInit {
 
   ngOnInit() {
     this.loadKitchenSets();
+    this.datosService.getLoggedUser().subscribe({
+      next: (u: any) => {
+        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
+      },
+      error: () => { this.isAdmin = false; }
+    });
+    // Listen for product updates from the Datos service and update local list if needed
+    this.datosService.productUpdated$.subscribe((prod: any) => {
+      if (!prod || !prod.id) return;
+      const idx = this.kitchenSets.findIndex(s => s.id === prod.id);
+      if (idx !== -1) {
+        this.kitchenSets[idx] = {
+          ...this.kitchenSets[idx],
+          name: prod.name ?? this.kitchenSets[idx].name,
+          basePrice: prod.price ?? this.kitchenSets[idx].basePrice,
+          image: prod.image ?? this.kitchenSets[idx].image,
+          dimensions: prod.dimensions ?? this.kitchenSets[idx].dimensions
+        };
+        if (this.selectedSet && this.selectedSet.id === prod.id) this.selectedSet = this.kitchenSets[idx];
+      }
+    });
   }
 
   loadKitchenSets() {
@@ -319,6 +353,13 @@ export class Kitchen implements OnInit {
     }
 
     const orderData = {
+      // human readable title to store as project/pedido name
+      title: (() => {
+        const names = this.customSelections.map(s => s.furniture.name).filter(Boolean);
+        const setName = this.selectedSet?.name;
+        const base = setName || (names.length ? names.slice(0,3).join(', ') : 'Pedido personalizado');
+        return `Pedido personalizado - ${base}`;
+      })(),
       type: 'custom-kitchen',
       spaceDimensions: {
         width: this.customSpaceWidth,
@@ -329,6 +370,7 @@ export class Kitchen implements OnInit {
         name: sel.furniture.name,
         type: sel.furniture.type,
         color: sel.selectedColor.name,
+        image: sel.furniture.image || null,
         dimensions: {
           width: sel.customWidth,
           height: sel.customHeight,
@@ -337,6 +379,7 @@ export class Kitchen implements OnInit {
         quantity: sel.quantity,
         price: this.calculateCustomPrice(sel)
       })),
+      images: Array.from(new Set(this.customSelections.map(s => s.furniture.image).filter(Boolean))),
       totalPrice: this.getTotalCustomPrice(),
       timestamp: new Date().toISOString()
     };
@@ -349,18 +392,26 @@ export class Kitchen implements OnInit {
   confirmSendCustomOrder(): void {
     if (!this.customOrderData) return;
     console.log('Sending custom order to carpenters:', this.customOrderData);
-    // TODO: actually send to backend
-    this.toastMessage = `Custom kitchen order sent! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
-    this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 3500);
+    // Send to backend via Datos service so admin will see it as pending presupuesto
+    this.datosService.createCustomOrder(this.customOrderData).subscribe({
+      next: (res) => {
+        this.toastMessage = `Custom kitchen order submitted! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 3500);
 
-    // reset form
-    this.customSelections = [];
-    this.customSpaceWidth = 0;
-    this.customSpaceHeight = 0;
-    this.customSpaceDepth = 0;
+        // reset form
+        this.customSelections = [];
+        this.customSpaceWidth = 0;
+        this.customSpaceHeight = 0;
+        this.customSpaceDepth = 0;
 
-    this.closeCustomModal();
+        this.closeCustomModal();
+      },
+      error: (err) => {
+        console.error('Error submitting custom order', err);
+        alert('Error enviando el pedido personalizado. Intenta de nuevo.');
+      }
+    });
   }
 
   closeCustomModal(): void {
@@ -374,7 +425,9 @@ export class Kitchen implements OnInit {
       return;
     }
 
+    this.modalProductId = this.selectedSet.id;
     this.modalItem = {
+      id: this.selectedSet.id,
       name: this.selectedSet.name,
       description: this.selectedSet.description,
       price: this.selectedSet.basePrice,
@@ -382,9 +435,11 @@ export class Kitchen implements OnInit {
       selectedColor: {
         name: this.selectedSetColor.name,
         code: this.selectedSetColor.code
-      }
+      },
+      dimensions: this.selectedSet.dimensions ?? null
     };
     
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -392,7 +447,9 @@ export class Kitchen implements OnInit {
     // Add set to cart with default/first color
     const defaultColor = set.availableColors[0];
     
+    this.modalProductId = set.id;
     this.modalItem = {
+      id: set.id,
       name: set.name,
       description: set.description,
       price: set.basePrice,
@@ -400,9 +457,10 @@ export class Kitchen implements OnInit {
       selectedColor: {
         name: defaultColor.name,
         code: defaultColor.code
-      }
+      },
+      dimensions: set.dimensions ?? null
     };
-    
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -419,7 +477,8 @@ export class Kitchen implements OnInit {
               description: this.modalItem!.description,
               price: this.modalItem!.price,
               image: this.modalItem!.image,
-              selectedColor: this.modalItem!.selectedColor
+              selectedColor: this.modalItem!.selectedColor,
+              dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
             });
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -440,7 +499,8 @@ export class Kitchen implements OnInit {
                 description: this.modalItem!.description,
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
-                selectedColor: this.modalItem!.selectedColor
+                selectedColor: this.modalItem!.selectedColor,
+                dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
@@ -457,8 +517,80 @@ export class Kitchen implements OnInit {
     }
   }
 
+  saveModified(edited: any) {
+    if (!edited) return;
+    this.modalItem = { ...(this.modalItem ?? {}), ...edited } as ModalCartItem;
+    this.showModal = false;
+
+    const targetId = this.modalProductId ?? (this.selectedSet ? this.selectedSet.id : null);
+    if (targetId == null) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const idx = this.kitchenSets.findIndex(s => s.id === targetId);
+    if (idx === -1) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const currentSet = this.kitchenSets[idx];
+    let updatedPrice = currentSet.basePrice;
+    if (edited.price !== undefined && edited.price !== null && edited.price !== '') {
+      const parsedPrice = Number(edited.price);
+      if (!Number.isNaN(parsedPrice)) {
+        updatedPrice = parsedPrice;
+      }
+    }
+    if (this.modalItem) {
+      this.modalItem.price = updatedPrice;
+    }
+
+    const updatedDimensions = edited.dimensions ?? currentSet.dimensions;
+    const updatedSet: KitchenSet = {
+      ...currentSet,
+      name: edited.name ?? currentSet.name,
+      basePrice: updatedPrice,
+      image: edited.image ?? currentSet.image,
+      dimensions: updatedDimensions
+    };
+    this.kitchenSets[idx] = updatedSet;
+    if (this.selectedSet && this.selectedSet.id === targetId) {
+      this.selectedSet = updatedSet;
+    }
+
+    const payload: any = {
+      id: targetId,
+      name: updatedSet.name,
+      price: updatedSet.basePrice,
+      image: updatedSet.image
+    };
+    if (updatedDimensions) {
+      payload.dimensions = updatedDimensions;
+    }
+    console.log('Kitchen.saveModified: calling updateProduct with payload', payload);
+    this.datosService.updateProduct(payload).subscribe({
+      next: () => {
+        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 2000);
+      },
+      error: (err) => {
+        console.error('Error updating product', err);
+        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 4000);
+      }
+    });
+  }
+
   closeModal(): void {
     this.showModal = false;
     this.modalItem = null;
+    this.modalProductId = null;
   }
 }

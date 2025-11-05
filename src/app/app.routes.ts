@@ -10,6 +10,8 @@ import { ProjectsPage } from './projects-page/projects-page';
 import { Projects } from './projects/projects';
 import { Profile } from './profile/profile';
 import { Cart } from './cart/cart';
+import { AdminCarpintero } from './admin-carpintero/admin-carpintero';
+import { Checkout } from './checkout/checkout';
 import { Kitchen as ServicesKitchen } from './services/kitchen/kitchen';
 import { Bathroom as ServicesBathroom } from './services/bathroom/bathroom';
 import { Bedroom as ServicesBedroom } from './services/bedroom/bedroom';
@@ -93,6 +95,14 @@ export const routes: Routes = [
     {
         path: 'profile',
         component: Profile
+    },
+    {
+        path: 'admin-carpintero',
+        component: AdminCarpintero
+    },
+    {
+        path: 'checkout',
+        component: Checkout
     },
     {
         path: 'cart',

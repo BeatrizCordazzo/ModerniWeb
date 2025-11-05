@@ -11,11 +11,11 @@ import { Router } from '@angular/router';
 interface LivingRoomSet {
   id: number;
   name: string;
-  style: string;
+  style?: string;
   description: string;
   basePrice: number;
   image: string;
-  includes: string[];
+  includes?: string[];
   dimensions: {
     width: string;
     height: string;
@@ -48,6 +48,15 @@ interface CustomSelection {
   quantity: number;
 }
 
+type ModalCartItem = CartItem & {
+  id?: number;
+  dimensions?: {
+    width?: string;
+    height?: string;
+    depth?: string;
+  } | null;
+};
+
 @Component({
   selector: 'app-livingroom',
   imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal],
@@ -57,7 +66,11 @@ interface CustomSelection {
 export class Livingroom implements OnInit {
   // Modal state
   showModal = false;
-  modalItem: CartItem | null = null;
+  modalAdminMode = false;
+  isAdmin = false;
+  showAdminConfirm = false;
+  modalItem: ModalCartItem | null = null;
+  modalProductId: number | null = null;
   
   // Toast notification state
   showToast = false;
@@ -77,6 +90,29 @@ export class Livingroom implements OnInit {
 
   ngOnInit() {
     this.loadLivingRoomSets();
+    // detect admin role to change UI for admins
+    this.datosService.getLoggedUser().subscribe({
+      next: (u: any) => {
+        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
+      },
+      error: () => { this.isAdmin = false; }
+    });
+    // Sync local livingRoomSets when a product is updated elsewhere
+    this.datosService.productUpdated$.subscribe((prod: any) => {
+      if (!prod || !prod.id) return;
+      const idx = this.livingRoomSets.findIndex(s => s.id === prod.id);
+      if (idx !== -1) {
+        this.livingRoomSets[idx] = {
+          ...this.livingRoomSets[idx],
+          name: prod.name ?? this.livingRoomSets[idx].name,
+          basePrice: prod.price ?? this.livingRoomSets[idx].basePrice,
+          image: prod.image ?? this.livingRoomSets[idx].image,
+          dimensions: prod.dimensions ?? this.livingRoomSets[idx].dimensions
+        };
+        if (this.selectedSet && this.selectedSet.id === prod.id) this.selectedSet = this.livingRoomSets[idx];
+      }
+    });
   }
 
   loadLivingRoomSets() {
@@ -307,6 +343,13 @@ export class Livingroom implements OnInit {
     }
 
     const orderData = {
+      // human readable title to store as project/pedido name
+      title: (() => {
+        const names = this.customSelections.map(s => s.furniture.name).filter(Boolean);
+        const setName = this.selectedSet?.name;
+        const base = setName || (names.length ? names.slice(0,3).join(', ') : 'Pedido personalizado');
+        return `Pedido personalizado - ${base}`;
+      })(),
       type: 'custom-livingroom',
       spaceDimensions: {
         width: this.customSpaceWidth,
@@ -317,6 +360,7 @@ export class Livingroom implements OnInit {
         name: sel.furniture.name,
         type: sel.furniture.type,
         color: sel.selectedColor.name,
+        image: sel.furniture.image || null,
         dimensions: {
           width: sel.customWidth,
           height: sel.customHeight,
@@ -325,6 +369,7 @@ export class Livingroom implements OnInit {
         quantity: sel.quantity,
         price: this.calculateCustomPrice(sel)
       })),
+      images: Array.from(new Set(this.customSelections.map(s => s.furniture.image).filter(Boolean))),
       totalPrice: this.getTotalCustomPrice(),
       timestamp: new Date().toISOString()
     };
@@ -337,18 +382,26 @@ export class Livingroom implements OnInit {
   confirmSendCustomOrder(): void {
     if (!this.customOrderData) return;
     console.log('Sending custom order to carpenters:', this.customOrderData);
-    // TODO: send to backend API here
-    this.toastMessage = `Custom living room order sent! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
-    this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 3500);
+    // Send to backend via Datos service so admin will see it as a pending custom order
+    this.datosService.createCustomOrder(this.customOrderData).subscribe({
+      next: (res: any) => {
+        this.toastMessage = `Custom living room order submitted! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 3500);
 
-    // reset form
-    this.customSelections = [];
-    this.customSpaceWidth = 0;
-    this.customSpaceHeight = 0;
-    this.customSpaceDepth = 0;
+        // reset form
+        this.customSelections = [];
+        this.customSpaceWidth = 0;
+        this.customSpaceHeight = 0;
+        this.customSpaceDepth = 0;
 
-    this.closeCustomModal();
+        this.closeCustomModal();
+      },
+      error: (err: any) => {
+        console.error('Error submitting custom living room order', err);
+        alert('Error enviando el pedido personalizado. Intenta de nuevo.');
+      }
+    });
   }
 
   closeCustomModal(): void {
@@ -362,7 +415,9 @@ export class Livingroom implements OnInit {
       return;
     }
 
+    this.modalProductId = this.selectedSet.id;
     this.modalItem = {
+      id: this.selectedSet.id,
       name: this.selectedSet.name,
       description: this.selectedSet.description,
       price: this.selectedSet.basePrice,
@@ -370,9 +425,11 @@ export class Livingroom implements OnInit {
       selectedColor: {
         name: this.selectedSetColor.name,
         code: this.selectedSetColor.code
-      }
+      },
+      dimensions: this.selectedSet.dimensions ?? null
     };
     
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -380,7 +437,9 @@ export class Livingroom implements OnInit {
     // Add set to cart with default/first color
     const defaultColor = set.availableColors[0];
     
+    this.modalProductId = set.id;
     this.modalItem = {
+      id: set.id,
       name: set.name,
       description: set.description,
       price: set.basePrice,
@@ -388,9 +447,11 @@ export class Livingroom implements OnInit {
       selectedColor: {
         name: defaultColor.name,
         code: defaultColor.code
-      }
+      },
+      dimensions: set.dimensions ?? null
     };
     
+    this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
 
@@ -405,11 +466,13 @@ export class Livingroom implements OnInit {
           if (isLogged) {
             // Add to cart via service
             this.cartService.addItem({
-              name: this.modalItem!.name,
-              description: this.modalItem!.description,
-              price: this.modalItem!.price,
-              image: this.modalItem!.image,
-              selectedColor: this.modalItem!.selectedColor
+                name: this.modalItem!.name,
+                description: this.modalItem!.description,
+                price: this.modalItem!.price,
+                image: this.modalItem!.image,
+                selectedColor: this.modalItem!.selectedColor,
+                // include set dimensions so checkout can forward them to the server
+                dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
             });
 
             // Close modal and show toast
@@ -457,8 +520,81 @@ export class Livingroom implements OnInit {
     }
   }
 
+  // Called when admin saves modifications from the modal
+  saveModified(edited: any) {
+    if (!edited) return;
+    this.modalItem = { ...(this.modalItem ?? {}), ...edited } as ModalCartItem;
+    this.showModal = false;
+
+    const targetId = this.modalProductId ?? (this.selectedSet ? this.selectedSet.id : null);
+    if (targetId == null) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const idx = this.livingRoomSets.findIndex(s => s.id === targetId);
+    if (idx === -1) {
+      this.toastMessage = 'Cambios guardados';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 1500);
+      return;
+    }
+
+    const currentSet = this.livingRoomSets[idx];
+    let updatedPrice = currentSet.basePrice;
+    if (edited.price !== undefined && edited.price !== null && edited.price !== '') {
+      const parsedPrice = Number(edited.price);
+      if (!Number.isNaN(parsedPrice)) {
+        updatedPrice = parsedPrice;
+      }
+    }
+    if (this.modalItem) {
+      this.modalItem.price = updatedPrice;
+    }
+    const updatedDimensions = edited.dimensions ?? currentSet.dimensions;
+    const updatedSet: LivingRoomSet = {
+      ...currentSet,
+      name: edited.name ?? currentSet.name,
+      basePrice: updatedPrice,
+      image: edited.image ?? currentSet.image,
+      dimensions: updatedDimensions
+    };
+    this.livingRoomSets[idx] = updatedSet;
+    if (this.selectedSet && this.selectedSet.id === targetId) {
+      this.selectedSet = updatedSet;
+    }
+
+    const payload: any = {
+      id: targetId,
+      name: updatedSet.name,
+      price: updatedSet.basePrice,
+      image: updatedSet.image
+    };
+    if (updatedDimensions) {
+      payload.dimensions = updatedDimensions;
+    }
+    console.log('Livingroom.saveModified: calling updateProduct with payload', payload);
+
+    this.datosService.updateProduct(payload).subscribe({
+      next: () => {
+        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 2000);
+      },
+      error: (err) => {
+        console.error('Error saving product changes to server', err);
+        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 4000);
+      }
+    });
+  }
+
   closeModal(): void {
     this.showModal = false;
     this.modalItem = null;
+    this.modalProductId = null;
   }
 }

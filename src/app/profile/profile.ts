@@ -16,16 +16,36 @@ interface User {
 }
 
 interface OrderItem {
+  id?: number | null;
   name: string;
   quantity: number;
   price: number;
-  image: string;
+  image?: string | null;
+  description?: string | null;
+  dimensions?: {
+    width?: string | null;
+    height?: string | null;
+    depth?: string | null;
+  } | null;
+  color?: {
+    name?: string | null;
+    code?: string | null;
+  } | null;
+  availableColors?: Array<{ nombre?: string; codigo_hex?: string; name?: string; code?: string }> | null;
+  includes?: string[];
 }
 
 interface Order {
   id: number;
+  type: 'pedido' | 'custom';
+  name?: string | null;
+  description?: string | null;
   date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
+  createdAt?: string | null;
+  status: string;
+  statusLabel: string;
+  progressStatus?: string | null;
+  progressStatusLabel?: string | null;
   items: OrderItem[];
   total: number;
 }
@@ -81,6 +101,8 @@ export class Profile implements OnInit {
           this.user = user;
           this.originalUser = { ...user };
           this.isLoading = false;
+          // Load real orders for this logged user
+          this.fetchOrders(user.email);
         } else {
           this.notLogged = true;
           this.isLoading = false;
@@ -104,6 +126,9 @@ export class Profile implements OnInit {
             this.originalUser = { ...this.user };
             this.isLoading = false;
             this.notLogged = false;
+            if (this.user.email) {
+              this.fetchOrders(this.user.email);
+            }
             return;
           }
         } catch (e) {
@@ -127,42 +152,7 @@ export class Profile implements OnInit {
     }
   }
 
-  orders: Order[] = [
-    {
-      id: 1001,
-      date: 'October 15, 2025',
-      status: 'delivered',
-      items: [
-        {
-          name: 'Modern Dining Table',
-          quantity: 1,
-          price: 45000,
-          image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=200'
-        },
-        {
-          name: 'Chairs (Set of 6)',
-          quantity: 1,
-          price: 32000,
-          image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=200'
-        }
-      ],
-      total: 77000
-    },
-    {
-      id: 1002,
-      date: 'October 10, 2025',
-      status: 'processing',
-      items: [
-        {
-          name: 'Office Desk',
-          quantity: 1,
-          price: 28000,
-          image: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=200'
-        }
-      ],
-      total: 28000
-    }
-  ];
+  orders: Order[] = [];
 
   favorites: FavoriteItem[] = [
     {
@@ -185,14 +175,135 @@ export class Profile implements OnInit {
     }
   ];
 
+  private fetchOrders(email: string): void {
+    if (!email) return;
+    this.datosService.getMyOrders(email).subscribe({
+      next: (res: any) => {
+        this.orders = this.transformOrdersResponse(res);
+      },
+      error: (err) => {
+        console.error('Error loading user orders:', err);
+      }
+    });
+  }
+
+  private transformOrdersResponse(res: any): Order[] {
+    const toArray = (raw: any): any[] => {
+      if (!raw) return [];
+      if (Array.isArray(raw)) return raw;
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+          if (parsed && typeof parsed === 'object') return [parsed];
+        } catch (e) {
+          return [];
+        }
+      }
+      if (typeof raw === 'object') {
+        const keys = Object.keys(raw);
+        const numericLike = keys.length && keys.every(k => String(Number(k)) === k);
+        if (numericLike) return keys.map(k => raw[k]);
+        return [raw];
+      }
+      return [];
+    };
+
+    const orders = (res?.orders || []) as any[];
+    return orders.map((o: any) => {
+      const rawItems = toArray(o.items ?? o.items_json ?? o.itemsData ?? o.items);
+      const parsedItems: OrderItem[] = rawItems.map((it: any) => {
+        const quantity = Number(it?.quantity ?? it?.qty ?? 1) || 1;
+        const price = Number(it?.price ?? it?.unit_price ?? it?.precio ?? 0) || 0;
+        const colorSource = it?.color ?? it?.selectedColor ?? null;
+        const resolvedColor = colorSource
+          ? {
+              name: colorSource.name ?? colorSource.nombre ?? null,
+              code: colorSource.code ?? colorSource.codigo_hex ?? null
+            }
+          : null;
+        const dims = it?.dimensions;
+        const resolvedDimensions = dims
+          ? {
+              width: dims.width ?? null,
+              height: dims.height ?? null,
+              depth: dims.depth ?? null
+            }
+          : null;
+        const includes = Array.isArray(it?.includes)
+          ? it.includes
+          : typeof it?.includes === 'string'
+            ? it.includes.split(/[,|]/).map((part: string) => part.trim()).filter(Boolean)
+            : [];
+
+        return {
+          id: it?.id ?? null,
+          name: it?.name || it?.title || 'Product',
+          description: it?.description ?? null,
+          quantity,
+          price,
+          image: it?.image ?? it?.imagen ?? null,
+          dimensions: resolvedDimensions,
+          color: resolvedColor,
+          availableColors: it?.availableColors ?? null,
+          includes
+        };
+      });
+
+      const backendTotal = Number(o.total ?? o.totalPrice ?? o.precio_total ?? 0);
+      const computedTotal = parsedItems.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 1), 0);
+      const statusRaw = (o.status ?? o.estado ?? 'pending') as string;
+      const statusLabel = o.status_label ?? this.getStatusText(statusRaw);
+      const createdAt = o.created_at ?? o.fecha ?? null;
+      let displayDate = createdAt;
+      try {
+        displayDate = createdAt ? new Date(createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+      } catch (e) {
+        displayDate = createdAt || new Date().toLocaleDateString();
+      }
+
+      const progressStatus = (o.progress_status ?? null) as string | null;
+      const progressStatusLabel = o.progress_status_label ?? null;
+
+      return {
+        id: Number(o.id),
+        type: o.type === 'custom' ? 'custom' : 'pedido',
+        name: o.name ?? null,
+        description: o.description ?? null,
+        date: displayDate,
+        createdAt,
+        status: statusRaw,
+        statusLabel,
+        progressStatus,
+        progressStatusLabel,
+        items: parsedItems,
+        total: backendTotal || computedTotal
+      } as Order;
+    });
+  }
+
+  statusClass(status: string): string {
+    if (!status) return '';
+    return status.toLowerCase().replace(/[\s_]+/g, '-');
+  }
+
   getStatusText(status: string): string {
+    if (!status) return 'Pending';
     const statusMap: { [key: string]: string } = {
       'pending': 'Pending',
       'processing': 'Processing',
       'shipped': 'Shipped',
-      'delivered': 'Delivered'
+      'delivered': 'Delivered',
+      'cancelled': 'Cancelled',
+      'to-do': 'To-do',
+      'in progress': 'In Progress',
+      'done': 'Completed',
+      'approved': 'Approved',
+      'rejected': 'Rejected'
     };
-    return statusMap[status] || status;
+    if (statusMap[status]) return statusMap[status];
+    const readable = status.replace(/[-_]/g, ' ');
+    return readable.charAt(0).toUpperCase() + readable.slice(1);
   }
 
   removeFavorite(id: number): void {

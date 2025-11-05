@@ -9,6 +9,8 @@ export interface SimpleCartItem {
   image: string;
   selectedColor?: { name: string; code: string };
   quantity?: number;
+  // optional dimensions for items that represent a furniture/set adapted to a space
+  dimensions?: { width?: number | string; height?: number | string; depth?: number | string } | any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -42,6 +44,7 @@ export class CartService {
 
   addItem(item: SimpleCartItem) {
     const items = this.getItems();
+    console.log('CartService.addItem called with', item, 'current items:', items);
     // Try to merge by name + color
     const existing = items.find(i => i.name === item.name && JSON.stringify(i.selectedColor) === JSON.stringify(item.selectedColor));
     if (existing) {
@@ -51,6 +54,7 @@ export class CartService {
     }
     this.itemsSubject.next([...items]);
     this.saveToStorage(items);
+    console.log('CartService: saved items', items);
   }
 
   updateQuantity(indexOrPredicate: number | ((it: SimpleCartItem) => boolean), quantity: number) {

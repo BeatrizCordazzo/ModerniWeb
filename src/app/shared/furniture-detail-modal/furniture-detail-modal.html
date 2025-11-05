@@ -1,0 +1,86 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="$event.target === $event.currentTarget ? onCancel() : null">
+  <div class="modal">
+    <h3>{{ title }}</h3>
+
+    <div class="modal-body">
+
+      <div class="grid">
+      <div class="gallery" *ngIf="getImages().length">
+        <div class="main-image">
+          <img [src]="getImages()[selectedImageIndex]" alt="Imagen" />
+        </div>
+        <div class="thumbs">
+          <img *ngFor="let img of getImages(); let i = index" [src]="img" [class.active]="i === selectedImageIndex" (click)="selectedImageIndex = i" />
+        </div>
+      </div>
+
+      <div class="details">
+        <p><strong>Pedido ID:</strong> {{ getOrderId() }}</p>
+        <p><strong>Estado:</strong> {{ getStatus() }}</p>
+        <p><strong>Fecha:</strong> {{ getDate() }}</p>
+        <p><strong>Cliente:</strong> {{ getClientName() }}</p>
+        <p *ngIf="getContactInfo().email"><strong>Email:</strong> {{ getContactInfo().email }}</p>
+        <p *ngIf="getContactInfo().telefono"><strong>Teléfono:</strong> {{ getContactInfo().telefono }}</p>
+        <p *ngIf="getContactInfo().direccion"><strong>Dirección:</strong> {{ getContactInfo().direccion }}</p>
+        <p><strong>Proyecto / Título:</strong> {{ getTitle() }}</p>
+        <p><strong>Precio final:</strong> <span *ngIf="getBudget()">{{ getBudget() }}</span><span *ngIf="!getBudget()">-</span></p>
+
+        <div *ngIf="getSpaceDimensions()" class="space-dims">
+          <h4>Medidas del espacio</h4>
+          <p *ngIf="getSpaceDimensions().width">Ancho: {{ getSpaceDimensions().width }} cm</p>
+          <p *ngIf="getSpaceDimensions().height">Altura: {{ getSpaceDimensions().height }} cm</p>
+          <p *ngIf="getSpaceDimensions().depth">Profundidad: {{ getSpaceDimensions().depth }} cm</p>
+        </div>
+
+        <div *ngIf="getItems().length" class="items-list">
+          <h4>Muebles / Items</h4>
+          <div class="items-table-wrapper">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Imagen</th>
+                  <th>Nombre</th>
+                  <th>Precio unitario</th>
+                  <th>Cantidad</th>
+                  <th>Medidas</th>
+                  <th>Notas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let it of getItems()">
+                  <td class="cell-img">
+                    <img *ngIf="it.image || it.img" [src]="it.image || it.img" class="thumb" alt="" />
+                    <ng-container *ngIf="!it.image">
+                      <ng-container *ngIf="getItemExtraObject(it) as eo">
+                        <div *ngIf="eo?.image" class="extra-image"><img [src]="eo.image" alt="" /></div>
+                      </ng-container>
+                    </ng-container>
+                  </td>
+                  <td class="cell-name">{{ it.name || it.nombre || it.title || it.producto || '-' }}</td>
+                  <td class="cell-price">{{ getItemPrice(it) }}</td>
+                  <td class="cell-qty">{{ it.quantity || getItemExtraField(it, 'quantity') || '-' }}</td>
+                  <td class="cell-dims">{{ getItemDimensionsString(it) || '-' }}</td>
+                  <td class="cell-notes">
+                    <div *ngIf="getItemExtraObject(it) as extraObj">
+                      <div *ngIf="extraObj.name"><strong>{{ extraObj.name }}</strong></div>
+                      <div *ngIf="extraObj.color">Color: {{ extraObj.color.name || extraObj.color }} <span *ngIf="extraObj.color.code" class="color-swatch" [style.background]="extraObj.color.code"></span></div>
+                      <div *ngIf="extraObj.price">Precio: {{ extraObj.price }}</div>
+                      <div *ngIf="extraObj.notes">Notas: {{ extraObj.notes }}</div>
+                    </div>
+                    <div *ngIf="!getItemExtraObject(it) && getItemExtra(it) as extraText">{{ extraText }}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" (click)="onCancel()">Cerrar</button>
+    </div>
+  </div>
+</div>

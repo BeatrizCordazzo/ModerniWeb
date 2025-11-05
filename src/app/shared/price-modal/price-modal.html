@@ -1,0 +1,20 @@
+<div class="modal-backdrop" *ngIf="isOpen">
+  <div class="modal">
+    <h3>{{ title }}</h3>
+
+    <div class="details" *ngIf="presupuesto">
+      <p><strong>Cliente:</strong> {{ presupuesto.cliente_nombre || presupuesto.nombre_cliente || '-' }}</p>
+      <p><strong>Proyecto:</strong> {{ presupuesto.proyecto_nombre || presupuesto.titulo || '-' }}</p>
+      <p *ngIf="presupuesto.detalle"><strong>Detalle:</strong></p>
+      <pre *ngIf="presupuesto.detalle" class="detalle-block">{{ presupuesto.detalle | json }}</pre>
+    </div>
+
+    <label>Precio final (ARS)</label>
+    <input type="number" [(ngModel)]="finalPrice" min="0" step="0.01" />
+
+    <div class="actions">
+      <button class="btn btn-ghost" (click)="onCancel()">Cancelar</button>
+      <button class="btn btn-primary" (click)="onConfirm()">Aceptar y enviar</button>
+    </div>
+  </div>
+</div>

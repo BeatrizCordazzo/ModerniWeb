@@ -97,8 +97,11 @@
             </div>
 
             <div class="action-buttons">
-              <button class="btn-add-cart" (click)="addSetToCart()">
+              <button *ngIf="!isAdmin" class="btn-add-cart" (click)="addSetToCart()">
                 Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
+              </button>
+              <button *ngIf="isAdmin" class="btn-add-cart admin-modify" (click)="addSetToCart()">
+                <i class="fas fa-edit"></i> Modify
               </button>
             </div>
           </div>
@@ -135,8 +138,11 @@
                 </div>
               </div>
             </div>
-            <button class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
+            <button *ngIf="!isAdmin" class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
               <i class="fas fa-shopping-bag"></i> Add to Cart
+            </button>
+            <button *ngIf="isAdmin" class="btn-add-to-cart admin-modify" (click)="quickAddToCart(set); $event.stopPropagation()">
+              <i class="fas fa-edit"></i> Modify
             </button>
           </div>
         </div>
@@ -335,6 +341,9 @@
 <app-cart-confirmation-modal
   [isOpen]="showModal"
   [item]="modalItem"
+  [adminMode]="modalAdminMode"
+  [productId]="modalProductId"
+  (save)="saveModified($event)"
   (confirm)="confirmAddToCart()"
   (cancel)="closeModal()">
 </app-cart-confirmation-modal>
