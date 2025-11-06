@@ -1,0 +1,47 @@
+:host {
+  display: inline-flex;
+}
+
+.favorite-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(220, 38, 38, 0.85);
+  background: rgba(255, 255, 255, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: rgba(220, 38, 38, 0.85);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: rgba(220, 38, 38, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: transparent;
+    stroke: currentColor;
+    stroke-width: 1.5px;
+    transition: fill 0.2s ease;
+  }
+
+  &.active {
+    background: rgba(220, 38, 38, 0.95);
+    color: #fff;
+
+    svg {
+      fill: currentColor;
+      stroke: currentColor;
+    }
+  }
+}

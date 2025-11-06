@@ -3,6 +3,7 @@ import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Datos } from '../datos';
 
 interface ContactFormData {
   name: string;
@@ -20,7 +21,9 @@ interface ContactFormData {
 })
 export class Contact {
   formSubmitted = false;
-  
+  isSubmitting = false;
+  submitError = '';
+
   formData: ContactFormData = {
     name: '',
     email: '',
@@ -28,6 +31,8 @@ export class Contact {
     subject: '',
     message: ''
   };
+
+  constructor(private datosService: Datos) {}
 
   isFormValid(): boolean {
     return !!(
@@ -40,27 +45,34 @@ export class Contact {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    
-    if (!this.isFormValid()) {
+
+    if (!this.isFormValid() || this.isSubmitting) {
       return;
     }
-    
-    console.log('Form submitted:', this.formData);
-    
-    // Aquí iría la lógica para enviar el formulario
-    // Por ahora solo mostramos el mensaje de éxito
-    this.formSubmitted = true;
-    
-    // Resetear el formulario después de 3 segundos
-    setTimeout(() => {
-      this.formSubmitted = false;
-      this.formData = {
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      };
-    }, 3000);
+
+    this.isSubmitting = true;
+    this.submitError = '';
+
+    this.datosService.sendContactMessage(this.formData).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.formSubmitted = true;
+        setTimeout(() => {
+          this.formSubmitted = false;
+        }, 3000);
+        this.formData = {
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        };
+      },
+      error: (err) => {
+        console.error('Error sending contact message', err);
+        this.isSubmitting = false;
+        this.submitError = 'There was an error sending your message. Please try again.';
+      }
+    });
   }
 }

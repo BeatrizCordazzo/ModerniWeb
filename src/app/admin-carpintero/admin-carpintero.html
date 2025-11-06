@@ -222,6 +222,40 @@
           </div>
         </div>
       </mat-tab>
+
+      <mat-tab label="Messages">
+        <div class="tab-content">
+          <h2>Client Messages</h2>
+          <div *ngIf="messagesLoading" class="loading-state">Loading messages...</div>
+          <div *ngIf="messagesError" class="error-state">{{ messagesError }}</div>
+          <div class="messages-list" *ngIf="!messagesLoading && !messagesError">
+            <article class="message-card" *ngFor="let msg of contactMessages">
+              <div class="message-header">
+                <div>
+                  <h3>{{ msg.name }}</h3>
+                  <p class="message-meta">
+                    <span>{{ msg.email }}</span>
+                    <span *ngIf="msg.phone">| {{ msg.phone }}</span>
+                  </p>
+                </div>
+                <span class="status-pill">{{ msg.status }}</span>
+              </div>
+              <p class="message-subject" *ngIf="msg.subject">{{ msg.subject }}</p>
+              <p class="message-body">{{ msg.message }}</p>
+              <div class="response-block" *ngIf="msg.response">
+                <strong>Response:</strong>
+                <p>{{ msg.response }}</p>
+                <small *ngIf="msg.response_created_at">Sent: {{ msg.response_created_at | date:'short' }}</small>
+              </div>
+              <div class="message-actions">
+                <textarea [(ngModel)]="msg.pendingResponse" placeholder="Write a response..."></textarea>
+                <button (click)="sendResponse(msg)">Send Reply</button>
+              </div>
+            </article>
+            <p *ngIf="contactMessages.length === 0" class="empty-state">No messages yet.</p>
+          </div>
+        </div>
+      </mat-tab>
     </mat-tab-group>
   </div>
 

@@ -133,6 +133,17 @@
   <div class="products-grid">
     <div *ngFor="let product of filteredProducts" class="product-card">
       <div class="product-image">
+        <div class="favorite-pill" *ngIf="!isAdmin">
+          <app-favorite-toggle
+            [itemType]="'product'"
+            [itemId]="product.id"
+            [itemSlug]="'product-' + product.id"
+            [itemName]="product.name"
+            [itemImage]="product.image"
+            [itemPrice]="product.price"
+            [extra]="{ category: product.category }">
+          </app-favorite-toggle>
+        </div>
         <img [src]="product.image" [alt]="product.name">
         <span *ngIf="!product.inStock" class="out-of-stock-badge">Out of Stock</span>
         <span *ngIf="product.oldPrice" class="discount-badge">

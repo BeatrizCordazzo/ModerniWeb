@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Datos } from '../datos';
 import { Nav } from '../nav/nav';
@@ -11,6 +11,7 @@ import { ConfirmationModal } from '../shared/confirmation-modal/confirmation-mod
 import { PriceModal } from '../shared/price-modal/price-modal.component';
 import { FurnitureDetailModal } from '../shared/furniture-detail-modal/furniture-detail-modal';
 import { ToastNotification } from '../shared/toast-notification/toast-notification';
+import { ContactMessage } from '../datos';
 
 @Component({
   selector: 'app-admin-carpintero',
@@ -57,6 +58,10 @@ export class AdminCarpintero implements OnInit {
   toastDuration = 3000;
 
   userRole = '';
+
+  contactMessages: Array<ContactMessage & { pendingResponse?: string }> = [];
+  messagesLoading = false;
+  messagesError = '';
 
 
   constructor(private datos: Datos, private router: Router) {}
@@ -210,6 +215,7 @@ export class AdminCarpintero implements OnInit {
     if (index === 0) this.loadPending();
     else if (index === 1) this.loadAcceptedProjects();
     else if (index === 2) this.loadOrders();
+    else if (index === 3) this.loadMessages();
   }
 
   // Grouped getters for To-Do columns
@@ -276,7 +282,7 @@ export class AdminCarpintero implements OnInit {
   // Request confirmation before saving a single project
   requestSaveProject(proj: any): void {
     if (!proj || !proj.proyecto_id) return;
-    this.confirmMessage = '¿Deseas guardar los cambios en este proyecto?';
+    this.confirmMessage = 'Deseas guardar los cambios en este proyecto?';
     this.confirmAction = 'saveProject';
     this.confirmTargetId = proj.proyecto_id;
     this.showConfirmModal = true;
@@ -300,7 +306,7 @@ export class AdminCarpintero implements OnInit {
       this.showToast('No hay proyectos para guardar', 'info');
       return;
     }
-    this.confirmMessage = '¿Deseas guardar los cambios en todos los proyectos aceptados?';
+    this.confirmMessage = 'Deseas guardar los cambios en todos los proyectos aceptados?';
     this.confirmAction = 'saveAllAccepted';
     this.confirmTargetId = null;
     this.showConfirmModal = true;
@@ -353,23 +359,59 @@ export class AdminCarpintero implements OnInit {
         },
         error: () => this.showToast('Error aceptando presupuesto', 'error')
       });
-    }
-    else if (action === 'saveProject' && target) {
-      // find the project in acceptedProjects and save it
+    } else if (action === 'saveProject' && target) {
       const proj = this.acceptedProjects.find((p: any) => p.proyecto_id === target);
       if (proj) {
         this.saveProject(proj);
       } else {
-        // fallback: directly call API if projecto not in list
         this.datos.updateProjectProgress(target, 'to-do').subscribe({
           next: () => this.showToast('Estado actualizado', 'success'),
           error: () => this.showToast('Error guardando estado', 'error')
         });
       }
-    }
-    else if (action === 'saveAllAccepted') {
+    } else if (action === 'saveAllAccepted') {
       this.saveAllAccepted();
     }
+  }
+
+  loadMessages(): void {
+    this.messagesLoading = true;
+    this.messagesError = '';
+    this.datos.getAdminMessages().subscribe({
+      next: (res) => {
+        if (res && res.success && Array.isArray(res.messages)) {
+          this.contactMessages = res.messages.map(msg => ({ ...msg, pendingResponse: '' }));
+        } else {
+          this.contactMessages = [];
+        }
+        this.messagesLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading messages', err);
+        this.messagesLoading = false;
+        this.messagesError = 'Unable to load messages.';
+      }
+    });
+  }
+
+  sendResponse(msg: ContactMessage & { pendingResponse?: string }): void {
+    if (!msg || !msg.id || !msg.pendingResponse?.trim()) {
+      this.showToast('Por favor escribe una respuesta antes de enviar.', 'warning');
+      return;
+    }
+    const responseText = msg.pendingResponse.trim();
+    this.datos.replyToMessage(msg.id, responseText).subscribe({
+      next: () => {
+        this.showToast('Respuesta enviada al cliente', 'success');
+        msg.response = responseText;
+        msg.pendingResponse = '';
+        this.loadMessages();
+      },
+      error: (err) => {
+        console.error('Error sending response', err);
+        this.showToast('No se pudo enviar la respuesta', 'error');
+      }
+    });
   }
 
   onConfirmModalCancel(): void {

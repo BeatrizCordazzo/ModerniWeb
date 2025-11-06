@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Datos } from '../datos';
+import { Datos, FavoriteItem, ContactMessage } from '../datos';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 interface User {
   name: string;
@@ -47,14 +48,10 @@ interface Order {
   progressStatus?: string | null;
   progressStatusLabel?: string | null;
   items: OrderItem[];
-  total: number;
-}
-
-interface FavoriteItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
+  total: number | null;
+  estimatedTotal?: number | null;
+  rejectionReason?: string | null;
+  rejectionDate?: string | null;
 }
 
 @Component({
@@ -63,8 +60,8 @@ interface FavoriteItem {
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
-export class Profile implements OnInit {
-  activeTab: 'credentials' | 'orders' | 'favorites' = 'credentials';
+export class Profile implements OnInit, OnDestroy {
+  activeTab: 'credentials' | 'orders' | 'favorites' | 'rejected' | 'messages' = 'credentials';
   user: User | null = null;
   originalUser: User | null = null;
   isLoading = true;
@@ -103,6 +100,8 @@ export class Profile implements OnInit {
           this.isLoading = false;
           // Load real orders for this logged user
           this.fetchOrders(user.email);
+          this.initializeFavorites();
+          this.initializeMessages();
         } else {
           this.notLogged = true;
           this.isLoading = false;
@@ -129,6 +128,8 @@ export class Profile implements OnInit {
             if (this.user.email) {
               this.fetchOrders(this.user.email);
             }
+            this.initializeFavorites();
+            this.initializeMessages();
             return;
           }
         } catch (e) {
@@ -153,37 +154,58 @@ export class Profile implements OnInit {
   }
 
   orders: Order[] = [];
+  rejectedOrders: Order[] = [];
+  selectedRejectedOrder: Order | null = null;
+  showRejectedModal = false;
+  showOrderDetailsModal = false;
+  selectedOrderDetails: Order | null = null;
 
-  favorites: FavoriteItem[] = [
-    {
-      id: 1,
-      name: 'Scandinavian Armchair',
-      price: 35000,
-      image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300'
-    },
-    {
-      id: 2,
-      name: 'Floor Lamp',
-      price: 12000,
-      image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300'
-    },
-    {
-      id: 3,
-      name: 'Modular Shelving',
-      price: 42000,
-      image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=300'
-    }
-  ];
+  favorites: FavoriteItem[] = [];
+  favoritesLoading = false;
+  favoritesError = '';
+  private favoritesSub?: Subscription;
+
+  userMessages: ContactMessage[] = [];
+  messagesLoading = false;
+  messagesError = '';
+  private messagesSub?: Subscription;
 
   private fetchOrders(email: string): void {
     if (!email) return;
     this.datosService.getMyOrders(email).subscribe({
       next: (res: any) => {
         this.orders = this.transformOrdersResponse(res);
+        this.updateRejectedOrders();
       },
       error: (err) => {
         console.error('Error loading user orders:', err);
       }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.favoritesSub?.unsubscribe();
+    this.messagesSub?.unsubscribe();
+  }
+
+  getOrderTotal(order: Order | null): number {
+    if (!order) return 0;
+    if (order.total !== null && order.total !== undefined && !Number.isNaN(order.total) && order.total > 0) {
+      return order.total;
+    }
+    if (order.estimatedTotal !== null && order.estimatedTotal !== undefined && !Number.isNaN(order.estimatedTotal) && order.estimatedTotal > 0) {
+      return order.estimatedTotal;
+    }
+    return order.items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+  }
+
+  private updateRejectedOrders(): void {
+    const rejectedKeywords = ['rejected', 'rechazado'];
+    this.rejectedOrders = this.orders.filter(order => {
+      const status = (order.status || '').toLowerCase();
+      if (rejectedKeywords.includes(status)) return true;
+      const label = (order.statusLabel || '').toLowerCase();
+      return rejectedKeywords.includes(label);
     });
   }
 
@@ -250,7 +272,12 @@ export class Profile implements OnInit {
         };
       });
 
-      const backendTotal = Number(o.total ?? o.totalPrice ?? o.precio_total ?? 0);
+      const backendTotalSource = o.total ?? o.totalPrice ?? o.precio_total;
+      const backendTotalParsed = backendTotalSource !== undefined && backendTotalSource !== null ? Number(backendTotalSource) : null;
+      const backendTotal = backendTotalParsed !== null && !Number.isNaN(backendTotalParsed) ? backendTotalParsed : null;
+      const estimatedTotalSource = o.estimated_total ?? o.estimatedTotal ?? o.total_estimate;
+      const estimatedTotalParsed = estimatedTotalSource !== undefined && estimatedTotalSource !== null ? Number(estimatedTotalSource) : null;
+      const estimatedTotal = estimatedTotalParsed !== null && !Number.isNaN(estimatedTotalParsed) ? estimatedTotalParsed : null;
       const computedTotal = parsedItems.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 1), 0);
       const statusRaw = (o.status ?? o.estado ?? 'pending') as string;
       const statusLabel = o.status_label ?? this.getStatusText(statusRaw);
@@ -264,6 +291,13 @@ export class Profile implements OnInit {
 
       const progressStatus = (o.progress_status ?? null) as string | null;
       const progressStatusLabel = o.progress_status_label ?? null;
+      const rejectionReason = o.rejection_reason ?? o.rechazo_motivo ?? null;
+      const rejectionDateRaw = o.rejection_date ?? o.fecha_rechazo ?? null;
+      let rejectionDate: string | null = null;
+      if (rejectionDateRaw) {
+        const parsed = new Date(rejectionDateRaw);
+        rejectionDate = Number.isNaN(parsed.getTime()) ? rejectionDateRaw : parsed.toISOString();
+      }
 
       return {
         id: Number(o.id),
@@ -277,7 +311,10 @@ export class Profile implements OnInit {
         progressStatus,
         progressStatusLabel,
         items: parsedItems,
-        total: backendTotal || computedTotal
+        total: backendTotal,
+        estimatedTotal,
+        rejectionReason,
+        rejectionDate
       } as Order;
     });
   }
@@ -299,14 +336,95 @@ export class Profile implements OnInit {
       'in progress': 'In Progress',
       'done': 'Completed',
       'approved': 'Approved',
-      'rejected': 'Rejected'
+      'rejected': 'Rejected',
+      'rechazado': 'Rejected'
     };
     if (statusMap[status]) return statusMap[status];
     const readable = status.replace(/[-_]/g, ' ');
     return readable.charAt(0).toUpperCase() + readable.slice(1);
   }
 
+  openRejectedModal(order: Order): void {
+    this.selectedRejectedOrder = order;
+    this.showRejectedModal = true;
+  }
+
+  closeRejectedModal(): void {
+    this.showRejectedModal = false;
+    this.selectedRejectedOrder = null;
+  }
+
+  startNewCustomOrder(): void {
+    this.closeRejectedModal();
+    try {
+      this.router.navigate(['/services']);
+    } catch (e) {
+      console.warn('Unable to navigate to services page for new custom order', e);
+    }
+  }
+
   removeFavorite(id: number): void {
-    this.favorites = this.favorites.filter(item => item.id !== id);
+    if (!id) return;
+    this.datosService.removeFavoriteById(id).subscribe({
+      error: (err) => console.error('Error removing favorite', err)
+    });
+  }
+
+  openOrderDetails(order: Order): void {
+    this.selectedOrderDetails = order;
+    this.showOrderDetailsModal = true;
+  }
+
+  closeOrderDetails(): void {
+    this.showOrderDetailsModal = false;
+    this.selectedOrderDetails = null;
+  }
+
+  private initializeFavorites(): void {
+    if (this.favoritesSub) return;
+    this.favoritesSub = this.datosService.favorites$.subscribe(favs => {
+      this.favorites = favs || [];
+    });
+    this.favoritesLoading = true;
+    this.datosService.loadFavorites().subscribe({
+      next: (favs) => {
+        this.favorites = favs || [];
+        this.favoritesLoading = false;
+        this.favoritesError = '';
+      },
+      error: (err) => {
+        this.favoritesLoading = false;
+        if (err && err.status === 401) {
+          this.favoritesError = 'Please log in to manage favorites.';
+        } else {
+          this.favoritesError = 'Unable to load favorites right now.';
+        }
+      }
+    });
+  }
+
+  private initializeMessages(): void {
+    if (this.messagesSub) return;
+    this.messagesLoading = true;
+    this.messagesError = '';
+    this.messagesSub = this.datosService.myMessages$.subscribe(msgs => {
+      this.userMessages = msgs || [];
+    });
+    this.datosService.loadMyMessages(true).subscribe({
+      next: (msgs) => {
+        this.userMessages = msgs || [];
+        this.messagesLoading = false;
+        this.messagesError = '';
+      },
+      error: (err) => {
+        console.error('Error loading messages', err);
+        this.messagesLoading = false;
+        if (err && err.status === 401) {
+          this.messagesError = 'Please log in to view your messages.';
+        } else {
+          this.messagesError = 'Unable to load messages.';
+        }
+      }
+    });
   }
 }

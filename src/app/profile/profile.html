@@ -10,10 +10,10 @@
 
     <!-- Not Logged In State -->
     <div *ngIf="notLogged && !isLoading" class="not-logged-container">
-      <h2>Debes iniciar sesión para ver tu perfil</h2>
-      <p>Por favor, inicia sesión o regístrate para acceder a tu perfil y pedidos.</p>
+      <h2>Debes iniciar sesi?n para ver tu perfil</h2>
+      <p>Por favor, inicia sesi?n o reg?strate para acceder a tu perfil y pedidos.</p>
       <div class="not-logged-actions">
-        <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesión</a>
+        <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesi?n</a>
         <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
       </div>
     </div>
@@ -35,12 +35,12 @@
           <p class="user-email">{{user.email}}</p>
           <p class="member-since">Member since {{user.memberSince}}</p>
           <div class="profile-actions">
-            <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
+            <button class="logout-btn" (click)="logout()">Cerrar sesi?n</button>
           </div>
         </div>
       </section>
 
-      <!-- Tabs de navegación -->
+      <!-- Tabs de navegaci?n -->
       <div class="profile-tabs">
         <button 
           class="tab" 
@@ -62,12 +62,30 @@
         </button>
         <button 
           class="tab" 
+          [class.active]="activeTab === 'rejected'"
+          (click)="activeTab = 'rejected'">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.59 13.59L13 13l-2.59 2.59L9 14.17 11.17 12 9 9.83 10.41 8.41 13 11l2.59-2.59L17 9.83 14.83 12 17 14.17l-1.41 1.42z"/>
+          </svg>
+          Rejected
+        </button>
+        <button 
+          class="tab" 
           [class.active]="activeTab === 'favorites'"
           (click)="activeTab = 'favorites'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
           Favorites
+        </button>
+        <button 
+          class="tab" 
+          [class.active]="activeTab === 'messages'"
+          (click)="activeTab = 'messages'">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.11 0-2 .89-2 2v18l4-4h14c1.11 0 2-.89 2-2V4c0-1.11-.89-2-2-2zM6 9h12v2H6V9zm8 4H6v-2h8v2zm4-6H6V5h12v2z"/>
+          </svg>
+          Messages
         </button>
       </div>
 
@@ -139,8 +157,8 @@
                       <strong>Dimensions:</strong>
                       <span class="meta-value">
                         <ng-container *ngIf="item.dimensions?.width">W {{item.dimensions?.width}}</ng-container>
-                        <ng-container *ngIf="item.dimensions?.height"> × H {{item.dimensions?.height}}</ng-container>
-                        <ng-container *ngIf="item.dimensions?.depth"> × D {{item.dimensions?.depth}}</ng-container>
+                        <ng-container *ngIf="item.dimensions?.height"> - H {{item.dimensions?.height}}</ng-container>
+                        <ng-container *ngIf="item.dimensions?.depth"> - D {{item.dimensions?.depth}}</ng-container>
                       </span>
                     </div>
                     <div class="item-meta color-meta" *ngIf="item.color?.name || item.color?.code">
@@ -154,13 +172,18 @@
                       <li *ngFor="let include of item.includes">{{include}}</li>
                     </ul>
                   </div>
-                  <span class="item-price">€{{item.price | number:'1.2-2'}}</span>
+                  <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
                 </div>
               </div>
               
               <div class="order-footer">
-                <span class="order-total">Total: €{{order.total | number:'1.2-2'}}</span>
-                <button class="view-details-btn" type="button">View Details</button>
+                <div class="order-total-wrapper">
+                  <span class="order-total">Total: &euro;{{ getOrderTotal(order) | number:'1.2-2' }}</span>
+                  <span class="order-estimate-note" *ngIf="order.estimatedTotal && order.total !== null && order.total !== undefined && order.total !== order.estimatedTotal">
+                    Estimate: &euro;{{ order.estimatedTotal | number:'1.2-2' }}
+                  </span>
+                </div>
+                <button class="view-details-btn" type="button" (click)="openOrderDetails(order)">View Details</button>
               </div>
             </article>
 
@@ -168,34 +191,238 @@
               You haven't placed any orders yet
             </p>
           </div>
+    </section>
+
+    <div class="order-details-modal-backdrop" *ngIf="showOrderDetailsModal && selectedOrderDetails">
+      <div class="order-details-modal">
+        <button class="close-modal" type="button" (click)="closeOrderDetails()" aria-label="Close">&times;</button>
+        <header class="modal-header">
+          <div>
+            <h3>{{ selectedOrderDetails?.type === 'custom' ? 'Project' : 'Order' }} #{{selectedOrderDetails?.id}}</h3>
+            <p *ngIf="selectedOrderDetails?.name">{{ selectedOrderDetails?.name }}</p>
+            <p class="modal-meta" *ngIf="selectedOrderDetails?.createdAt">Placed: {{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
+          </div>
+          <div class="modal-status">
+            <span class="status-pill" [ngClass]="statusClass(selectedOrderDetails?.status || '')">{{ selectedOrderDetails?.statusLabel }}</span>
+            <span *ngIf="selectedOrderDetails?.progressStatus" class="progress-pill">
+              {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
+            </span>
+          </div>
+        </header>
+
+        <div class="modal-rejection-alert" *ngIf="selectedOrderDetails?.rejectionReason">
+          <strong>Request rejected.</strong>
+          <span>{{ selectedOrderDetails?.rejectionReason }}</span>
+          <small *ngIf="selectedOrderDetails?.rejectionDate">
+            ({{ selectedOrderDetails?.rejectionDate | date:'medium' }})
+          </small>
+        </div>
+
+        <section class="modal-summary">
+          <div class="summary-card">
+            <p class="summary-label">Total</p>
+            <p class="summary-value">&euro;{{ getOrderTotal(selectedOrderDetails) | number:'1.2-2' }}</p>
+            <p class="summary-note" *ngIf="selectedOrderDetails?.estimatedTotal && selectedOrderDetails?.total && selectedOrderDetails?.estimatedTotal !== selectedOrderDetails?.total">
+              Estimate: &euro;{{ selectedOrderDetails?.estimatedTotal | number:'1.2-2' }}
+            </p>
+          </div>
+          <div class="summary-card">
+            <p class="summary-label">Order type</p>
+            <p class="summary-value">{{ selectedOrderDetails?.type === 'custom' ? 'Custom project' : 'Store order' }}</p>
+            <p class="summary-note" *ngIf="selectedOrderDetails?.items?.length">
+              {{ selectedOrderDetails.items.length }} item(s)
+            </p>
+          </div>
+          <div class="summary-card" *ngIf="selectedOrderDetails?.progressStatus">
+            <p class="summary-label">Project stage</p>
+            <p class="summary-value">
+              {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
+            </p>
+          </div>
+          <div class="summary-card" *ngIf="selectedOrderDetails?.createdAt">
+            <p class="summary-label">Placed on</p>
+            <p class="summary-value">{{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
+          </div>
         </section>
 
+        <section class="modal-details" *ngIf="selectedOrderDetails?.description || selectedOrderDetails?.rejectionReason">
+          <div class="detail-block" *ngIf="selectedOrderDetails?.description">
+            <h4>Project details</h4>
+            <p>{{ selectedOrderDetails?.description }}</p>
+          </div>
+          <div class="detail-block rejection" *ngIf="selectedOrderDetails?.rejectionReason">
+            <h4>Rejection details</h4>
+            <p>{{ selectedOrderDetails?.rejectionReason }}</p>
+            <p *ngIf="selectedOrderDetails?.rejectionDate">Rejected on {{ selectedOrderDetails?.rejectionDate | date:'medium' }}</p>
+          </div>
+        </section>
+
+        <section class="modal-items">
+          <h4>Items</h4>
+          <div class="item-row" *ngFor="let item of selectedOrderDetails?.items">
+            <img *ngIf="item.image" [src]="item.image" [alt]="item.name">
+            <div class="item-info">
+              <h5>{{ item.name }}</h5>
+              <p *ngIf="item.description">{{ item.description }}</p>
+              <p class="item-meta">Quantity: {{ item.quantity }}</p>
+              <p class="item-meta" *ngIf="item.dimensions">
+                <strong>Measurements:</strong>
+                <span *ngIf="item.dimensions.width">W {{ item.dimensions.width }}</span>
+                <span *ngIf="item.dimensions.height"> x H {{ item.dimensions.height }}</span>
+                <span *ngIf="item.dimensions.depth"> x D {{ item.dimensions.depth }}</span>
+              </p>
+              <p class="item-meta" *ngIf="item.color?.name || item.color?.code">
+                <strong>Color:</strong>
+                <span class="color-chip">
+                  <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
+                  {{ item.color?.name || item.color?.code }}
+                </span>
+              </p>
+              <div class="available-colors" *ngIf="item.availableColors?.length">
+                <strong>Available colors:</strong>
+                <span class="color-chip" *ngFor="let color of item.availableColors">
+                  <span class="color-dot" [style.backgroundColor]="color.codigo_hex || color.code || '#ccc'"></span>
+                  {{ color.nombre || color.name || color.codigo_hex || color.code }}
+                </span>
+              </div>
+              <ul class="item-includes" *ngIf="item.includes?.length">
+                <li *ngFor="let include of item.includes">{{ include }}</li>
+              </ul>
+            </div>
+            <div class="item-price">
+              <span>Unit: &euro;{{ item.price | number:'1.2-2' }}</span>
+              <span>Total: &euro;{{ (item.price || 0) * (item.quantity || 1) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+        <!-- Rejected -->
+        <section class="rejected-section" *ngIf="activeTab === 'rejected'">
+          <h2>Rejected Requests</h2>
+          <div class="rejected-list" *ngIf="rejectedOrders.length; else noRejectedOrders">
+            <article class="rejected-card" *ngFor="let order of rejectedOrders">
+              <div class="rejected-card-header">
+                <div>
+                  <h3>Request #{{order.id}}</h3>
+                  <p class="order-title" *ngIf="order.name">{{order.name}}</p>
+                </div>
+                <span class="order-status rejected">Rejected</span>
+              </div>
+              <p class="rejection-message" *ngIf="order.rejectionReason">{{order.rejectionReason}}</p>
+              <div class="rejected-meta">
+                <span>Submitted: {{order.date}}</span>
+                <span *ngIf="order.rejectionDate">Rejected: {{order.rejectionDate | date:'mediumDate'}}</span>
+                <span>Total requested: &euro;{{ (order.estimatedTotal || getOrderTotal(order)) | number:'1.2-2' }}</span>
+              </div>
+              <div class="rejected-actions">
+                <button type="button" class="view-details-btn" (click)="openRejectedModal(order)">View details</button>
+                <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <ng-template #noRejectedOrders>
+          <p class="empty-state">You don't have rejected requests.</p>
+        </ng-template>
         <!-- Favoritos -->
         <section class="favorites-section" *ngIf="activeTab === 'favorites'">
           <h2>My Favorites</h2>
-          <div class="favorites-grid">
+          <div class="favorites-grid" *ngIf="favorites.length; else favoritesState">
             <article class="favorite-card" *ngFor="let item of favorites">
-              <img [src]="item.image" [alt]="item.name">
+              <img [src]="item.item_image || 'https://via.placeholder.com/400x260?text=Favorite'" [alt]="item.item_name">
               <button class="remove-favorite" (click)="removeFavorite(item.id)" aria-label="Remove from favorites">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                 </svg>
               </button>
               <div class="favorite-info">
-                <h3>{{item.name}}</h3>
-                <p class="favorite-price">${{item.price}}</p>
-                <button class="add-to-cart-btn">Add to Cart</button>
+                <p class="favorite-tag">{{ item.item_type | titlecase }}</p>
+                <h3>{{item.item_name}}</h3>
+                <p class="favorite-price" *ngIf="item.item_price">&euro;{{item.item_price | number:'1.2-2'}}</p>
+                <p class="favorite-price muted" *ngIf="!item.item_price">Custom price</p>
+                <p class="favorite-meta" *ngIf="item.extra?.category">Category: {{ item.extra?.category }}</p>
+                <button class="add-to-cart-btn" type="button">Saved</button>
               </div>
             </article>
-
-            <p class="empty-state" *ngIf="favorites.length === 0">
-              You don't have any favorite products yet
-            </p>
           </div>
         </section>
+
+        <section class="messages-section" *ngIf="activeTab === 'messages'">
+          <h2>Messages</h2>
+          <p class="empty-state" *ngIf="messagesLoading">Loading your messages...</p>
+          <p class="empty-state error" *ngIf="messagesError">{{messagesError}}</p>
+          <div class="messages-list" *ngIf="!messagesLoading && !messagesError && userMessages.length">
+            <article class="message-card" *ngFor="let msg of userMessages">
+              <div class="message-header">
+                <div>
+                  <h3>{{ msg.subject || 'General inquiry' }}</h3>
+                  <p class="message-meta">Sent on {{ msg.created_at | date:'medium' }}</p>
+                </div>
+                <span class="status-pill">{{ msg.status }}</span>
+              </div>
+              <p class="message-body">{{ msg.message }}</p>
+              <div class="response-block" *ngIf="msg.response">
+                <strong>Response from {{ msg.admin_name || 'Moderni' }}:</strong>
+                <p>{{ msg.response }}</p>
+                <small *ngIf="msg.response_created_at">
+                  {{ msg.response_created_at | date:'medium' }}
+                </small>
+              </div>
+            </article>
+          </div>
+          <p class="empty-state" *ngIf="!messagesLoading && !messagesError && userMessages.length === 0">
+            You don�t have any messages yet.
+          </p>
+        </section>
+
+        <ng-template #favoritesState>
+          <p class="empty-state" *ngIf="!favoritesLoading && !favoritesError">
+            You don't have any favorite products yet
+          </p>
+          <p class="empty-state" *ngIf="favoritesLoading">Loading your favorites...</p>
+          <p class="empty-state error" *ngIf="favoritesError">{{favoritesError}}</p>
+        </ng-template>
       </div>
+    <div class="rejection-modal-backdrop" *ngIf="showRejectedModal && selectedRejectedOrder">
+      <div class="rejection-modal">
+        <button class="close-modal" type="button" (click)="closeRejectedModal()" aria-label="Close">
+          &times;
+        </button>
+        <h3>Request #{{selectedRejectedOrder?.id}} was rejected</h3>
+        <p class="modal-status">Status: {{selectedRejectedOrder?.statusLabel}}</p>
+        <p class="modal-reason" *ngIf="selectedRejectedOrder?.rejectionReason">
+          "{{selectedRejectedOrder?.rejectionReason}}"
+        </p>
+        <div class="modal-meta">
+          <span *ngIf="selectedRejectedOrder?.date">Submitted: {{selectedRejectedOrder?.date}}</span>
+          <span *ngIf="selectedRejectedOrder?.rejectionDate">Rejected: {{selectedRejectedOrder?.rejectionDate | date:'medium'}}</span>
+          <span>Total requested: &euro;{{ (selectedRejectedOrder?.estimatedTotal || getOrderTotal(selectedRejectedOrder)) | number:'1.2-2' }}</span>
+        </div>
+        <div class="modal-items" *ngIf="selectedRejectedOrder?.items?.length">
+          <h4>Requested items</h4>
+          <ul>
+            <li *ngFor="let item of selectedRejectedOrder?.items">
+              <span class="item-name">{{item.name}}</span>
+              <span class="item-qty">x{{item.quantity}}</span>
+              <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
+          <button type="button" class="close-secondary" (click)="closeRejectedModal()">Close</button>
+        </div>
+      </div>
+    </div>
     </ng-container>
   </div>
 </main>
 
 <app-footer></app-footer>
+
+
+
+
+

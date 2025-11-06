@@ -116,6 +116,17 @@
       
       <div class="grid-container">
         <div *ngFor="let set of kitchenSets" class="set-card" (click)="selectSet(set)">
+          <div class="card-favorite" *ngIf="!isAdmin">
+            <app-favorite-toggle
+              [itemType]="'service'"
+              [itemId]="set.id"
+              [itemSlug]="'kitchen-set-' + set.id"
+              [itemName]="set.name"
+              [itemImage]="set.image"
+              [itemPrice]="set.basePrice"
+              [extra]="{ category: 'kitchen', style: set.style }">
+            </app-favorite-toggle>
+          </div>
           <div class="set-image">
             <img [src]="set.image" [alt]="set.name">
           </div>

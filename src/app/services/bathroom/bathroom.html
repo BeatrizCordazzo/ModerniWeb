@@ -93,6 +93,17 @@
       <p class="section-subtitle">All sets come in standard sizes with customizable colors</p>
       <div class="grid-container">
         <div *ngFor="let set of bathroomSets" class="set-card" (click)="selectSet(set)">
+          <div class="card-favorite" *ngIf="!isAdmin">
+            <app-favorite-toggle
+              [itemType]="'service'"
+              [itemId]="set.id"
+              [itemSlug]="'bathroom-set-' + set.id"
+              [itemName]="set.name"
+              [itemImage]="set.image"
+              [itemPrice]="set.basePrice"
+              [extra]="{ category: 'bathroom', style: set.style }">
+            </app-favorite-toggle>
+          </div>
           <div class="set-image">
             <img [src]="set.image" [alt]="set.name">
           </div>

@@ -118,6 +118,17 @@
             *ngFor="let set of bedroomSets"
             class="set-card"
             (click)="selectSet(set)">
+            <div class="card-favorite" *ngIf="!isAdmin">
+              <app-favorite-toggle
+                [itemType]="'service'"
+                [itemId]="set.id"
+                [itemSlug]="'bedroom-set-' + set.id"
+                [itemName]="set.name"
+                [itemImage]="set.image"
+                [itemPrice]="set.basePrice"
+                [extra]="{ category: 'bedroom', style: set.style }">
+              </app-favorite-toggle>
+            </div>
             <div class="card-image">
               <img [src]="set.image" [alt]="set.name">
             </div>

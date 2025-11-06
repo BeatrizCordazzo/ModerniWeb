@@ -7,6 +7,7 @@ import { ToastNotification } from '../../shared/toast-notification/toast-notific
 import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
+import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
 
 interface KitchenSet {
   id: number;
@@ -59,7 +60,7 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-kitchen',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal],
+  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent],
   templateUrl: './kitchen.html',
   styleUrl: './kitchen.scss'
 })

@@ -6,6 +6,7 @@ import { ToastNotification } from '../../shared/toast-notification/toast-notific
 import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
+import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
 
 interface FurnitureCategory {
   id: string;
@@ -37,7 +38,7 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-others',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification],
+  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, FavoriteToggleComponent],
   templateUrl: './others.html',
   styleUrl: './others.scss'
 })
