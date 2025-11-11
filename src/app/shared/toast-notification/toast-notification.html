@@ -1,16 +1,24 @@
-<div class="toast-container" 
-     role="status" aria-live="polite"
-     [class.visible]="isVisible"
-     [class.exiting]="isExiting"
-     [class.success]="type === 'success'"
-     [class.error]="type === 'error'"
-     [class.info]="type === 'info'"
-     [class.warning]="type === 'warning'">
+<div class="toast-container"
+  role="status" aria-live="polite"
+  [class.visible]="isVisible"
+  [class.exiting]="isExiting"
+  [class.success]="type === 'success'"
+  [class.error]="type === 'error'"
+  [class.info]="type === 'info'"
+  [class.warning]="type === 'warning'">
   <div class="toast-icon" aria-hidden="true">
-    <span *ngIf="type === 'success'">✓</span>
-    <span *ngIf="type === 'error'">✕</span>
-    <span *ngIf="type === 'info'">ℹ</span>
-    <span *ngIf="type === 'warning'">⚠</span>
+    @if (type === 'success') {
+      <span>✓</span>
+    }
+    @if (type === 'error') {
+      <span>✕</span>
+    }
+    @if (type === 'info') {
+      <span>ℹ</span>
+    }
+    @if (type === 'warning') {
+      <span>⚠</span>
+    }
   </div>
   <div class="toast-content">
     <div class="toast-message">{{ message }}</div>

@@ -62,6 +62,7 @@ export class AdminCarpintero implements OnInit {
   contactMessages: Array<ContactMessage & { pendingResponse?: string }> = [];
   messagesLoading = false;
   messagesError = '';
+  unreadMessageCount = 0;
 
 
   constructor(private datos: Datos, private router: Router) {}
@@ -76,6 +77,7 @@ export class AdminCarpintero implements OnInit {
         }
         this.userRole = user.rol;
         this.loadPending();
+        this.loadMessages();
       },
       error: () => {
         // fallback: check localStorage
@@ -89,6 +91,7 @@ export class AdminCarpintero implements OnInit {
             }
             this.userRole = parsed.rol;
             this.loadPending();
+            this.loadMessages();
             return;
           }
         } catch (e) {}
@@ -381,8 +384,14 @@ export class AdminCarpintero implements OnInit {
       next: (res) => {
         if (res && res.success && Array.isArray(res.messages)) {
           this.contactMessages = res.messages.map(msg => ({ ...msg, pendingResponse: '' }));
+          if (typeof res.unread_count === 'number') {
+            this.unreadMessageCount = res.unread_count;
+          } else {
+            this.updateUnreadCountFromMessages();
+          }
         } else {
           this.contactMessages = [];
+          this.unreadMessageCount = 0;
         }
         this.messagesLoading = false;
       },
@@ -392,6 +401,49 @@ export class AdminCarpintero implements OnInit {
         this.messagesError = 'Unable to load messages.';
       }
     });
+  }
+
+  private updateUnreadCountFromMessages(): void {
+    this.unreadMessageCount = this.contactMessages.reduce((count, msg) => {
+      const isUnread = Number(msg.admin_unread ?? 0) === 1;
+      return count + (isUnread ? 1 : 0);
+    }, 0);
+  }
+
+  markMessageStatus(msg: ContactMessage & { pendingResponse?: string }, state: 'new' | 'read'): void {
+    if (!msg || !msg.id) return;
+    const isCurrentlyUnread = Number(msg.admin_unread ?? 0) === 1;
+    if ((state === 'read' && !isCurrentlyUnread) || (state === 'new' && isCurrentlyUnread)) {
+      return;
+    }
+    this.datos.updateMessageStatus(msg.id, state).subscribe({
+      next: () => {
+        msg.admin_unread = state === 'new' ? 1 : 0;
+        if (state === 'read' && msg.status === 'new') {
+          msg.status = 'read';
+        } else if (state === 'new' && msg.status === 'read') {
+          msg.status = 'new';
+        }
+        this.updateUnreadCountFromMessages();
+        this.showToast(
+          state === 'read' ? 'Mensaje marcado como leído' : 'Mensaje marcado como no leído',
+          'info'
+        );
+      },
+      error: (err) => {
+        console.error('Error updating message status', err);
+        this.showToast('No se pudo actualizar el estado del mensaje', 'error');
+      }
+    });
+  }
+
+  isMessageUnread(msg: ContactMessage): boolean {
+    return Number(msg.admin_unread ?? 0) === 1;
+  }
+
+  formatMessageStatus(status: string): string {
+    if (!status) return 'New';
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   sendResponse(msg: ContactMessage & { pendingResponse?: string }): void {

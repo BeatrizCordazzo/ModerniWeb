@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Datos, FavoriteItem, ContactMessage } from '../datos';
+import { Datos, FavoriteItem, ContactMessage, OrderReviewPayload } from '../datos';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,7 @@ interface User {
   address: string;
   avatar: string;
   memberSince: string;
+  rol?: string;
 }
 
 interface OrderItem {
@@ -52,6 +53,23 @@ interface Order {
   estimatedTotal?: number | null;
   rejectionReason?: string | null;
   rejectionDate?: string | null;
+  canReview?: boolean;
+  review?: OrderReview | null;
+  showReviewForm?: boolean;
+  pendingReview?: ReviewFormState;
+  reviewSubmitting?: boolean;
+  reviewError?: string;
+}
+
+interface OrderReview {
+  rating: number;
+  comment?: string | null;
+  createdAt?: string | null;
+}
+
+interface ReviewFormState {
+  rating: number;
+  comment: string;
 }
 
 @Component({
@@ -66,6 +84,10 @@ export class Profile implements OnInit, OnDestroy {
   originalUser: User | null = null;
   isLoading = true;
   notLogged = false;
+  reviewStars = [1, 2, 3, 4, 5];
+  userRole = '';
+  isAdminUser = false;
+  adminUnreadCount = 0;
 
   constructor(private router: Router, private datosService: Datos) {}
 
@@ -85,6 +107,10 @@ export class Profile implements OnInit, OnDestroy {
         this.originalUser = null;
         this.notLogged = true;
         this.isLoading = false;
+        this.userRole = '';
+        this.isAdminUser = false;
+        this.adminUnreadCount = 0;
+        this.userMessages = [];
         // Optionally navigate to profile root to refresh UI
         this.router.navigate(['/profile']);
       }
@@ -97,6 +123,8 @@ export class Profile implements OnInit, OnDestroy {
         if (user && user.email) {
           this.user = user;
           this.originalUser = { ...user };
+          this.userRole = this.normalizeRole(user?.rol);
+          this.isAdminUser = this.userRole === 'admin';
           this.isLoading = false;
           // Load real orders for this logged user
           this.fetchOrders(user.email);
@@ -120,9 +148,12 @@ export class Profile implements OnInit, OnDestroy {
               phone: parsed.telefono || parsed.phone || '',
               address: parsed.direccion || parsed.address || '',
               avatar: parsed.avatar || '',
-              memberSince: parsed.fecha_registro || parsed.memberSince || ''
+              memberSince: parsed.fecha_registro || parsed.memberSince || '',
+              rol: parsed.rol || parsed.role || ''
             };
             this.originalUser = { ...this.user };
+            this.userRole = this.normalizeRole(parsed.rol || parsed.role);
+            this.isAdminUser = this.userRole === 'admin';
             this.isLoading = false;
             this.notLogged = false;
             if (this.user.email) {
@@ -186,6 +217,11 @@ export class Profile implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.favoritesSub?.unsubscribe();
     this.messagesSub?.unsubscribe();
+  }
+
+  private normalizeRole(role: any): string {
+    if (!role || typeof role !== 'string') return '';
+    return role.toLowerCase().trim();
   }
 
   getOrderTotal(order: Order | null): number {
@@ -298,6 +334,15 @@ export class Profile implements OnInit, OnDestroy {
         const parsed = new Date(rejectionDateRaw);
         rejectionDate = Number.isNaN(parsed.getTime()) ? rejectionDateRaw : parsed.toISOString();
       }
+      const reviewPayload = o.review ?? null;
+      const reviewData: OrderReview | null = reviewPayload && typeof reviewPayload === 'object'
+        ? {
+            rating: Number(reviewPayload.rating) || 0,
+            comment: reviewPayload.comment ?? null,
+            createdAt: reviewPayload.created_at ?? reviewPayload.createdAt ?? null
+          }
+        : null;
+      const canReview = Boolean(o.can_review ?? o.canReview);
 
       return {
         id: Number(o.id),
@@ -314,7 +359,9 @@ export class Profile implements OnInit, OnDestroy {
         total: backendTotal,
         estimatedTotal,
         rejectionReason,
-        rejectionDate
+        rejectionDate,
+        canReview,
+        review: reviewData
       } as Order;
     });
   }
@@ -380,6 +427,60 @@ export class Profile implements OnInit, OnDestroy {
     this.selectedOrderDetails = null;
   }
 
+  openReviewForm(order: Order): void {
+    if (!order || !order.canReview) return;
+    order.showReviewForm = true;
+    order.reviewError = '';
+    if (!order.pendingReview) {
+      order.pendingReview = { rating: 5, comment: '' };
+    }
+  }
+
+  cancelReviewForm(order: Order): void {
+    if (!order) return;
+    order.showReviewForm = false;
+    order.reviewError = '';
+  }
+
+  setReviewRating(order: Order, rating: number): void {
+    if (!order || !order.canReview) return;
+    if (rating < 1) rating = 1;
+    if (rating > 5) rating = 5;
+    if (!order.pendingReview) {
+      order.pendingReview = { rating, comment: '' };
+    } else {
+      order.pendingReview.rating = rating;
+    }
+  }
+
+  submitOrderReview(order: Order): void {
+    if (!order || !order.pendingReview || !order.canReview) return;
+    const payload: OrderReviewPayload = {
+      order_id: order.id,
+      order_type: order.type,
+      rating: order.pendingReview.rating,
+      comment: order.pendingReview.comment?.trim() || ''
+    };
+    order.reviewSubmitting = true;
+    order.reviewError = '';
+    this.datosService.submitOrderReview(payload).subscribe({
+      next: () => {
+        order.reviewSubmitting = false;
+        order.review = {
+          rating: payload.rating,
+          comment: payload.comment,
+          createdAt: new Date().toISOString()
+        };
+        order.canReview = false;
+        order.showReviewForm = false;
+      },
+      error: (err) => {
+        order.reviewSubmitting = false;
+        order.reviewError = err?.error?.error || 'Unable to submit your review right now.';
+      }
+    });
+  }
+
   private initializeFavorites(): void {
     if (this.favoritesSub) return;
     this.favoritesSub = this.datosService.favorites$.subscribe(favs => {
@@ -404,6 +505,10 @@ export class Profile implements OnInit, OnDestroy {
   }
 
   private initializeMessages(): void {
+    if (this.isAdminUser) {
+      this.fetchAdminMessages();
+      return;
+    }
     if (this.messagesSub) return;
     this.messagesLoading = true;
     this.messagesError = '';
@@ -426,5 +531,71 @@ export class Profile implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  private fetchAdminMessages(): void {
+    this.messagesLoading = true;
+    this.messagesError = '';
+    this.datosService.getAdminMessages().subscribe({
+      next: (res) => {
+        if (res && res.success && Array.isArray(res.messages)) {
+          this.userMessages = res.messages;
+          this.updateAdminUnreadCount();
+        } else {
+          this.userMessages = [];
+          this.adminUnreadCount = 0;
+        }
+        this.messagesLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading admin messages', err);
+        this.messagesLoading = false;
+        if (err && err.status === 403) {
+          this.messagesError = 'Solo los administradores pueden ver estos mensajes.';
+        } else if (err && err.status === 401) {
+          this.messagesError = 'Please log in to view the inbox.';
+        } else {
+          this.messagesError = 'Unable to load messages.';
+        }
+      }
+    });
+  }
+
+  private updateAdminUnreadCount(): void {
+    this.adminUnreadCount = this.userMessages.reduce((count, msg) => {
+      return count + (this.isAdminMessageUnread(msg) ? 1 : 0);
+    }, 0);
+  }
+
+  markAdminMessageStatus(msg: ContactMessage, state: 'new' | 'read'): void {
+    if (!this.isAdminUser || !msg || !msg.id) return;
+    const currentlyUnread = this.isAdminMessageUnread(msg);
+    if ((state === 'read' && !currentlyUnread) || (state === 'new' && currentlyUnread)) {
+      return;
+    }
+    this.datosService.updateMessageStatus(msg.id, state).subscribe({
+      next: () => {
+        msg.admin_unread = state === 'new' ? 1 : 0;
+        if (state === 'read' && msg.status === 'new') {
+          msg.status = 'read';
+        } else if (state === 'new' && msg.status === 'read') {
+          msg.status = 'new';
+        }
+        this.updateAdminUnreadCount();
+      },
+      error: (err) => {
+        console.error('Error updating admin message state', err);
+        this.messagesError = 'Unable to update message state.';
+      }
+    });
+  }
+
+  isAdminMessageUnread(msg: ContactMessage): boolean {
+    return Number(msg?.admin_unread ?? 0) === 1;
+  }
+
+  formatAdminMessageStatus(status: string): string {
+    if (!status) return 'New';
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 }

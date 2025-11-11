@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
+import {
+  CartConfirmationModal,
+  CartItem,
+} from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
 import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
@@ -38,9 +41,9 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-others',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, FavoriteToggleComponent],
+  imports: [FormsModule, CartConfirmationModal, ToastNotification, FavoriteToggleComponent],
   templateUrl: './others.html',
-  styleUrl: './others.scss'
+  styleUrl: './others.scss',
 })
 export class Others implements OnInit {
   // Modal state
@@ -50,25 +53,62 @@ export class Others implements OnInit {
   isAdmin = false;
   modalProductId: number | null = null;
   selectedProductColors: { [productId: number]: number } = {};
-  
+
   // Toast notification state
   showToast = false;
   toastMessage = '';
   currentProductName = '';
-  
+
   // Loading state
   isLoading = true;
   loadError = '';
+
+  // --- borrar producto (admin) ---
+  showDeleteConfirm = false;
+  productToDelete: number | null = null;
+
   // Furniture categories for carousel
   categories: FurnitureCategory[] = [
-    { id: 'all', name: 'All Products', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=300&fit=crop' },
-    { id: 'Chairs', name: 'Chairs', image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=300&h=300&fit=crop' },
-    { id: 'Tables', name: 'Tables', image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=300&h=300&fit=crop' },
-    { id: 'Shelves', name: 'Shelves', image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=300&h=300&fit=crop' },
-    { id: 'Stools', name: 'Stools', image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop' },
-    { id: 'Benches', name: 'Benches', image: 'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=300&h=300&fit=crop' },
-    { id: 'Organizers', name: 'Organizers', image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300&h=300&fit=crop' },
-    { id: 'Mirrors', name: 'Mirrors', image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=300&h=300&fit=crop' }
+    {
+      id: 'all',
+      name: 'All Products',
+      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Chairs',
+      name: 'Chairs',
+      image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Tables',
+      name: 'Tables',
+      image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Shelves',
+      name: 'Shelves',
+      image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Stools',
+      name: 'Stools',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Benches',
+      name: 'Benches',
+      image: 'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Organizers',
+      name: 'Organizers',
+      image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300&h=300&fit=crop',
+    },
+    {
+      id: 'Mirrors',
+      name: 'Mirrors',
+      image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=300&h=300&fit=crop',
+    },
   ];
 
   // All products (loaded from API)
@@ -91,27 +131,33 @@ export class Others implements OnInit {
   // Available filter options
   allColors: string[] = [];
 
-  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
+  constructor(
+    private datosService: Datos,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadProducts();
     this.datosService.getLoggedUser().subscribe({
       next: (u: any) => {
-        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        const role = u && u.rol ? u.rol : u && u.role ? u.role : null;
         this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
       },
-      error: () => { this.isAdmin = false; }
+      error: () => {
+        this.isAdmin = false;
+      },
     });
   }
 
   loadProducts() {
     this.isLoading = true;
     this.loadError = '';
-    
+
     this.datosService.getIndividualProducts().subscribe({
       next: (apiProducts: ApiProduct[]) => {
         // Map API products to component Product interface
-        this.allProducts = apiProducts.map(ap => ({
+        this.allProducts = apiProducts.map((ap) => ({
           id: ap.id,
           name: ap.name,
           collection: ap.collection,
@@ -121,9 +167,9 @@ export class Others implements OnInit {
           category: ap.category,
           colors: ap.colors,
           image: ap.image,
-          inStock: ap.inStock
+          inStock: ap.inStock,
         }));
-        
+
         this.isLoading = false;
         this.extractFilters();
         this.applyFilters();
@@ -132,14 +178,14 @@ export class Others implements OnInit {
         console.error('Error loading products:', error);
         this.loadError = 'Failed to load products. Please try again later.';
         this.isLoading = false;
-      }
+      },
     });
   }
 
   extractFilters() {
     const colorSet = new Set<string>();
-    this.allProducts.forEach(product => {
-      product.colors.forEach(color => colorSet.add(color.name));
+    this.allProducts.forEach((product) => {
+      product.colors.forEach((color) => colorSet.add(color.name));
     });
     this.allColors = Array.from(colorSet).sort();
   }
@@ -168,22 +214,22 @@ export class Others implements OnInit {
 
     // Filter by category
     if (this.selectedCategory !== 'all') {
-      products = products.filter(p => p.category === this.selectedCategory);
+      products = products.filter((p) => p.category === this.selectedCategory);
     }
 
     // Filter by price
-    products = products.filter(p => p.price >= this.currentMinPrice && p.price <= this.currentMaxPrice);
+    products = products.filter(
+      (p) => p.price >= this.currentMinPrice && p.price <= this.currentMaxPrice
+    );
 
     // Filter by colors
     if (this.selectedColors.length > 0) {
-      products = products.filter(p => 
-        p.colors.some(c => this.selectedColors.includes(c.name))
-      );
+      products = products.filter((p) => p.colors.some((c) => this.selectedColors.includes(c.name)));
     }
 
     // Filter by stock
     if (this.onlyInStock) {
-      products = products.filter(p => p.inStock);
+      products = products.filter((p) => p.inStock);
     }
 
     // Sort products
@@ -193,7 +239,7 @@ export class Others implements OnInit {
   }
 
   sortProducts(products: Product[]) {
-    switch(this.sortBy) {
+    switch (this.sortBy) {
       case 'price-asc':
         products.sort((a, b) => a.price - b.price);
         break;
@@ -234,10 +280,11 @@ export class Others implements OnInit {
 
   openCartModal(product: Product): void {
     if (!product.inStock) return;
-    
+
     // Get selected color or default to first color
     const colorIndex = this.selectedProductColors[product.id] ?? 0;
-    const selectedColor = product.colors?.[colorIndex] || product.colors?.[0] || { name: 'Default', code: '#000000' };
+    const selectedColor = product.colors?.[colorIndex] ||
+      product.colors?.[0] || { name: 'Default', code: '#000000' };
 
     this.modalProductId = product.id;
     this.modalItem = {
@@ -248,9 +295,9 @@ export class Others implements OnInit {
       image: product.image,
       selectedColor: {
         name: selectedColor.name,
-        code: selectedColor.code
+        code: selectedColor.code,
       },
-      dimensions: (product as any).dimensions ?? null
+      dimensions: (product as any).dimensions ?? null,
     };
     this.modalAdminMode = this.isAdmin;
     this.showModal = true;
@@ -270,16 +317,20 @@ export class Others implements OnInit {
               price: this.modalItem!.price,
               image: this.modalItem!.image,
               selectedColor: this.modalItem!.selectedColor,
-              dimensions: (this.modalItem as any).dimensions || null
+              dimensions: (this.modalItem as any).dimensions || null,
             });
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
             this.showToast = true;
-            setTimeout(() => { this.showToast = false; }, 3500);
+            setTimeout(() => {
+              this.showToast = false;
+            }, 3500);
           } else {
             this.closeModal();
             alert('You must be logged in to add items to the cart. Please log in first.');
-            try { this.router.navigate(['/login']); } catch (e) {}
+            try {
+              this.router.navigate(['/login']);
+            } catch (e) {}
           }
         },
         error: () => {
@@ -292,19 +343,25 @@ export class Others implements OnInit {
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
                 selectedColor: this.modalItem!.selectedColor,
-                dimensions: (this.modalItem as any).dimensions || null
+                dimensions: (this.modalItem as any).dimensions || null,
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
               this.showToast = true;
-              setTimeout(() => { this.showToast = false; }, 3500);
+              setTimeout(() => {
+                this.showToast = false;
+              }, 3500);
               return;
             }
-          } catch (e) { /* ignore */ }
+          } catch (e) {
+            /* ignore */
+          }
           this.closeModal();
           alert('You must be logged in to add items to the cart. Please log in first.');
-          try { this.router.navigate(['/login']); } catch (e) {}
-        }
+          try {
+            this.router.navigate(['/login']);
+          } catch (e) {}
+        },
       });
     }
   }
@@ -325,15 +382,19 @@ export class Others implements OnInit {
     if (targetId == null) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
-    const idx = this.allProducts.findIndex(p => p.id === targetId);
+    const idx = this.allProducts.findIndex((p) => p.id === targetId);
     if (idx === -1) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
@@ -352,7 +413,7 @@ export class Others implements OnInit {
       ...current,
       name: edited.name ?? current.name,
       price: updatedPrice,
-      image: edited.image ?? current.image
+      image: edited.image ?? current.image,
     };
     this.allProducts[idx] = updatedProduct;
     this.applyFilters();
@@ -361,7 +422,7 @@ export class Others implements OnInit {
       id: updatedProduct.id,
       name: updatedProduct.name,
       price: updatedProduct.price,
-      image: updatedProduct.image
+      image: updatedProduct.image,
     };
 
     if (edited.dimensions) {
@@ -373,18 +434,58 @@ export class Others implements OnInit {
       next: () => {
         this.toastMessage = 'Cambios guardados en el servidor.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 2000);
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
       },
       error: (err) => {
         console.error('Error updating product', err);
         this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 4000);
-      }
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
     });
   }
 
   addToCart(product: Product) {
     this.openCartModal(product);
+  }
+
+  confirmDeleteProduct(productId: number, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.productToDelete = productId;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.productToDelete = null;
+  }
+
+  executeDelete() {
+    if (!this.productToDelete) return;
+    this.datosService.deleteProduct(this.productToDelete).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.productToDelete = null;
+        this.toastMessage = 'Producto eliminado correctamente.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
+        this.loadProducts(); // << recarga others
+      },
+      error: (err) => {
+        console.error('Error eliminando producto', err);
+        this.toastMessage = 'Error eliminando el producto.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
+    });
   }
 }

@@ -1,0 +1,41 @@
+<section class="reviews-section">
+  <div class="reviews-container">
+    <header class="reviews-header">
+      <p class="eyebrow">Testimonios reales</p>
+      <h2>Nuestros clientes confían en Moderni</h2>
+      <p class="subtitle">
+        Descubre lo que dicen quienes ya completaron sus proyectos con nosotros.
+      </p>
+    </header>
+
+    @if (isLoading) {
+      <p class="state">Cargando reseñas...</p>
+    }
+    @if (!isLoading && error) {
+      <p class="state error">{{ error }}</p>
+    }
+
+    @if (!isLoading && !error && reviews.length) {
+      <div class="reviews-grid">
+        @for (review of reviews; track review.id) {
+          <article class="review-card">
+            <div class="rating">
+              @for (star of stars; track star) {
+                <span [class.filled]="review.rating >= star">&#9733;</span>
+              }
+            </div>
+            <p class="comment">
+              {{ review.comment || 'Sin comentario.' }}
+            </p>
+            <div class="review-footer">
+              <div>
+                <p class="author">{{ review.user_name }}</p>
+                <small>{{ review.created_at | date:'mediumDate' }}</small>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>

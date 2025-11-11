@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirmation-modal/custom-order-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
+import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
@@ -60,7 +61,7 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-kitchen',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent],
+  imports: [FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent, ConfirmationModal],
   templateUrl: './kitchen.html',
   styleUrl: './kitchen.scss'
 })
@@ -86,6 +87,10 @@ export class Kitchen implements OnInit {
   
   // Pre-designed kitchen sets (loaded from API)
   kitchenSets: KitchenSet[] = [];
+  
+  // Confirmation modal for delete
+  showDeleteConfirm = false;
+  productToDelete: number | null = null;
 
   constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
 
@@ -583,6 +588,44 @@ export class Kitchen implements OnInit {
       error: (err) => {
         console.error('Error updating product', err);
         this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 4000);
+      }
+    });
+  }
+
+  confirmDeleteProduct(productId: number, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.productToDelete = productId;
+    this.showDeleteConfirm = true;
+  }
+  
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.productToDelete = null;
+  }
+  
+  executeDelete() {
+    if (!this.isAdmin || !this.productToDelete) {
+      return;
+    }
+    
+    this.datosService.deleteProduct(this.productToDelete).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.productToDelete = null;
+        this.toastMessage = 'Producto eliminado correctamente.';
+        this.showToast = true;
+        setTimeout(() => { this.showToast = false; }, 2000);
+        // Reload products
+        this.loadKitchenSets();
+      },
+      error: (err) => {
+        console.error('Error deleting product:', err);
+        this.showDeleteConfirm = false;
+        this.productToDelete = null;
+        this.toastMessage = 'Error al eliminar el producto.';
         this.showToast = true;
         setTimeout(() => { this.showToast = false; }, 4000);
       }

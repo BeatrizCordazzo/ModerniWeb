@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService, SimpleCartItem } from '../shared/cart.service';
@@ -11,7 +11,7 @@ import { ToastNotification } from '../shared/toast-notification/toast-notificati
 
 @Component({
   selector: 'app-checkout',
-  imports: [Nav, Footer, CommonModule, FormsModule, ToastNotification],
+  imports: [Nav, Footer, FormsModule, ToastNotification],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss'
 })

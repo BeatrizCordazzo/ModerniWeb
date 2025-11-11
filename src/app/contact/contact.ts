@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Datos } from '../datos';
 
@@ -15,7 +15,7 @@ interface ContactFormData {
 
 @Component({
   selector: 'app-contact',
-  imports: [Nav, Footer, CommonModule, FormsModule],
+  imports: [Nav, Footer, FormsModule],
   templateUrl: './contact.html',
   styleUrl: './contact.scss'
 })

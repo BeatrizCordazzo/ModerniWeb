@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -10,7 +12,7 @@
   .modal-container {
     width: 92%;
     max-width: 780px;
-    background: #fff;
+    background: theme.color('surface');
     border-radius: 10px;
     padding: 18px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.2);
@@ -40,5 +42,8 @@
 
 .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
 .btn { padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-.btn-cancel { background:#f5f5f5; color:#333; }
-.btn-confirm { background:#4CAF50; color:#fff; }
+.btn-cancel { background:theme.color('gray-100'); color:#333; }
+.btn-confirm { background:#4CAF50; color:theme.color('surface'); }
+
+
+

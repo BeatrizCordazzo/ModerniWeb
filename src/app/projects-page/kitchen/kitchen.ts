@@ -1,23 +1,54 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Datos, ShowcaseProject } from '../../datos';
+import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-kitchen',
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmationModal],
   templateUrl: './kitchen.html',
   styleUrl: './kitchen.scss'
 })
-export class Kitchen implements OnInit {
+export class Kitchen implements OnInit, OnDestroy {
   projects: ShowcaseProject[] = [];
   isLoading = true;
   errorMessage = '';
   selectedProject: ShowcaseProject | null = null;
+  isAdmin = false;
+  
+  // Confirmation modal
+  showDeleteConfirm = false;
+  projectToDelete: number | null = null;
+  
+  private projectsSubscription?: Subscription;
 
   constructor(private datosService: Datos) {}
 
   ngOnInit() {
     this.loadProjects();
+    this.checkAdminStatus();
+    
+    // Subscribe to project changes
+    this.projectsSubscription = this.datosService.showcaseProjectsChanged$.subscribe(() => {
+      this.loadProjects();
+    });
+  }
+  
+  ngOnDestroy() {
+    if (this.projectsSubscription) {
+      this.projectsSubscription.unsubscribe();
+    }
+  }
+  
+  checkAdminStatus() {
+    this.datosService.getLoggedUser().subscribe({
+      next: (user) => {
+        const role = user && (user.rol || user.role) ? (user.rol || user.role) : null;
+        this.isAdmin = !!role && ['admin', 'carpintero', 'superadmin', 'arquitecto'].includes(role);
+      },
+      error: () => { this.isAdmin = false; }
+    });
   }
 
   loadProjects() {
@@ -47,6 +78,38 @@ export class Kitchen implements OnInit {
 
   retryLoad() {
     this.loadProjects();
+  }
+  
+  confirmDeleteProject(projectId: number, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.projectToDelete = projectId;
+    this.showDeleteConfirm = true;
+  }
+  
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.projectToDelete = null;
+  }
+  
+  executeDelete() {
+    if (!this.isAdmin || !this.projectToDelete) {
+      return;
+    }
+    
+    this.datosService.deleteShowcaseProject(this.projectToDelete).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.projectToDelete = null;
+        // Projects will be reloaded via subscription
+      },
+      error: (err) => {
+        console.error('Error deleting project:', err);
+        this.showDeleteConfirm = false;
+        this.projectToDelete = null;
+        this.errorMessage = 'Error al eliminar el proyecto.';
+      }
+    });
   }
 
   // Helper method to calculate start date

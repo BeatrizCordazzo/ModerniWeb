@@ -1,12 +1,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subscription } from 'rxjs';
 import { Datos, FavoriteItem, FavoritePayload } from '../../datos';
 
 @Component({
   selector: 'app-favorite-toggle',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './favorite-toggle.html',
   styleUrl: './favorite-toggle.scss'
 })

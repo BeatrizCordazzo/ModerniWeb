@@ -7,6 +7,8 @@ import { tap, map } from 'rxjs/operators';
 export interface Color {
   name: string;
   code: string;
+  codigo_hex?: string;
+  nombre?: string;
 }
 
 export interface Dimensions {
@@ -81,6 +83,10 @@ export class Datos {
   // Emit when a product is updated so other components can refresh their local lists
   private productUpdated = new Subject<any>();
   productUpdated$ = this.productUpdated.asObservable();
+  private productsChanged = new Subject<string | null>();
+  productsChanged$ = this.productsChanged.asObservable();
+  private showcaseProjectsChanged = new Subject<string | null>();
+  showcaseProjectsChanged$ = this.showcaseProjectsChanged.asObservable();
 
   private favoritesSubject = new BehaviorSubject<FavoriteItem[]>([]);
   favorites$ = this.favoritesSubject.asObservable();
@@ -249,6 +255,14 @@ export class Datos {
     return this.http.get<any>(endpoint, { withCredentials: true });
   }
 
+  submitOrderReview(payload: OrderReviewPayload): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(this.url + 'submit_review.php', payload, { withCredentials: true });
+  }
+
+  getPublicReviews(): Observable<{ success: boolean; reviews: PublicReview[] }> {
+    return this.http.get<{ success: boolean; reviews: PublicReview[] }>(this.url + 'get_reviews.php');
+  }
+
   // Update project progress (to-do, in progress, done)
   updateProjectProgress(proyectoId: number, estado: string): Observable<any> {
     return this.http.post<any>(this.url + 'update_project_progress.php', { proyecto_id: proyectoId, estado: estado }, { withCredentials: true });
@@ -262,6 +276,27 @@ export class Datos {
         if (res && res.success && res.product) {
           // forward the updated product to any subscribers
           try { this.notifyProductUpdated(res.product); } catch (e) { /* noop */ }
+          try { this.notifyProductsChanged(productData?.type ?? productData?.tipo_producto ?? null); } catch (e) { /* noop */ }
+        }
+      })
+    );
+  }
+
+  createProduct(productData: any): Observable<any> {
+    return this.http.post<any>(this.url + 'create_product.php', productData, { withCredentials: true }).pipe(
+      tap((res: any) => {
+        if (res && res.success) {
+          try { this.notifyProductsChanged(productData?.type ?? productData?.tipo_producto ?? null); } catch (e) { /* noop */ }
+        }
+      })
+    );
+  }
+
+  deleteProduct(productId: number): Observable<any> {
+    return this.http.post<any>(this.url + 'delete_product.php', { id: productId }, { withCredentials: true }).pipe(
+      tap((res: any) => {
+        if (res && res.success) {
+          try { this.notifyProductsChanged(null); } catch (e) { /* noop */ }
         }
       })
     );
@@ -270,6 +305,34 @@ export class Datos {
   // Notify listeners that a product was updated (call after successful update)
   notifyProductUpdated(product: any) {
     try { this.productUpdated.next(product); } catch (e) { /* noop */ }
+  }
+
+  notifyProductsChanged(productType?: string | null) {
+    try { this.productsChanged.next(productType ?? null); } catch (e) { /* noop */ }
+  }
+
+  notifyShowcaseProjectsChanged(category?: string | null) {
+    try { this.showcaseProjectsChanged.next(category ?? null); } catch (e) { /* noop */ }
+  }
+
+  createShowcaseProject(projectData: any): Observable<any> {
+    return this.http.post<any>(this.url + 'create_showcase_project.php', projectData, { withCredentials: true }).pipe(
+      tap((res: any) => {
+        if (res && res.success) {
+          try { this.notifyShowcaseProjectsChanged(projectData?.categoria ?? projectData?.category ?? null); } catch (e) { /* noop */ }
+        }
+      })
+    );
+  }
+
+  deleteShowcaseProject(projectId: number): Observable<any> {
+    return this.http.post<any>(this.url + 'delete_showcase_project.php', { id: projectId }, { withCredentials: true }).pipe(
+      tap((res: any) => {
+        if (res && res.success) {
+          try { this.notifyShowcaseProjectsChanged(null); } catch (e) { /* noop */ }
+        }
+      })
+    );
   }
 
   // ==== Favorites ====
@@ -337,8 +400,16 @@ export class Datos {
     return this.http.post<any>(this.url + 'send_message.php', payload, { withCredentials: true });
   }
 
-  getAdminMessages(): Observable<{ success: boolean; messages: ContactMessage[] }> {
-    return this.http.get<{ success: boolean; messages: ContactMessage[] }>(this.url + 'get_messages.php', { withCredentials: true });
+  getAdminMessages(): Observable<{ success: boolean; messages: ContactMessage[]; unread_count?: number }> {
+    return this.http.get<{ success: boolean; messages: ContactMessage[]; unread_count?: number }>(this.url + 'get_messages.php', { withCredentials: true });
+  }
+
+  updateMessageStatus(messageId: number, status: 'new' | 'read'): Observable<{ success: boolean; status: string }> {
+    return this.http.post<{ success: boolean; status: string }>(
+      this.url + 'update_message_status.php',
+      { message_id: messageId, status },
+      { withCredentials: true }
+    );
   }
 
   replyToMessage(messageId: number, response: string): Observable<any> {
@@ -381,6 +452,7 @@ export interface ContactMessage {
   subject?: string | null;
   message: string;
   status: 'new' | 'read' | 'responded' | 'closed' | string;
+  admin_unread?: number;
   response?: string | null;
   response_user_id?: number | null;
   response_created_at?: string | null;
@@ -388,4 +460,21 @@ export interface ContactMessage {
   updated_at?: string | null;
   admin_name?: string | null;
   user_nombre?: string | null;
+}
+
+export interface OrderReviewPayload {
+  order_id: number;
+  order_type: 'pedido' | 'custom';
+  rating: number;
+  comment?: string;
+}
+
+export interface PublicReview {
+  id: number;
+  order_id?: number;
+  order_type?: 'pedido' | 'custom';
+  user_name: string;
+  rating: number;
+  comment?: string | null;
+  created_at: string;
 }

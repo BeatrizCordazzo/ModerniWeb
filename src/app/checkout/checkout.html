@@ -4,17 +4,21 @@
   <div class="checkout-container">
     <h1>Checkout</h1>
 
-    <section class="checkout-items" *ngIf="cartItems.length > 0">
-      <article class="checkout-item" *ngFor="let it of cartItems">
-        <img [src]="it.image" [alt]="it.name" />
-        <div class="info">
-          <h3>{{ it.name }}</h3>
-          <p>{{ it.description }}</p>
-          <div class="meta">Cantidad: {{ it.quantity || 1 }} · Precio unitario: ${{ it.price.toLocaleString() }}</div>
-        </div>
-        <div class="line-total">${{ ((it.price || 0) * (it.quantity || 1)).toLocaleString() }}</div>
-      </article>
-    </section>
+    @if (cartItems.length > 0) {
+      <section class="checkout-items">
+        @for (it of cartItems; track it.id ?? it.name ?? it) {
+          <article class="checkout-item">
+            <img [src]="it.image" [alt]="it.name" />
+            <div class="info">
+              <h3>{{ it.name }}</h3>
+              <p>{{ it.description }}</p>
+              <div class="meta">Cantidad: {{ it.quantity || 1 }} · Precio unitario: ${{ it.price.toLocaleString() }}</div>
+            </div>
+            <div class="line-total">${{ ((it.price || 0) * (it.quantity || 1)).toLocaleString() }}</div>
+          </article>
+        }
+      </section>
+    }
 
     <aside class="checkout-summary">
       <h2>Resumen</h2>
@@ -41,18 +45,26 @@
         </div>
 
         <button class="confirm-btn" (click)="confirmPayment()" [disabled]="loading">
-          <span *ngIf="!loading">Confirmar pago</span>
-          <span *ngIf="loading">Procesando...</span>
+          @if (!loading) {
+            <span>Confirmar pago</span>
+          }
+          @if (loading) {
+            <span>Procesando...</span>
+          }
         </button>
       </div>
     </aside>
 
-    <div *ngIf="cartItems.length === 0" class="empty">
-      <h3>Tu carrito está vacío</h3>
-      <p>Agrega servicios y vuelve a esta página para completar el pago.</p>
-    </div>
+    @if (cartItems.length === 0) {
+      <div class="empty">
+        <h3>Tu carrito está vacío</h3>
+        <p>Agrega servicios y vuelve a esta página para completar el pago.</p>
+      </div>
+    }
 
-    <app-toast-notification *ngIf="toastVisible" [message]="toastMessage" [type]="toastType"></app-toast-notification>
+    @if (toastVisible) {
+      <app-toast-notification [message]="toastMessage" [type]="toastType"></app-toast-notification>
+    }
   </div>
 </main>
 

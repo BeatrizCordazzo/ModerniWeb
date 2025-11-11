@@ -1,29 +1,33 @@
-<app-nav></app-nav>
+ï»¿<app-nav></app-nav>
 
 <main class="profile-page">
   <div class="profile-container">
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Verificando usuario...</p>
-    </div>
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Verificando usuario...</p>
+      </div>
+    }
 
     <!-- Not Logged In State -->
-    <div *ngIf="notLogged && !isLoading" class="not-logged-container">
-      <h2>Debes iniciar sesi?n para ver tu perfil</h2>
-      <p>Por favor, inicia sesi?n o reg?strate para acceder a tu perfil y pedidos.</p>
-      <div class="not-logged-actions">
-        <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesi?n</a>
-        <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
+    @if (notLogged && !isLoading) {
+      <div class="not-logged-container">
+        <h2>Debes iniciar sesi?n para ver tu perfil</h2>
+        <p>Por favor, inicia sesi?n o reg?strate para acceder a tu perfil y pedidos.</p>
+        <div class="not-logged-actions">
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesi?n</a>
+          <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- Profile Content -->
-    <ng-container *ngIf="user && !notLogged && !isLoading">
+    @if (user && !notLogged && !isLoading) {
       <!-- Header del perfil -->
       <section class="profile-header">
         <div class="profile-avatar">
-          <img [src]="user.avatar" [alt]="user.name">
+          <img [src]="user?.avatar" [alt]="user?.name || 'Profile avatar'">
           <button class="change-avatar" aria-label="Change photo">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
@@ -31,19 +35,20 @@
           </button>
         </div>
         <div class="profile-info">
-          <h1>{{user.name}}</h1>
-          <p class="user-email">{{user.email}}</p>
-          <p class="member-since">Member since {{user.memberSince}}</p>
+          <h1>{{user?.name}}</h1>
+          <p class="user-email">{{user?.email}}</p>
+          @if (user?.memberSince) {
+            <p class="member-since">Member since {{user?.memberSince}}</p>
+          }
           <div class="profile-actions">
             <button class="logout-btn" (click)="logout()">Cerrar sesi?n</button>
           </div>
         </div>
       </section>
-
       <!-- Tabs de navegaci?n -->
       <div class="profile-tabs">
-        <button 
-          class="tab" 
+        <button
+          class="tab"
           [class.active]="activeTab === 'credentials'"
           (click)="activeTab = 'credentials'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -51,8 +56,8 @@
           </svg>
           My Information
         </button>
-        <button 
-          class="tab" 
+        <button
+          class="tab"
           [class.active]="activeTab === 'orders'"
           (click)="activeTab = 'orders'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -60,8 +65,8 @@
           </svg>
           My Orders
         </button>
-        <button 
-          class="tab" 
+        <button
+          class="tab"
           [class.active]="activeTab === 'rejected'"
           (click)="activeTab = 'rejected'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -69,8 +74,8 @@
           </svg>
           Rejected
         </button>
-        <button 
-          class="tab" 
+        <button
+          class="tab"
           [class.active]="activeTab === 'favorites'"
           (click)="activeTab = 'favorites'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -78,8 +83,8 @@
           </svg>
           Favorites
         </button>
-        <button 
-          class="tab" 
+        <button
+          class="tab"
           [class.active]="activeTab === 'messages'"
           (click)="activeTab = 'messages'">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -88,340 +93,632 @@
           Messages
         </button>
       </div>
-
       <!-- Contenido de las tabs -->
       <div class="tab-content">
         <!-- Credenciales -->
-        <section class="credentials-section" *ngIf="activeTab === 'credentials'">
-          <h2>Personal Information</h2>
-          <form class="credentials-form" (submit)="saveChanges(); $event.preventDefault()">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" [(ngModel)]="user.name" name="name">
+        @if (activeTab === 'credentials') {
+          <section class="credentials-section">
+            <h2>Personal Information</h2>
+            <form class="credentials-form" (submit)="saveChanges(); $event.preventDefault()">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Full Name</label>
+                  <input type="text" id="name" [(ngModel)]="user.name" name="name">
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="email" [(ngModel)]="user.email" name="email">
+                </div>
               </div>
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" [(ngModel)]="user.email" name="email">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+                </div>
+                <div class="form-group">
+                  <label for="address">Address</label>
+                  <input type="text" id="address" [(ngModel)]="user.address" name="address">
+                </div>
               </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+              <div class="form-actions">
+                <button type="submit" class="save-btn" [disabled]="!hasChanges()">Save Changes</button>
+                <button type="button" class="change-password-btn">Change Password</button>
               </div>
-              <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address" [(ngModel)]="user.address" name="address">
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="save-btn" [disabled]="!hasChanges()">Save Changes</button>
-              <button type="button" class="change-password-btn">Change Password</button>
-            </div>
-          </form>
-        </section>
-
+            </form>
+          </section>
+        }
         <!-- Pedidos -->
-        <section class="orders-section" *ngIf="activeTab === 'orders'">
-          <h2>Order History</h2>
-          <div class="orders-list">
-            <article class="order-card" *ngFor="let order of orders">
-              <div class="order-header">
-                <div class="order-info">
-                  <h3>{{ order.type === 'custom' ? 'Project' : 'Order' }} #{{order.id}}</h3>
-                  <span class="order-date">{{order.date}}</span>
-                  <span class="order-type" *ngIf="order.type === 'custom'">Custom request</span>
-                  <p class="order-title" *ngIf="order.name">{{order.name}}</p>
-                  <p class="order-description" *ngIf="order.description">{{order.description}}</p>
-                </div>
-                <span class="order-status" [ngClass]="statusClass(order.status)">{{order.statusLabel}}</span>
-              </div>
-              
-              <div class="order-progress" *ngIf="order.progressStatus">
-                <label>Production status:</label>
-                <span class="progress-pill">{{ order.progressStatusLabel || getStatusText(order.progressStatus) }}</span>
-              </div>
-
-              <div class="order-items">
-                <div class="order-item" *ngFor="let item of order.items">
-                  <img *ngIf="item.image" [src]="item.image" [alt]="item.name">
-                  <div class="item-image-placeholder" *ngIf="!item.image">No image</div>
-                  <div class="item-details">
-                    <h4>{{item.name}}</h4>
-                    <p class="item-quantity">Quantity: {{item.quantity}}</p>
-                    <p class="item-description" *ngIf="item.description">{{item.description}}</p>
-                    <div class="item-meta" *ngIf="item.dimensions">
-                      <strong>Dimensions:</strong>
-                      <span class="meta-value">
-                        <ng-container *ngIf="item.dimensions?.width">W {{item.dimensions?.width}}</ng-container>
-                        <ng-container *ngIf="item.dimensions?.height"> - H {{item.dimensions?.height}}</ng-container>
-                        <ng-container *ngIf="item.dimensions?.depth"> - D {{item.dimensions?.depth}}</ng-container>
-                      </span>
+        @if (activeTab === 'orders') {
+          <section class="orders-section">
+            <h2>Order History</h2>
+            <div class="orders-list">
+              @for (order of orders; track order.id ?? order) {
+                <article class="order-card">
+                  <div class="order-header">
+                    <div class="order-info">
+                      <h3>{{ order.type === 'custom' ? 'Project' : 'Order' }} #{{order.id}}</h3>
+                      <span class="order-date">{{order.date}}</span>
+                      @if (order.type === 'custom') {
+                        <span class="order-type">Custom request</span>
+                      }
+                      @if (order.name) {
+                        <p class="order-title">{{order.name}}</p>
+                      }
+                      @if (order.description) {
+                        <p class="order-description">{{order.description}}</p>
+                      }
                     </div>
-                    <div class="item-meta color-meta" *ngIf="item.color?.name || item.color?.code">
-                      <strong>Color:</strong>
-                      <span class="color-chip">
-                        <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
-                        {{item.color?.name || item.color?.code}}
-                      </span>
-                    </div>
-                    <ul class="item-includes" *ngIf="item.includes?.length">
-                      <li *ngFor="let include of item.includes">{{include}}</li>
-                    </ul>
+                    <span class="order-status" [ngClass]="statusClass(order.status)">
+                      @let normalizedStatus = (order.status || '').toLowerCase();
+                      @switch (normalizedStatus) {
+                        @case ('pending') {
+                          Pending
+                        }
+                        @case ('in_progress') {
+                          In progress
+                        }
+                        @case ('in progress') {
+                          In progress
+                        }
+                        @case ('completed') {
+                          Completed
+                        }
+                        @case ('done') {
+                          Completed
+                        }
+                        @case ('rejected') {
+                          Rejected
+                        }
+                        @case ('rechazado') {
+                          Rejected
+                        }
+                        @default {
+                          {{order.statusLabel || 'Status unknown'}}
+                        }
+                      }
+                    </span>
                   </div>
-                  <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
-                </div>
-              </div>
-              
-              <div class="order-footer">
-                <div class="order-total-wrapper">
-                  <span class="order-total">Total: &euro;{{ getOrderTotal(order) | number:'1.2-2' }}</span>
-                  <span class="order-estimate-note" *ngIf="order.estimatedTotal && order.total !== null && order.total !== undefined && order.total !== order.estimatedTotal">
-                    Estimate: &euro;{{ order.estimatedTotal | number:'1.2-2' }}
-                  </span>
-                </div>
-                <button class="view-details-btn" type="button" (click)="openOrderDetails(order)">View Details</button>
-              </div>
-            </article>
-
-            <p class="empty-state" *ngIf="orders.length === 0">
-              You haven't placed any orders yet
-            </p>
-          </div>
-    </section>
-
-    <div class="order-details-modal-backdrop" *ngIf="showOrderDetailsModal && selectedOrderDetails">
-      <div class="order-details-modal">
-        <button class="close-modal" type="button" (click)="closeOrderDetails()" aria-label="Close">&times;</button>
-        <header class="modal-header">
-          <div>
-            <h3>{{ selectedOrderDetails?.type === 'custom' ? 'Project' : 'Order' }} #{{selectedOrderDetails?.id}}</h3>
-            <p *ngIf="selectedOrderDetails?.name">{{ selectedOrderDetails?.name }}</p>
-            <p class="modal-meta" *ngIf="selectedOrderDetails?.createdAt">Placed: {{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
-          </div>
-          <div class="modal-status">
-            <span class="status-pill" [ngClass]="statusClass(selectedOrderDetails?.status || '')">{{ selectedOrderDetails?.statusLabel }}</span>
-            <span *ngIf="selectedOrderDetails?.progressStatus" class="progress-pill">
-              {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
-            </span>
-          </div>
-        </header>
-
-        <div class="modal-rejection-alert" *ngIf="selectedOrderDetails?.rejectionReason">
-          <strong>Request rejected.</strong>
-          <span>{{ selectedOrderDetails?.rejectionReason }}</span>
-          <small *ngIf="selectedOrderDetails?.rejectionDate">
-            ({{ selectedOrderDetails?.rejectionDate | date:'medium' }})
-          </small>
-        </div>
-
-        <section class="modal-summary">
-          <div class="summary-card">
-            <p class="summary-label">Total</p>
-            <p class="summary-value">&euro;{{ getOrderTotal(selectedOrderDetails) | number:'1.2-2' }}</p>
-            <p class="summary-note" *ngIf="selectedOrderDetails?.estimatedTotal && selectedOrderDetails?.total && selectedOrderDetails?.estimatedTotal !== selectedOrderDetails?.total">
-              Estimate: &euro;{{ selectedOrderDetails?.estimatedTotal | number:'1.2-2' }}
-            </p>
-          </div>
-          <div class="summary-card">
-            <p class="summary-label">Order type</p>
-            <p class="summary-value">{{ selectedOrderDetails?.type === 'custom' ? 'Custom project' : 'Store order' }}</p>
-            <p class="summary-note" *ngIf="selectedOrderDetails?.items?.length">
-              {{ selectedOrderDetails.items.length }} item(s)
-            </p>
-          </div>
-          <div class="summary-card" *ngIf="selectedOrderDetails?.progressStatus">
-            <p class="summary-label">Project stage</p>
-            <p class="summary-value">
-              {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
-            </p>
-          </div>
-          <div class="summary-card" *ngIf="selectedOrderDetails?.createdAt">
-            <p class="summary-label">Placed on</p>
-            <p class="summary-value">{{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
-          </div>
-        </section>
-
-        <section class="modal-details" *ngIf="selectedOrderDetails?.description || selectedOrderDetails?.rejectionReason">
-          <div class="detail-block" *ngIf="selectedOrderDetails?.description">
-            <h4>Project details</h4>
-            <p>{{ selectedOrderDetails?.description }}</p>
-          </div>
-          <div class="detail-block rejection" *ngIf="selectedOrderDetails?.rejectionReason">
-            <h4>Rejection details</h4>
-            <p>{{ selectedOrderDetails?.rejectionReason }}</p>
-            <p *ngIf="selectedOrderDetails?.rejectionDate">Rejected on {{ selectedOrderDetails?.rejectionDate | date:'medium' }}</p>
-          </div>
-        </section>
-
-        <section class="modal-items">
-          <h4>Items</h4>
-          <div class="item-row" *ngFor="let item of selectedOrderDetails?.items">
-            <img *ngIf="item.image" [src]="item.image" [alt]="item.name">
-            <div class="item-info">
-              <h5>{{ item.name }}</h5>
-              <p *ngIf="item.description">{{ item.description }}</p>
-              <p class="item-meta">Quantity: {{ item.quantity }}</p>
-              <p class="item-meta" *ngIf="item.dimensions">
-                <strong>Measurements:</strong>
-                <span *ngIf="item.dimensions.width">W {{ item.dimensions.width }}</span>
-                <span *ngIf="item.dimensions.height"> x H {{ item.dimensions.height }}</span>
-                <span *ngIf="item.dimensions.depth"> x D {{ item.dimensions.depth }}</span>
-              </p>
-              <p class="item-meta" *ngIf="item.color?.name || item.color?.code">
-                <strong>Color:</strong>
-                <span class="color-chip">
-                  <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
-                  {{ item.color?.name || item.color?.code }}
-                </span>
-              </p>
-              <div class="available-colors" *ngIf="item.availableColors?.length">
-                <strong>Available colors:</strong>
-                <span class="color-chip" *ngFor="let color of item.availableColors">
-                  <span class="color-dot" [style.backgroundColor]="color.codigo_hex || color.code || '#ccc'"></span>
-                  {{ color.nombre || color.name || color.codigo_hex || color.code }}
-                </span>
-              </div>
-              <ul class="item-includes" *ngIf="item.includes?.length">
-                <li *ngFor="let include of item.includes">{{ include }}</li>
-              </ul>
+                  @if (order.progressStatus) {
+                    <div class="order-progress">
+                      <label>Production status:</label>
+                      <span class="progress-pill">{{ order.progressStatusLabel || getStatusText(order.progressStatus) }}</span>
+                    </div>
+                  }
+                  <div class="order-items">
+                    @for (item of order.items; track item?.id ?? item?.name ?? item) {
+                      <div class="order-item">
+                        @if (item.image) {
+                          <img [src]="item.image" [alt]="item.name">
+                        }
+                        @if (!item.image) {
+                          <div class="item-image-placeholder">No image</div>
+                        }
+                        <div class="item-details">
+                          <h4>{{item.name}}</h4>
+                          <p class="item-quantity">Quantity: {{item.quantity}}</p>
+                          @if (item.description) {
+                            <p class="item-description">{{item.description}}</p>
+                          }
+                          @if (item.dimensions) {
+                            <div class="item-meta">
+                              <strong>Dimensions:</strong>
+                              <span class="meta-value">
+                                @if (item.dimensions?.width) {
+                                  W {{item.dimensions?.width}}
+                                }
+                                @if (item.dimensions?.height) {
+                                  - H {{item.dimensions?.height}}
+                                }
+                                @if (item.dimensions?.depth) {
+                                  - D {{item.dimensions?.depth}}
+                                }
+                              </span>
+                            </div>
+                          }
+                          @if (item.color?.name || item.color?.code) {
+                            <div class="item-meta color-meta">
+                              <strong>Color:</strong>
+                              <span class="color-chip">
+                                <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
+                                {{item.color?.name || item.color?.code}}
+                              </span>
+                            </div>
+                          }
+                          @if (item.includes?.length) {
+                            <ul class="item-includes">
+                              @for (include of item.includes; track include) {
+                                <li>{{include}}</li>
+                              }
+                            </ul>
+                          }
+                        </div>
+                        <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
+                      </div>
+                    }
+                  </div>
+                  @if (order.review || order.canReview) {
+                    <div class="order-review">
+                      @if (order.review) {
+                        <div class="existing-review">
+                          <div class="review-header">
+                            <h4>Your review</h4>
+                            <div class="star-row">
+                              @for (star of reviewStars; track star) {
+                                <span [class.filled]="(order.review?.rating || 0) >= star">&#9733;</span>
+                              }
+                            </div>
+                          </div>
+                          @if (order.review?.comment) {
+                            <p class="review-comment">{{ order.review?.comment }}</p>
+                          }
+                          @if (order.review?.createdAt) {
+                            <small class="review-date">
+                              {{ order.review?.createdAt | date:'medium' }}
+                            </small>
+                          }
+                        </div>
+                      }
+                      @if (order.canReview) {
+                        <div class="new-review">
+                          @if (!order.showReviewForm) {
+                            <button class="add-review-btn" type="button" (click)="openReviewForm(order)">
+                              Add review
+                            </button>
+                          }
+                          @if (order.showReviewForm && order.pendingReview) {
+                            <div class="review-form">
+                              <label class="form-label">Rating</label>
+                              <div class="star-selector">
+                                @for (star of reviewStars; track star) {
+                                  <button type="button"
+                                    (click)="setReviewRating(order, star)"
+                                    [class.active]="order.pendingReview.rating >= star">
+                                    &#9733;
+                                  </button>
+                                }
+                              </div>
+                              <label class="form-label">Comment</label>
+                              <textarea [(ngModel)]="order.pendingReview.comment"
+                                maxlength="1000"
+                              placeholder="Share your experience..."></textarea>
+                              @if (order.reviewError) {
+                                <div class="review-error">{{ order.reviewError }}</div>
+                              }
+                              <div class="review-actions">
+                                <button type="button" class="btn btn-ghost" (click)="cancelReviewForm(order)">Cancel</button>
+                                <button type="button"
+                                  class="btn btn-primary"
+                                  (click)="submitOrderReview(order)"
+                                  [disabled]="order.reviewSubmitting">
+                                  {{ order.reviewSubmitting ? 'Saving...' : 'Submit review' }}
+                                </button>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                  <div class="order-footer">
+                    <div class="order-total-wrapper">
+                      <span class="order-total">Total: &euro;{{ getOrderTotal(order) | number:'1.2-2' }}</span>
+                      @if (order.estimatedTotal && order.total !== null && order.total !== undefined && order.total !== order.estimatedTotal) {
+                        <span class="order-estimate-note">
+                          Estimate: &euro;{{ order.estimatedTotal | number:'1.2-2' }}
+                        </span>
+                      }
+                    </div>
+                    <button class="view-details-btn" type="button" (click)="openOrderDetails(order)">View Details</button>
+                  </div>
+                </article>
+              }
+              @if (orders.length === 0) {
+                <p class="empty-state">
+                  You haven't placed any orders yet
+                </p>
+              }
             </div>
-            <div class="item-price">
-              <span>Unit: &euro;{{ item.price | number:'1.2-2' }}</span>
-              <span>Total: &euro;{{ (item.price || 0) * (item.quantity || 1) | number:'1.2-2' }}</span>
+          </section>
+        }
+        @if (showOrderDetailsModal && selectedOrderDetails) {
+          <div class="order-details-modal-backdrop">
+            <div class="order-details-modal">
+              <button class="close-modal" type="button" (click)="closeOrderDetails()" aria-label="Close">&times;</button>
+              <header class="modal-header">
+                <div>
+                  <h3>{{ selectedOrderDetails?.type === 'custom' ? 'Project' : 'Order' }} #{{selectedOrderDetails?.id}}</h3>
+                  @if (selectedOrderDetails?.name) {
+                    <p>{{ selectedOrderDetails?.name }}</p>
+                  }
+                  @if (selectedOrderDetails?.createdAt) {
+                    <p class="modal-meta">Placed: {{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
+                  }
+                </div>
+                <div class="modal-status">
+                  <span class="status-pill" [ngClass]="statusClass(selectedOrderDetails?.status || '')">{{ selectedOrderDetails?.statusLabel }}</span>
+                  @if (selectedOrderDetails?.progressStatus) {
+                    <span class="progress-pill">
+                      {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
+                    </span>
+                  }
+                </div>
+              </header>
+              @if (selectedOrderDetails?.rejectionReason) {
+                <div class="modal-rejection-alert">
+                  <strong>Request rejected.</strong>
+                  <span>{{ selectedOrderDetails?.rejectionReason }}</span>
+                  @if (selectedOrderDetails?.rejectionDate) {
+                    <small>
+                      ({{ selectedOrderDetails?.rejectionDate | date:'medium' }})
+                    </small>
+                  }
+                </div>
+              }
+              <section class="modal-summary">
+                <div class="summary-card">
+                  <p class="summary-label">Total</p>
+                  <p class="summary-value">&euro;{{ getOrderTotal(selectedOrderDetails) | number:'1.2-2' }}</p>
+                  @if (selectedOrderDetails?.estimatedTotal && selectedOrderDetails?.total && selectedOrderDetails?.estimatedTotal !== selectedOrderDetails?.total) {
+                    <p class="summary-note">
+                      Estimate: &euro;{{ selectedOrderDetails?.estimatedTotal | number:'1.2-2' }}
+                    </p>
+                  }
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Order type</p>
+                  <p class="summary-value">{{ selectedOrderDetails?.type === 'custom' ? 'Custom project' : 'Store order' }}</p>
+                  @if (selectedOrderDetails?.items?.length) {
+                    <p class="summary-note">
+                      {{ selectedOrderDetails.items.length }} item(s)
+                    </p>
+                  }
+                </div>
+                @if (selectedOrderDetails?.progressStatus) {
+                  <div class="summary-card">
+                    <p class="summary-label">Project stage</p>
+                    <p class="summary-value">
+                      {{ selectedOrderDetails?.progressStatusLabel || getStatusText(selectedOrderDetails?.progressStatus || '') }}
+                    </p>
+                  </div>
+                }
+                @if (selectedOrderDetails?.createdAt) {
+                  <div class="summary-card">
+                    <p class="summary-label">Placed on</p>
+                    <p class="summary-value">{{ selectedOrderDetails?.createdAt | date:'medium' }}</p>
+                  </div>
+                }
+              </section>
+              @if (selectedOrderDetails?.description || selectedOrderDetails?.rejectionReason) {
+                <section class="modal-details">
+                  @if (selectedOrderDetails?.description) {
+                    <div class="detail-block">
+                      <h4>Project details</h4>
+                      <p>{{ selectedOrderDetails?.description }}</p>
+                    </div>
+                  }
+                  @if (selectedOrderDetails?.rejectionReason) {
+                    <div class="detail-block rejection">
+                      <h4>Rejection details</h4>
+                      <p>{{ selectedOrderDetails?.rejectionReason }}</p>
+                      @if (selectedOrderDetails?.rejectionDate) {
+                        <p>Rejected on {{ selectedOrderDetails?.rejectionDate | date:'medium' }}</p>
+                      }
+                    </div>
+                  }
+                </section>
+              }
+              <section class="modal-items">
+                <h4>Items</h4>
+                @for (item of selectedOrderDetails?.items; track item?.id ?? item?.name ?? item) {
+                  <div class="item-row">
+                    @if (item.image) {
+                      <img [src]="item.image" [alt]="item.name">
+                    }
+                    <div class="item-info">
+                      <h5>{{ item.name }}</h5>
+                      @if (item.description) {
+                        <p>{{ item.description }}</p>
+                      }
+                      <p class="item-meta">Quantity: {{ item.quantity }}</p>
+                      @if (item.dimensions) {
+                        <p class="item-meta">
+                          <strong>Measurements:</strong>
+                          @if (item.dimensions.width) {
+                            <span>W {{ item.dimensions.width }}</span>
+                          }
+                          @if (item.dimensions.height) {
+                            <span> x H {{ item.dimensions.height }}</span>
+                          }
+                          @if (item.dimensions.depth) {
+                            <span> x D {{ item.dimensions.depth }}</span>
+                          }
+                        </p>
+                      }
+                      @if (item.color?.name || item.color?.code) {
+                        <p class="item-meta">
+                          <strong>Color:</strong>
+                          <span class="color-chip">
+                            <span class="color-dot" [style.backgroundColor]="item.color?.code || '#ccc'"></span>
+                            {{ item.color?.name || item.color?.code }}
+                          </span>
+                        </p>
+                      }
+                      @if (item.availableColors?.length) {
+                        <div class="available-colors">
+                          <strong>Available colors:</strong>
+                          @for (color of item.availableColors; track color?.code ?? color?.codigo_hex ?? color?.name ?? color) {
+                            <span class="color-chip">
+                              <span class="color-dot" [style.backgroundColor]="color.codigo_hex || color.code || '#ccc'"></span>
+                              {{ color.nombre || color.name || color.codigo_hex || color.code }}
+                            </span>
+                          }
+                        </div>
+                      }
+                      @if (item.includes?.length) {
+                        <ul class="item-includes">
+                          @for (include of item.includes; track include) {
+                            <li>{{ include }}</li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                    <div class="item-price">
+                      <span>Unit: &euro;{{ item.price | number:'1.2-2' }}</span>
+                      <span>Total: &euro;{{ (item.price || 0) * (item.quantity || 1) | number:'1.2-2' }}</span>
+                    </div>
+                  </div>
+                }
+              </section>
             </div>
           </div>
-        </section>
-      </div>
-    </div>
+        }
         <!-- Rejected -->
-        <section class="rejected-section" *ngIf="activeTab === 'rejected'">
-          <h2>Rejected Requests</h2>
-          <div class="rejected-list" *ngIf="rejectedOrders.length; else noRejectedOrders">
-            <article class="rejected-card" *ngFor="let order of rejectedOrders">
-              <div class="rejected-card-header">
-                <div>
-                  <h3>Request #{{order.id}}</h3>
-                  <p class="order-title" *ngIf="order.name">{{order.name}}</p>
-                </div>
-                <span class="order-status rejected">Rejected</span>
+        @if (activeTab === 'rejected') {
+          <section class="rejected-section">
+            <h2>Rejected Requests</h2>
+            @if (rejectedOrders.length) {
+              <div class="rejected-list">
+                @for (order of rejectedOrders; track order.id ?? order) {
+                  <article class="rejected-card">
+                    <div class="rejected-card-header">
+                      <div>
+                        <h3>Request #{{order.id}}</h3>
+                        @if (order.name) {
+                          <p class="order-title">{{order.name}}</p>
+                        }
+                      </div>
+                      <span class="order-status rejected">Rejected</span>
+                    </div>
+                    @if (order.rejectionReason) {
+                      <p class="rejection-message">{{order.rejectionReason}}</p>
+                    }
+                    <div class="rejected-meta">
+                      <span>Submitted: {{order.date}}</span>
+                      @if (order.rejectionDate) {
+                        <span>Rejected: {{order.rejectionDate | date:'mediumDate'}}</span>
+                      }
+                      <span>Total requested: &euro;{{ (order.estimatedTotal || getOrderTotal(order)) | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="rejected-actions">
+                      <button type="button" class="view-details-btn" (click)="openRejectedModal(order)">View details</button>
+                      <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
+                    </div>
+                  </article>
+                }
               </div>
-              <p class="rejection-message" *ngIf="order.rejectionReason">{{order.rejectionReason}}</p>
-              <div class="rejected-meta">
-                <span>Submitted: {{order.date}}</span>
-                <span *ngIf="order.rejectionDate">Rejected: {{order.rejectionDate | date:'mediumDate'}}</span>
-                <span>Total requested: &euro;{{ (order.estimatedTotal || getOrderTotal(order)) | number:'1.2-2' }}</span>
-              </div>
-              <div class="rejected-actions">
-                <button type="button" class="view-details-btn" (click)="openRejectedModal(order)">View details</button>
-                <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <ng-template #noRejectedOrders>
-          <p class="empty-state">You don't have rejected requests.</p>
-        </ng-template>
+            } @else {
+              <p class="empty-state">You don't have rejected requests.</p>
+            }
+          </section>
+        }
         <!-- Favoritos -->
-        <section class="favorites-section" *ngIf="activeTab === 'favorites'">
-          <h2>My Favorites</h2>
-          <div class="favorites-grid" *ngIf="favorites.length; else favoritesState">
-            <article class="favorite-card" *ngFor="let item of favorites">
-              <img [src]="item.item_image || 'https://via.placeholder.com/400x260?text=Favorite'" [alt]="item.item_name">
-              <button class="remove-favorite" (click)="removeFavorite(item.id)" aria-label="Remove from favorites">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-              </button>
-              <div class="favorite-info">
-                <p class="favorite-tag">{{ item.item_type | titlecase }}</p>
-                <h3>{{item.item_name}}</h3>
-                <p class="favorite-price" *ngIf="item.item_price">&euro;{{item.item_price | number:'1.2-2'}}</p>
-                <p class="favorite-price muted" *ngIf="!item.item_price">Custom price</p>
-                <p class="favorite-meta" *ngIf="item.extra?.category">Category: {{ item.extra?.category }}</p>
-                <button class="add-to-cart-btn" type="button">Saved</button>
+        @if (activeTab === 'favorites') {
+          <section class="favorites-section">
+            <h2>My Favorites</h2>
+            @if (favorites.length) {
+              <div class="favorites-grid">
+                @for (item of favorites; track item.id ?? item.item_id ?? item) {
+                  <article class="favorite-card">
+                    <img [src]="item.item_image || 'https://via.placeholder.com/400x260?text=Favorite'" [alt]="item.item_name">
+                    <button class="remove-favorite" (click)="removeFavorite(item.id)" aria-label="Remove from favorites">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                      </svg>
+                    </button>
+                    <div class="favorite-info">
+                      <p class="favorite-tag">{{ item.item_type | titlecase }}</p>
+                      <h3>{{item.item_name}}</h3>
+                      @if (item.item_price) {
+                        <p class="favorite-price">&euro;{{item.item_price | number:'1.2-2'}}</p>
+                      }
+                      @if (!item.item_price) {
+                        <p class="favorite-price muted">Custom price</p>
+                      }
+                      @if (item.extra?.category) {
+                        <p class="favorite-meta">Category: {{ item.extra?.category }}</p>
+                      }
+                      <button class="add-to-cart-btn" type="button">Saved</button>
+                    </div>
+                  </article>
+                }
               </div>
-            </article>
-          </div>
-        </section>
-
-        <section class="messages-section" *ngIf="activeTab === 'messages'">
-          <h2>Messages</h2>
-          <p class="empty-state" *ngIf="messagesLoading">Loading your messages...</p>
-          <p class="empty-state error" *ngIf="messagesError">{{messagesError}}</p>
-          <div class="messages-list" *ngIf="!messagesLoading && !messagesError && userMessages.length">
-            <article class="message-card" *ngFor="let msg of userMessages">
-              <div class="message-header">
-                <div>
-                  <h3>{{ msg.subject || 'General inquiry' }}</h3>
-                  <p class="message-meta">Sent on {{ msg.created_at | date:'medium' }}</p>
+            } @else {
+              @if (!favoritesLoading && !favoritesError) {
+                <p class="empty-state">
+                  You don't have any favorite products yet
+                </p>
+              }
+              @if (favoritesLoading) {
+                <p class="empty-state">Loading your favorites...</p>
+              }
+              @if (favoritesError) {
+                <p class="empty-state error">{{favoritesError}}</p>
+              }
+            }
+          </section>
+        }
+        @if (activeTab === 'messages') {
+          <section class="messages-section">
+            <div class="messages-heading">
+              <h2>Messages</h2>
+              @if (isAdminUser && adminUnreadCount > 0) {
+                <div class="messages-badge">
+                  {{ adminUnreadCount }} new
                 </div>
-                <span class="status-pill">{{ msg.status }}</span>
+              }
+            </div>
+            @if (messagesLoading) {
+              <p class="empty-state">
+                {{ isAdminUser ? 'Loading contact messages...' : 'Loading your messages...' }}
+              </p>
+            }
+            @if (messagesError) {
+              <p class="empty-state error">{{messagesError}}</p>
+            }
+            @if (!messagesLoading && !messagesError && userMessages.length) {
+              <div class="messages-list">
+                @for (msg of userMessages; track msg.id ?? msg.email ?? msg) {
+                  <article class="message-card">
+                    @if (isAdminUser) {
+                      <div class="message-header admin-view">
+                        <div>
+                          <h3>{{ msg.name }}</h3>
+                          <p class="message-meta">
+                            <span>{{ msg.email }}</span>
+                            @if (msg.phone) {
+                              <span>| {{ msg.phone }}</span>
+                            }
+                            <span>&bull; {{ msg.created_at | date:'medium' }}</span>
+                          </p>
+                          @if (msg.user_nombre) {
+                            <p class="message-meta small">
+                              Perfil: {{ msg.user_nombre }}
+                            </p>
+                          }
+                        </div>
+                        <div class="message-status-block">
+                    <span class="status-pill" [ngClass]="{
+                      'status-new': msg.status === 'new',
+                      'status-read': msg.status === 'read',
+                      'status-responded': msg.status === 'responded'
+                    }">
+                            {{ formatAdminMessageStatus(msg.status) }}
+                          </span>
+                          @if (isAdminMessageUnread(msg)) {
+                            <span class="unread-indicator">Nuevo</span>
+                          }
+                        </div>
+                      </div>
+                      @if (msg.subject) {
+                        <p class="message-subject">{{ msg.subject }}</p>
+                      }
+                      <p class="message-body">{{ msg.message }}</p>
+                      <div class="message-status-actions">
+                        <button type="button"
+                          class="btn btn-ghost"
+                          (click)="markAdminMessageStatus(msg, 'read')"
+                          [disabled]="!isAdminMessageUnread(msg)">
+                          Mark as read
+                        </button>
+                        <button type="button"
+                          class="btn btn-ghost"
+                          (click)="markAdminMessageStatus(msg, 'new')"
+                          [disabled]="isAdminMessageUnread(msg)">
+                          Mark as unread
+                        </button>
+                      </div>
+                      @if (msg.response) {
+                        <div class="response-block">
+                          <strong>Response sent:</strong>
+                          <p>{{ msg.response }}</p>
+                          @if (msg.response_created_at) {
+                            <small>
+                              {{ msg.response_created_at | date:'medium' }}
+                            </small>
+                          }
+                        </div>
+                      }
+                    } @else {
+                      <div class="message-header">
+                        <div>
+                          <h3>{{ msg.subject || 'General inquiry' }}</h3>
+                          <p class="message-meta">Sent on {{ msg.created_at | date:'medium' }}</p>
+                        </div>
+                        <span class="status-pill">{{ msg.status }}</span>
+                      </div>
+                      <p class="message-body">{{ msg.message }}</p>
+                      @if (msg.response) {
+                        <div class="response-block">
+                          <strong>Response from {{ msg.admin_name || 'Moderni' }}:</strong>
+                          <p>{{ msg.response }}</p>
+                          @if (msg.response_created_at) {
+                            <small>
+                              {{ msg.response_created_at | date:'medium' }}
+                            </small>
+                          }
+                        </div>
+                      }
+                    }
+                  </article>
+                }
               </div>
-              <p class="message-body">{{ msg.message }}</p>
-              <div class="response-block" *ngIf="msg.response">
-                <strong>Response from {{ msg.admin_name || 'Moderni' }}:</strong>
-                <p>{{ msg.response }}</p>
-                <small *ngIf="msg.response_created_at">
-                  {{ msg.response_created_at | date:'medium' }}
-                </small>
+            }
+            @if (!messagesLoading && !messagesError && userMessages.length === 0) {
+              <p class="empty-state">
+                {{ isAdminUser ? 'No contact messages received yet.' : "You don't have any messages yet." }}
+              </p>
+            }
+          </section>
+        }
+      </div>
+      @if (showRejectedModal && selectedRejectedOrder) {
+        <div class="rejection-modal-backdrop">
+          <div class="rejection-modal">
+            <button class="close-modal" type="button" (click)="closeRejectedModal()" aria-label="Close">
+              &times;
+            </button>
+            <h3>Request #{{selectedRejectedOrder?.id}} was rejected</h3>
+            <p class="modal-status">Status: {{selectedRejectedOrder?.statusLabel}}</p>
+            @if (selectedRejectedOrder?.rejectionReason) {
+              <p class="modal-reason">
+                "{{selectedRejectedOrder?.rejectionReason}}"
+              </p>
+            }
+            <div class="modal-meta">
+              @if (selectedRejectedOrder?.date) {
+                <span>Submitted: {{selectedRejectedOrder?.date}}</span>
+              }
+              @if (selectedRejectedOrder?.rejectionDate) {
+                <span>Rejected: {{selectedRejectedOrder?.rejectionDate | date:'medium'}}</span>
+              }
+              <span>Total requested: &euro;{{ (selectedRejectedOrder?.estimatedTotal || getOrderTotal(selectedRejectedOrder)) | number:'1.2-2' }}</span>
+            </div>
+            @if (selectedRejectedOrder?.items?.length) {
+              <div class="modal-items">
+                <h4>Requested items</h4>
+                <ul>
+                  @for (item of selectedRejectedOrder?.items; track item?.id ?? item?.name ?? item) {
+                    <li>
+                      <span class="item-name">{{item.name}}</span>
+                      <span class="item-qty">x{{item.quantity}}</span>
+                      <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
+                    </li>
+                  }
+                </ul>
               </div>
-            </article>
+            }
+            <div class="modal-actions">
+              <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
+              <button type="button" class="close-secondary" (click)="closeRejectedModal()">Close</button>
+            </div>
           </div>
-          <p class="empty-state" *ngIf="!messagesLoading && !messagesError && userMessages.length === 0">
-            You don’t have any messages yet.
-          </p>
-        </section>
-
-        <ng-template #favoritesState>
-          <p class="empty-state" *ngIf="!favoritesLoading && !favoritesError">
-            You don't have any favorite products yet
-          </p>
-          <p class="empty-state" *ngIf="favoritesLoading">Loading your favorites...</p>
-          <p class="empty-state error" *ngIf="favoritesError">{{favoritesError}}</p>
-        </ng-template>
-      </div>
-    <div class="rejection-modal-backdrop" *ngIf="showRejectedModal && selectedRejectedOrder">
-      <div class="rejection-modal">
-        <button class="close-modal" type="button" (click)="closeRejectedModal()" aria-label="Close">
-          &times;
-        </button>
-        <h3>Request #{{selectedRejectedOrder?.id}} was rejected</h3>
-        <p class="modal-status">Status: {{selectedRejectedOrder?.statusLabel}}</p>
-        <p class="modal-reason" *ngIf="selectedRejectedOrder?.rejectionReason">
-          "{{selectedRejectedOrder?.rejectionReason}}"
-        </p>
-        <div class="modal-meta">
-          <span *ngIf="selectedRejectedOrder?.date">Submitted: {{selectedRejectedOrder?.date}}</span>
-          <span *ngIf="selectedRejectedOrder?.rejectionDate">Rejected: {{selectedRejectedOrder?.rejectionDate | date:'medium'}}</span>
-          <span>Total requested: &euro;{{ (selectedRejectedOrder?.estimatedTotal || getOrderTotal(selectedRejectedOrder)) | number:'1.2-2' }}</span>
         </div>
-        <div class="modal-items" *ngIf="selectedRejectedOrder?.items?.length">
-          <h4>Requested items</h4>
-          <ul>
-            <li *ngFor="let item of selectedRejectedOrder?.items">
-              <span class="item-name">{{item.name}}</span>
-              <span class="item-qty">x{{item.quantity}}</span>
-              <span class="item-price">&euro;{{item.price | number:'1.2-2'}}</span>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="retry-btn" (click)="startNewCustomOrder()">Make another order</button>
-          <button type="button" class="close-secondary" (click)="closeRejectedModal()">Close</button>
-        </div>
-      </div>
-    </div>
-    </ng-container>
+      }
+    }
   </div>
 </main>
 
 <app-footer></app-footer>
-
 
 
 

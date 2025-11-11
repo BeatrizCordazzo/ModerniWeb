@@ -1,18 +1,14 @@
-<div class="livingroom-page">
+﻿<div class="livingroom-page">
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
       <h1>Your Perfect Living Space</h1>
       <p>Design a living room where memories are made</p>
       <div class="mode-toggle">
-        <button 
-          [class.active]="viewMode === 'sets'" 
-          (click)="switchToSets()">
+        <button [class.active]="viewMode === 'sets'" (click)="switchToSets()">
           <i class="fas fa-layer-group"></i> Pre-Designed Sets
         </button>
-        <button 
-          [class.active]="viewMode === 'custom'" 
-          (click)="switchToCustom()">
+        <button [class.active]="viewMode === 'custom'" (click)="switchToCustom()">
           <i class="fas fa-ruler-combined"></i> Make It Your Own
         </button>
       </div>
@@ -20,41 +16,43 @@
   </section>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-container">
+  @if (isLoading) {
+  <div class="loading-container">
     <div class="spinner"></div>
     <p>Loading living room sets...</p>
   </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="loadError && !isLoading" class="error-container">
+  @if (loadError && !isLoading) {
+  <div class="error-container">
     <p class="error-message">{{ loadError }}</p>
     <button class="retry-button" (click)="loadLivingRoomSets()">Retry</button>
   </div>
+  }
 
   <!-- Pre-Designed Sets View -->
-  <section class="sets-section" *ngIf="viewMode === 'sets' && !isLoading && !loadError">
+  @if (viewMode === 'sets' && !isLoading && !loadError) {
+  <section class="sets-section">
     <div class="container">
       <!-- Selected Set Detail View -->
-      <div class="selected-set-detail" *ngIf="selectedSet && showColorPicker">
+      @if (selectedSet && showColorPicker) {
+      <div class="selected-set-detail">
         <button class="back-button" (click)="selectedSet = null; showColorPicker = false">
           <i class="fas fa-arrow-left"></i> Back to All Sets
         </button>
-        
         <div class="detail-content">
           <div class="detail-image">
-            <img [src]="selectedSet.image" [alt]="selectedSet.name">
+            <img [src]="selectedSet.image" [alt]="selectedSet.name" />
           </div>
-          
           <div class="detail-info">
             <h2>{{ selectedSet.name }}</h2>
             <p class="style-tag">{{ selectedSet.style }}</p>
             <p class="description">{{ selectedSet.description }}</p>
-            
             <div class="price-tag">
               <span class="price-label">Starting at:</span>
-              <span class="price">€{{ selectedSet.basePrice.toFixed(2) }}</span>
+              <span class="price">â‚¬{{ selectedSet.basePrice.toFixed(2) }}</span>
             </div>
-
             <div class="dimensions-section">
               <h3>Standard Dimensions</h3>
               <div class="dimensions-grid">
@@ -72,53 +70,66 @@
                 </div>
               </div>
             </div>
-
             <div class="includes-section">
               <h3>Includes:</h3>
               <ul>
-                <li *ngFor="let item of selectedSet.includes">
+                @for (item of selectedSet.includes; track item) {
+                <li>
                   {{ item }}
                 </li>
+                }
               </ul>
             </div>
-
             <div class="color-picker-section">
               <h3>Choose Your Color</h3>
               <div class="color-options">
-                <div 
-                  *ngFor="let color of selectedSet.availableColors"
+                @for (color of selectedSet.availableColors; track color.code ?? color.codigo_hex ??
+                color.name ?? color) {
+                <div
                   class="color-option"
                   [class.selected]="selectedSetColor?.name === color.name"
-                  (click)="selectSetColor(color)">
+                  (click)="selectSetColor(color)"
+                >
                   <div class="color-swatch" [style.backgroundColor]="color.code"></div>
                   <span class="color-name">{{ color.name }}</span>
                 </div>
+                }
               </div>
             </div>
-
             <div class="action-buttons">
-              <button *ngIf="!isAdmin" class="btn-primary" (click)="addSetToCart()">
-                Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
+              @if (!isAdmin) {
+              <button class="btn-primary" (click)="addSetToCart()">
+                Add to Cart - â‚¬{{ selectedSet.basePrice.toFixed(2) }}
               </button>
-              <button *ngIf="isAdmin" class="btn-primary admin-modify" (click)="addSetToCart()">
+              } @if (isAdmin) {
+              <button class="btn-primary admin-modify" (click)="addSetToCart()">
                 <i class="fas fa-edit"></i> Modify
               </button>
+              }
             </div>
           </div>
         </div>
       </div>
-
+      }
       <!-- Sets Grid -->
-      <div class="sets-grid" *ngIf="!selectedSet || !showColorPicker">
+      @if (!selectedSet || !showColorPicker) {
+      <div class="sets-grid">
         <h2 class="section-title">Choose Your Living Room Style</h2>
         <p class="section-subtitle">Select from our curated living room collections</p>
-        
         <div class="grid">
-          <div 
-            *ngFor="let set of livingRoomSets"
-            class="set-card"
-            (click)="selectSet(set)">
-            <div class="card-favorite" *ngIf="!isAdmin">
+          @for (set of livingRoomSets; track set.id) {
+          <div class="set-card" (click)="selectSet(set)">
+            @if (isAdmin) {
+            <!-- NEW: botón eliminar -->
+            <button
+              class="delete-btn"
+              (click)="confirmDeleteProduct(set.id, $event)"
+              title="Eliminar producto"
+            >
+              ×
+            </button>
+            } @if (!isAdmin) {
+            <div class="card-favorite">
               <app-favorite-toggle
                 [itemType]="'service'"
                 [itemId]="set.id"
@@ -126,49 +137,65 @@
                 [itemName]="set.name"
                 [itemImage]="set.image"
                 [itemPrice]="set.basePrice"
-                [extra]="{ category: 'livingroom', style: set.style }">
+                [extra]="{ category: 'livingroom', style: set.style }"
+              >
               </app-favorite-toggle>
             </div>
+            }
             <div class="card-image">
-              <img [src]="set.image" [alt]="set.name">
+              <img [src]="set.image" [alt]="set.name" />
             </div>
             <div class="card-content">
               <h3>{{ set.name }}</h3>
               <p class="style">{{ set.style }}</p>
               <div class="price">
                 <span class="from">From</span>
-                <span class="amount">€{{ set.basePrice.toFixed(2) }}</span>
+                <span class="amount">â‚¬{{ set.basePrice.toFixed(2) }}</span>
               </div>
               <div class="color-preview">
                 <span>Available in:</span>
                 <div class="color-dots">
-                  <div 
-                    *ngFor="let color of set.availableColors"
+                  @for (color of set.availableColors; track color.code ?? color.codigo_hex ??
+                  color.name ?? color) {
+                  <div
                     class="color-dot"
                     [style.backgroundColor]="color.code"
-                    [title]="color.name">
-                  </div>
+                    [title]="color.name"
+                  ></div>
+                  }
                 </div>
               </div>
-              <button *ngIf="!isAdmin" class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
+              @if (!isAdmin) {
+              <button
+                class="btn-add-to-cart"
+                (click)="quickAddToCart(set); $event.stopPropagation()"
+              >
                 <i class="fas fa-shopping-bag"></i> Add to Cart
               </button>
-              <button *ngIf="isAdmin" class="btn-add-to-cart admin-modify" (click)="quickAddToCart(set); $event.stopPropagation()">
+              } @if (isAdmin) {
+              <button
+                class="btn-add-to-cart admin-modify"
+                (click)="quickAddToCart(set); $event.stopPropagation()"
+              >
                 <i class="fas fa-edit"></i> Modify
               </button>
+              }
             </div>
           </div>
+          }
         </div>
       </div>
+      }
     </div>
   </section>
+  }
 
   <!-- Custom Living Room Builder -->
-  <section class="custom-section" *ngIf="viewMode === 'custom'">
+  @if (viewMode === 'custom') {
+  <section class="custom-section">
     <div class="container">
       <h2 class="section-title">Create Your Custom Living Room</h2>
       <p class="section-subtitle">Design furniture tailored to your exact space and style</p>
-
       <!-- Step 1: Space Dimensions -->
       <div class="step-card">
         <div class="step-header">
@@ -182,45 +209,50 @@
                 <i class="fas fa-arrows-alt-h"></i>
                 Width (cm)
               </label>
-              <input 
-                type="number" 
-                [(ngModel)]="customSpaceWidth" 
+              <input
+                type="number"
+                [(ngModel)]="customSpaceWidth"
                 placeholder="e.g., 500"
                 min="300"
-                max="1000">
+                max="1000"
+              />
             </div>
             <div class="input-group">
               <label>
                 <i class="fas fa-arrows-alt-v"></i>
                 Height (cm)
               </label>
-              <input 
-                type="number" 
-                [(ngModel)]="customSpaceHeight" 
+              <input
+                type="number"
+                [(ngModel)]="customSpaceHeight"
                 placeholder="e.g., 260"
                 min="200"
-                max="400">
+                max="400"
+              />
             </div>
             <div class="input-group">
               <label>
                 <i class="fas fa-arrows-alt"></i>
                 Depth (cm)
               </label>
-              <input 
-                type="number" 
-                [(ngModel)]="customSpaceDepth" 
+              <input
+                type="number"
+                [(ngModel)]="customSpaceDepth"
                 placeholder="e.g., 450"
                 min="300"
-                max="1000">
+                max="1000"
+              />
             </div>
           </div>
-          <div class="validation-message" *ngIf="!isCustomSpaceValid() && (customSpaceWidth || customSpaceHeight || customSpaceDepth)">
+          @if (!isCustomSpaceValid() && (customSpaceWidth || customSpaceHeight || customSpaceDepth))
+          {
+          <div class="validation-message">
             <i class="fas fa-exclamation-circle"></i>
             Please enter all three dimensions
           </div>
+          }
         </div>
       </div>
-
       <!-- Step 2: Select Furniture -->
       <div class="step-card" [class.disabled]="!isCustomSpaceValid()">
         <div class="step-header">
@@ -229,132 +261,148 @@
         </div>
         <div class="step-content">
           <div class="furniture-grid">
-            <div 
-              *ngFor="let furniture of customFurnitureOptions"
+            @for (furniture of customFurnitureOptions; track furniture.id) {
+            <div
               class="furniture-card"
               [class.disabled]="!isCustomSpaceValid()"
-              (click)="isCustomSpaceValid() && addCustomFurniture(furniture)">
-              <img [src]="furniture.image" [alt]="furniture.name">
+              (click)="isCustomSpaceValid() && addCustomFurniture(furniture)"
+            >
+              <img [src]="furniture.image" [alt]="furniture.name" />
               <div class="furniture-info">
                 <h4>{{ furniture.name }}</h4>
-                <p class="base-price">From €{{ furniture.basePrice.toFixed(2) }}</p>
+                <p class="base-price">From â‚¬{{ furniture.basePrice.toFixed(2) }}</p>
                 <button class="add-btn" [disabled]="!isCustomSpaceValid()">
                   <i class="fas fa-plus"></i> Add
                 </button>
               </div>
             </div>
+            }
           </div>
         </div>
       </div>
-
       <!-- Step 3: Customize Selected Items -->
-      <div class="step-card" *ngIf="customSelections.length > 0">
+      @if (customSelections.length > 0) {
+      <div class="step-card">
         <div class="step-header">
           <span class="step-number">3</span>
           <h3>Customize Your Selections ({{ customSelections.length }} items)</h3>
         </div>
         <div class="step-content">
           <div class="selections-list">
-            <div 
-              *ngFor="let selection of customSelections; let i = index"
-              class="selection-item">
+            @for (selection of customSelections; track selection.furniture.id + '-' +
+            (selection.selectedColor?.code ?? selection.selectedColor?.name ?? '') + '-' +
+            selection.customWidth + 'x' + selection.customHeight + '-' + selection.quantity; let i =
+            $index) {
+            <div class="selection-item">
               <div class="selection-header">
                 <h4>{{ selection.furniture.name }}</h4>
                 <button class="remove-btn" (click)="removeCustomSelection(i)">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
-
               <div class="selection-body">
                 <div class="dimension-inputs">
                   <div class="input-group">
                     <label>Width (cm)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       [(ngModel)]="selection.customWidth"
                       [min]="selection.furniture.dimensions.minWidth"
                       [max]="selection.furniture.dimensions.maxWidth"
-                      (ngModelChange)="calculateCustomPrice(selection)">
+                      (ngModelChange)="calculateCustomPrice(selection)"
+                    />
                     <span class="range-hint">
-                      {{ selection.furniture.dimensions.minWidth }}-{{ selection.furniture.dimensions.maxWidth }}cm
+                      {{ selection.furniture.dimensions.minWidth }}-{{
+                        selection.furniture.dimensions.maxWidth
+                      }}cm
                     </span>
                   </div>
-
                   <div class="input-group">
                     <label>Height (cm)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       [(ngModel)]="selection.customHeight"
                       [min]="selection.furniture.dimensions.minHeight"
                       [max]="selection.furniture.dimensions.maxHeight"
-                      (ngModelChange)="calculateCustomPrice(selection)">
+                      (ngModelChange)="calculateCustomPrice(selection)"
+                    />
                     <span class="range-hint">
-                      {{ selection.furniture.dimensions.minHeight }}-{{ selection.furniture.dimensions.maxHeight }}cm
+                      {{ selection.furniture.dimensions.minHeight }}-{{
+                        selection.furniture.dimensions.maxHeight
+                      }}cm
                     </span>
                   </div>
-
                   <div class="input-group">
                     <label>Quantity</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       [(ngModel)]="selection.quantity"
                       min="1"
                       max="10"
-                      (ngModelChange)="calculateCustomPrice(selection)">
+                      (ngModelChange)="calculateCustomPrice(selection)"
+                    />
                   </div>
                 </div>
-
                 <div class="color-selection">
                   <label>Color:</label>
                   <div class="color-options">
-                    <div 
-                      *ngFor="let color of selection.furniture.availableColors"
+                    @for (color of selection.furniture.availableColors; track color.code ??
+                    color.codigo_hex ?? color.name ?? color) {
+                    <div
                       class="color-option"
                       [class.selected]="selection.selectedColor.name === color.name"
                       (click)="selection.selectedColor = color"
                       [style.background-color]="color.code"
-                      [title]="color.name">
-                      <i class="fas fa-check" *ngIf="selection.selectedColor.name === color.name"></i>
+                      [title]="color.name"
+                    >
+                      @if (selection.selectedColor.name === color.name) {
+                      <i class="fas fa-check"></i>
+                      }
                     </div>
+                    }
                   </div>
                   <span class="selected-color-name">{{ selection.selectedColor.name }}</span>
                 </div>
-
                 <div class="selection-price">
                   <span class="label">Price for this item:</span>
-                  <span class="price">€{{ calculateCustomPrice(selection).toFixed(2) }}</span>
+                  <span class="price">â‚¬{{ calculateCustomPrice(selection).toFixed(2) }}</span>
                 </div>
               </div>
             </div>
+            }
           </div>
-
           <!-- Total and Submit -->
           <div class="total-section">
             <div class="total-row">
               <span class="label">Total Living Room Cost:</span>
-              <span class="total-price">€{{ getTotalCustomPrice().toFixed(2) }}</span>
+              <span class="total-price">â‚¬{{ getTotalCustomPrice().toFixed(2) }}</span>
             </div>
-            <button 
+            <button
               class="btn-submit"
               (click)="sendCustomOrderToCarpenters()"
-              [disabled]="!isCustomSpaceValid() || customSelections.length === 0">
+              [disabled]="!isCustomSpaceValid() || customSelections.length === 0"
+            >
               <i class="fas fa-paper-plane"></i> Send Order to Our Carpenters
             </button>
             <p class="submit-note">
               <i class="fas fa-info-circle"></i>
-              Our team will review your custom design and contact you within 24 hours with a detailed quote
+              Our team will review your custom design and contact you within 24 hours with a
+              detailed quote
             </p>
           </div>
         </div>
       </div>
-
+      }
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="customSelections.length === 0 && isCustomSpaceValid()">
+      @if (customSelections.length === 0 && isCustomSpaceValid()) {
+      <div class="empty-state">
         <i class="fas fa-couch"></i>
         <p>Start by selecting furniture items above</p>
       </div>
+      }
     </div>
   </section>
+  }
 </div>
 
 <!-- Cart Confirmation Modal -->
@@ -365,7 +413,8 @@
   [adminMode]="modalAdminMode"
   (confirm)="confirmAddToCart()"
   (save)="saveModified($event)"
-  (cancel)="closeModal()">
+  (cancel)="closeModal()"
+>
 </app-cart-confirmation-modal>
 
 <!-- Custom Order Confirmation Modal -->
@@ -373,20 +422,21 @@
   [isOpen]="showCustomModal"
   [order]="customOrderData"
   (confirm)="confirmSendCustomOrder()"
-  (cancel)="closeCustomModal()">
+  (cancel)="closeCustomModal()"
+>
 </app-custom-order-confirmation-modal>
 
 <!-- Toast Notification -->
-<app-toast-notification
-  *ngIf="showToast"
-  [message]="toastMessage"
-  type="success">
-</app-toast-notification>
+@if (showToast) {
+<app-toast-notification [message]="toastMessage" type="success"> </app-toast-notification>
+}
 
 <!-- Small Admin Confirmation Modal -->
-<div class="admin-confirm-backdrop" *ngIf="showAdminConfirm">
+@if (showAdminConfirm) {
+<div class="admin-confirm-backdrop">
   <div class="admin-confirm-modal">
     <p>Cambios guardados correctamente.</p>
     <button class="btn" (click)="showAdminConfirm = false">OK</button>
   </div>
 </div>
+}

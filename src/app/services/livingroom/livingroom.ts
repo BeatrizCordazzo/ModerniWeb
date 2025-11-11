@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
+import {
+  CartConfirmationModal,
+  CartItem,
+} from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirmation-modal/custom-order-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
 import { Datos, Product as ApiProduct, Color } from '../../datos';
@@ -60,9 +63,15 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-livingroom',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent],
+  imports: [
+    FormsModule,
+    CartConfirmationModal,
+    ToastNotification,
+    CustomOrderConfirmationModal,
+    FavoriteToggleComponent,
+  ],
   templateUrl: './livingroom.html',
-  styleUrl: './livingroom.scss'
+  styleUrl: './livingroom.scss',
 })
 export class Livingroom implements OnInit {
   // Modal state
@@ -72,7 +81,7 @@ export class Livingroom implements OnInit {
   showAdminConfirm = false;
   modalItem: ModalCartItem | null = null;
   modalProductId: number | null = null;
-  
+
   // Toast notification state
   showToast = false;
   toastMessage = '';
@@ -80,38 +89,49 @@ export class Livingroom implements OnInit {
   // Custom order modal state
   showCustomModal = false;
   customOrderData: any = null;
-  
+
   // Loading state
   isLoading = true;
   loadError = '';
-  
+
   livingRoomSets: LivingRoomSet[] = [];
 
-  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
+  // --- borrar producto (admin) ---
+  showDeleteConfirm = false;
+  productToDelete: number | null = null;
+
+  constructor(
+    private datosService: Datos,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadLivingRoomSets();
     // detect admin role to change UI for admins
     this.datosService.getLoggedUser().subscribe({
       next: (u: any) => {
-        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        const role = u && u.rol ? u.rol : u && u.role ? u.role : null;
         this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
       },
-      error: () => { this.isAdmin = false; }
+      error: () => {
+        this.isAdmin = false;
+      },
     });
     // Sync local livingRoomSets when a product is updated elsewhere
     this.datosService.productUpdated$.subscribe((prod: any) => {
       if (!prod || !prod.id) return;
-      const idx = this.livingRoomSets.findIndex(s => s.id === prod.id);
+      const idx = this.livingRoomSets.findIndex((s) => s.id === prod.id);
       if (idx !== -1) {
         this.livingRoomSets[idx] = {
           ...this.livingRoomSets[idx],
           name: prod.name ?? this.livingRoomSets[idx].name,
           basePrice: prod.price ?? this.livingRoomSets[idx].basePrice,
           image: prod.image ?? this.livingRoomSets[idx].image,
-          dimensions: prod.dimensions ?? this.livingRoomSets[idx].dimensions
+          dimensions: prod.dimensions ?? this.livingRoomSets[idx].dimensions,
         };
-        if (this.selectedSet && this.selectedSet.id === prod.id) this.selectedSet = this.livingRoomSets[idx];
+        if (this.selectedSet && this.selectedSet.id === prod.id)
+          this.selectedSet = this.livingRoomSets[idx];
       }
     });
   }
@@ -119,10 +139,10 @@ export class Livingroom implements OnInit {
   loadLivingRoomSets() {
     this.isLoading = true;
     this.loadError = '';
-    
+
     this.datosService.getLivingRoomSets().subscribe({
       next: (apiProducts: ApiProduct[]) => {
-        this.livingRoomSets = apiProducts.map(ap => ({
+        this.livingRoomSets = apiProducts.map((ap) => ({
           id: ap.id,
           name: ap.name,
           style: ap.style || '',
@@ -133,18 +153,18 @@ export class Livingroom implements OnInit {
           dimensions: {
             width: ap.dimensions?.width || '',
             height: ap.dimensions?.height || '',
-            depth: ap.dimensions?.depth || ''
+            depth: ap.dimensions?.depth || '',
           },
-          availableColors: ap.colors
+          availableColors: ap.colors,
         }));
-        
+
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading living room sets:', error);
         this.loadError = 'Failed to load living room sets. Please try again later.';
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -160,14 +180,14 @@ export class Livingroom implements OnInit {
         maxWidth: 280,
         minHeight: 80,
         maxHeight: 100,
-        depth: 90
+        depth: 90,
       },
       availableColors: [
         { name: 'Gray', code: '#808080' },
         { name: 'Beige', code: '#F5F5DC' },
         { name: 'Navy', code: '#000080' },
-        { name: 'Charcoal', code: '#36454F' }
-      ]
+        { name: 'Charcoal', code: '#36454F' },
+      ],
     },
     {
       id: 'coffee-table',
@@ -180,14 +200,14 @@ export class Livingroom implements OnInit {
         maxWidth: 150,
         minHeight: 40,
         maxHeight: 50,
-        depth: 60
+        depth: 60,
       },
       availableColors: [
         { name: 'Walnut', code: '#5C4033' },
         { name: 'Oak', code: '#D2B48C' },
         { name: 'White', code: '#FFFFFF' },
-        { name: 'Black', code: '#000000' }
-      ]
+        { name: 'Black', code: '#000000' },
+      ],
     },
     {
       id: 'tv-unit',
@@ -200,14 +220,14 @@ export class Livingroom implements OnInit {
         maxWidth: 250,
         minHeight: 50,
         maxHeight: 70,
-        depth: 45
+        depth: 45,
       },
       availableColors: [
         { name: 'Walnut', code: '#5C4033' },
         { name: 'Oak', code: '#D2B48C' },
         { name: 'White Gloss', code: '#FFFFFF' },
-        { name: 'Gray', code: '#808080' }
-      ]
+        { name: 'Gray', code: '#808080' },
+      ],
     },
     {
       id: 'bookshelf',
@@ -220,14 +240,14 @@ export class Livingroom implements OnInit {
         maxWidth: 180,
         minHeight: 180,
         maxHeight: 240,
-        depth: 35
+        depth: 35,
       },
       availableColors: [
         { name: 'Walnut', code: '#5C4033' },
         { name: 'Oak', code: '#D2B48C' },
         { name: 'White', code: '#FFFFFF' },
-        { name: 'Black', code: '#000000' }
-      ]
+        { name: 'Black', code: '#000000' },
+      ],
     },
     {
       id: 'side-table',
@@ -240,14 +260,14 @@ export class Livingroom implements OnInit {
         maxWidth: 60,
         minHeight: 50,
         maxHeight: 65,
-        depth: 40
+        depth: 40,
       },
       availableColors: [
         { name: 'Walnut', code: '#5C4033' },
         { name: 'Oak', code: '#D2B48C' },
         { name: 'White', code: '#FFFFFF' },
-        { name: 'Marble Top', code: '#E8F4F8' }
-      ]
+        { name: 'Marble Top', code: '#E8F4F8' },
+      ],
     },
     {
       id: 'accent-chair',
@@ -260,15 +280,15 @@ export class Livingroom implements OnInit {
         maxWidth: 80,
         minHeight: 80,
         maxHeight: 100,
-        depth: 70
+        depth: 70,
       },
       availableColors: [
         { name: 'Velvet Blue', code: '#4169E1' },
         { name: 'Gray Fabric', code: '#A9A9A9' },
         { name: 'Beige Linen', code: '#F5F5DC' },
-        { name: 'Emerald Green', code: '#50C878' }
-      ]
-    }
+        { name: 'Emerald Green', code: '#50C878' },
+      ],
+    },
   ];
 
   viewMode: 'sets' | 'custom' = 'sets';
@@ -308,7 +328,7 @@ export class Livingroom implements OnInit {
       selectedColor: furniture.availableColors[0],
       customWidth: furniture.dimensions.minWidth,
       customHeight: furniture.dimensions.minHeight,
-      quantity: 1
+      quantity: 1,
     };
     this.customSelections.push(selection);
   }
@@ -332,9 +352,7 @@ export class Livingroom implements OnInit {
   }
 
   isCustomSpaceValid(): boolean {
-    return this.customSpaceWidth > 0 && 
-           this.customSpaceHeight > 0 && 
-           this.customSpaceDepth > 0;
+    return this.customSpaceWidth > 0 && this.customSpaceHeight > 0 && this.customSpaceDepth > 0;
   }
 
   sendCustomOrderToCarpenters() {
@@ -346,18 +364,19 @@ export class Livingroom implements OnInit {
     const orderData = {
       // human readable title to store as project/pedido name
       title: (() => {
-        const names = this.customSelections.map(s => s.furniture.name).filter(Boolean);
+        const names = this.customSelections.map((s) => s.furniture.name).filter(Boolean);
         const setName = this.selectedSet?.name;
-        const base = setName || (names.length ? names.slice(0,3).join(', ') : 'Pedido personalizado');
+        const base =
+          setName || (names.length ? names.slice(0, 3).join(', ') : 'Pedido personalizado');
         return `Pedido personalizado - ${base}`;
       })(),
       type: 'custom-livingroom',
       spaceDimensions: {
         width: this.customSpaceWidth,
         height: this.customSpaceHeight,
-        depth: this.customSpaceDepth
+        depth: this.customSpaceDepth,
       },
-      furniture: this.customSelections.map(sel => ({
+      furniture: this.customSelections.map((sel) => ({
         name: sel.furniture.name,
         type: sel.furniture.type,
         color: sel.selectedColor.name,
@@ -365,14 +384,16 @@ export class Livingroom implements OnInit {
         dimensions: {
           width: sel.customWidth,
           height: sel.customHeight,
-          depth: sel.furniture.dimensions.depth
+          depth: sel.furniture.dimensions.depth,
         },
         quantity: sel.quantity,
-        price: this.calculateCustomPrice(sel)
+        price: this.calculateCustomPrice(sel),
       })),
-      images: Array.from(new Set(this.customSelections.map(s => s.furniture.image).filter(Boolean))),
+      images: Array.from(
+        new Set(this.customSelections.map((s) => s.furniture.image).filter(Boolean))
+      ),
       totalPrice: this.getTotalCustomPrice(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // open confirmation modal with order details
@@ -386,9 +407,13 @@ export class Livingroom implements OnInit {
     // Send to backend via Datos service so admin will see it as a pending custom order
     this.datosService.createCustomOrder(this.customOrderData).subscribe({
       next: (res: any) => {
-        this.toastMessage = `Custom living room order submitted! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+        this.toastMessage = `Custom living room order submitted! Total: €${this.customOrderData.totalPrice.toFixed(
+          2
+        )}`;
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 3500);
+        setTimeout(() => {
+          this.showToast = false;
+        }, 3500);
 
         // reset form
         this.customSelections = [];
@@ -401,7 +426,7 @@ export class Livingroom implements OnInit {
       error: (err: any) => {
         console.error('Error submitting custom living room order', err);
         alert('Error enviando el pedido personalizado. Intenta de nuevo.');
-      }
+      },
     });
   }
 
@@ -425,11 +450,11 @@ export class Livingroom implements OnInit {
       image: this.selectedSet.image,
       selectedColor: {
         name: this.selectedSetColor.name,
-        code: this.selectedSetColor.code
+        code: this.selectedSetColor.code,
       },
-      dimensions: this.selectedSet.dimensions ?? null
+      dimensions: this.selectedSet.dimensions ?? null,
     };
-    
+
     this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
@@ -437,7 +462,7 @@ export class Livingroom implements OnInit {
   quickAddToCart(set: LivingRoomSet) {
     // Add set to cart with default/first color
     const defaultColor = set.availableColors[0];
-    
+
     this.modalProductId = set.id;
     this.modalItem = {
       id: set.id,
@@ -447,11 +472,11 @@ export class Livingroom implements OnInit {
       image: set.image,
       selectedColor: {
         name: defaultColor.name,
-        code: defaultColor.code
+        code: defaultColor.code,
       },
-      dimensions: set.dimensions ?? null
+      dimensions: set.dimensions ?? null,
     };
-    
+
     this.modalAdminMode = this.isAdmin;
     this.showModal = true;
   }
@@ -467,20 +492,23 @@ export class Livingroom implements OnInit {
           if (isLogged) {
             // Add to cart via service
             this.cartService.addItem({
-                name: this.modalItem!.name,
-                description: this.modalItem!.description,
-                price: this.modalItem!.price,
-                image: this.modalItem!.image,
-                selectedColor: this.modalItem!.selectedColor,
-                // include set dimensions so checkout can forward them to the server
-                dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
+              name: this.modalItem!.name,
+              description: this.modalItem!.description,
+              price: this.modalItem!.price,
+              image: this.modalItem!.image,
+              selectedColor: this.modalItem!.selectedColor,
+              // include set dimensions so checkout can forward them to the server
+              dimensions:
+                this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null,
             });
 
             // Close modal and show toast
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
             this.showToast = true;
-            setTimeout(() => { this.showToast = false; }, 3500);
+            setTimeout(() => {
+              this.showToast = false;
+            }, 3500);
           } else {
             // Not logged - prompt to login
             this.closeModal();
@@ -503,20 +531,26 @@ export class Livingroom implements OnInit {
                 description: this.modalItem!.description,
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
-                selectedColor: this.modalItem!.selectedColor
+                selectedColor: this.modalItem!.selectedColor,
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
               this.showToast = true;
-              setTimeout(() => { this.showToast = false; }, 3500);
+              setTimeout(() => {
+                this.showToast = false;
+              }, 3500);
               return;
             }
-          } catch (e) { /* ignore */ }
+          } catch (e) {
+            /* ignore */
+          }
 
           this.closeModal();
           alert('You must be logged in to add items to the cart. Please log in first.');
-          try { this.router.navigate(['/login']); } catch (e) {}
-        }
+          try {
+            this.router.navigate(['/login']);
+          } catch (e) {}
+        },
       });
     }
   }
@@ -531,15 +565,19 @@ export class Livingroom implements OnInit {
     if (targetId == null) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
-    const idx = this.livingRoomSets.findIndex(s => s.id === targetId);
+    const idx = this.livingRoomSets.findIndex((s) => s.id === targetId);
     if (idx === -1) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
@@ -560,7 +598,7 @@ export class Livingroom implements OnInit {
       name: edited.name ?? currentSet.name,
       basePrice: updatedPrice,
       image: edited.image ?? currentSet.image,
-      dimensions: updatedDimensions
+      dimensions: updatedDimensions,
     };
     this.livingRoomSets[idx] = updatedSet;
     if (this.selectedSet && this.selectedSet.id === targetId) {
@@ -571,7 +609,7 @@ export class Livingroom implements OnInit {
       id: targetId,
       name: updatedSet.name,
       price: updatedSet.basePrice,
-      image: updatedSet.image
+      image: updatedSet.image,
     };
     if (updatedDimensions) {
       payload.dimensions = updatedDimensions;
@@ -582,14 +620,18 @@ export class Livingroom implements OnInit {
       next: () => {
         this.toastMessage = 'Cambios guardados en el servidor.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 2000);
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
       },
       error: (err) => {
         console.error('Error saving product changes to server', err);
         this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 4000);
-      }
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
     });
   }
 
@@ -597,5 +639,41 @@ export class Livingroom implements OnInit {
     this.showModal = false;
     this.modalItem = null;
     this.modalProductId = null;
+  }
+
+  confirmDeleteProduct(productId: number, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.productToDelete = productId;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.productToDelete = null;
+  }
+
+  executeDelete() {
+    if (!this.productToDelete) return;
+    this.datosService.deleteProduct(this.productToDelete).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.productToDelete = null;
+        this.toastMessage = 'Producto eliminado correctamente.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
+        this.loadLivingRoomSets(); // << recarga livingroom
+      },
+      error: (err) => {
+        console.error('Error eliminando producto', err);
+        this.toastMessage = 'Error eliminando el producto.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
+    });
   }
 }

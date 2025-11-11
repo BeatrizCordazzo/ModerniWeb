@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 :host {
   display: inline-flex;
 }
@@ -37,7 +39,7 @@
 
   &.active {
     background: rgba(220, 38, 38, 0.95);
-    color: #fff;
+    color: theme.color('surface');
 
     svg {
       fill: currentColor;
@@ -45,3 +47,5 @@
     }
   }
 }
+
+

@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { CartService, SimpleCartItem } from '../shared/cart.service';
@@ -19,7 +19,7 @@ interface CartItem {
 
 @Component({
   selector: 'app-cart',
-  imports: [Nav, Footer, CommonModule, FormsModule, RouterLink],
+  imports: [Nav, Footer, FormsModule, RouterLink],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'
 })

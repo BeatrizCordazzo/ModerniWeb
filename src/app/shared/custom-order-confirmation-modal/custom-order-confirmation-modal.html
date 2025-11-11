@@ -1,43 +1,47 @@
-<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
-  <div class="modal-container" *ngIf="order">
-    <div class="modal-header">
-      <h2>Confirm Custom Order</h2>
-      <button class="close-btn" (click)="onCancel()" aria-label="Close modal">&times;</button>
-    </div>
-
-    <div class="modal-body">
-      <div class="order-summary">
-        <h3>Space dimensions</h3>
-        <p>
-          Width: <strong>{{order.spaceDimensions.width}} cm</strong>
-          &nbsp;•&nbsp; Height: <strong>{{order.spaceDimensions.height}} cm</strong>
-          &nbsp;•&nbsp; Depth: <strong>{{order.spaceDimensions.depth}} cm</strong>
-        </p>
-
-        <h3>Items</h3>
-        <ul class="items-list">
-          <li *ngFor="let it of order.furniture">
-            <div class="item-row">
-              <img *ngIf="it.image" [src]="it.image" alt="" class="thumb">
-              <div class="item-info">
-                <div class="item-name">{{it.name}} <span class="qty">×{{it.quantity}}</span></div>
-                <div class="item-meta">Color: {{it.color}} • Size: {{it.dimensions.width}}×{{it.dimensions.height}} cm</div>
-              </div>
-              <div class="item-price">€{{it.price.toFixed(2)}}</div>
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    @if (order) {
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Confirm Custom Order</h2>
+          <button class="close-btn" (click)="onCancel()" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="order-summary">
+            <h3>Space dimensions</h3>
+            <p>
+              Width: <strong>{{order.spaceDimensions.width}} cm</strong>
+              &nbsp;•&nbsp; Height: <strong>{{order.spaceDimensions.height}} cm</strong>
+              &nbsp;•&nbsp; Depth: <strong>{{order.spaceDimensions.depth}} cm</strong>
+            </p>
+            <h3>Items</h3>
+            <ul class="items-list">
+              @for (it of order.furniture; track it) {
+                <li>
+                  <div class="item-row">
+                    @if (it.image) {
+                      <img [src]="it.image" alt="" class="thumb">
+                    }
+                    <div class="item-info">
+                      <div class="item-name">{{it.name}} <span class="qty">×{{it.quantity}}</span></div>
+                      <div class="item-meta">Color: {{it.color}} • Size: {{it.dimensions.width}}×{{it.dimensions.height}} cm</div>
+                    </div>
+                    <div class="item-price">€{{it.price.toFixed(2)}}</div>
+                  </div>
+                </li>
+              }
+            </ul>
+            <div class="total-row">
+              <span>Total</span>
+              <strong>€{{order.totalPrice.toFixed(2)}}</strong>
             </div>
-          </li>
-        </ul>
-
-        <div class="total-row">
-          <span>Total</span>
-          <strong>€{{order.totalPrice.toFixed(2)}}</strong>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+          <button class="btn btn-confirm" (click)="onConfirm()">Send to Carpenters</button>
         </div>
       </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-cancel" (click)="onCancel()">Cancel</button>
-      <button class="btn btn-confirm" (click)="onConfirm()">Send to Carpenters</button>
-    </div>
+    }
   </div>
-</div>
+}

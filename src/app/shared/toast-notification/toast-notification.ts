@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface ToastMessage {
   message: string;
@@ -9,7 +9,7 @@ export interface ToastMessage {
 
 @Component({
   selector: 'app-toast-notification',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './toast-notification.html',
   styleUrl: './toast-notification.scss'
 })

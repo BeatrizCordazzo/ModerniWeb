@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-custom-order-confirmation-modal',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './custom-order-confirmation-modal.html',
   styleUrl: './custom-order-confirmation-modal.scss'
 })

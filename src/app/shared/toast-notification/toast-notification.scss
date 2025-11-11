@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 .toast-container {
   position: fixed;
   bottom: 30px;
@@ -89,16 +91,16 @@
   // Warning (Yellow)
   &.warning {
     background: linear-gradient(90deg, rgba(245,158,11,0.06), rgba(255,255,255,0));
-    color: #92400e;
+    color: theme.color('gold-dark');
     border-left: 6px solid #f59e0b;
     
     .toast-icon {
-      background: #b45309;
+      background: theme.color('gold-dark');
       color: white;
     }
     
     .toast-close {
-      color: #92400e;
+      color: theme.color('gold-dark');
       
       &:hover {
         background: rgba(255, 255, 255, 0.2);
@@ -140,7 +142,7 @@
   height: 24px;
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: theme.color('gray-500');
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -189,3 +191,5 @@
     font-size: 1.1rem;
   }
 }
+
+

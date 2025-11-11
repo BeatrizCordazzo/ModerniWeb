@@ -1,4 +1,4 @@
-<div class="others-page">
+﻿<div class="others-page">
   <!-- Hero Section -->
   <div class="hero">
     <h1>Individual Furniture</h1>
@@ -6,211 +6,247 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-container">
+  @if (isLoading) {
+  <div class="loading-container">
     <div class="spinner"></div>
     <p>Loading products...</p>
   </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="loadError && !isLoading" class="error-container">
+  @if (loadError && !isLoading) {
+  <div class="error-container">
     <p class="error-message">{{ loadError }}</p>
     <button class="retry-button" (click)="loadProducts()">Retry</button>
   </div>
+  }
 
   <!-- Content (only show when loaded successfully) -->
-  <div *ngIf="!isLoading && !loadError">
+  @if (!isLoading && !loadError) {
+  <div>
     <!-- Category Carousel -->
     <div class="category-carousel">
       <h2>Browse by Category</h2>
       <div class="carousel-wrapper">
         <div class="carousel-container">
-          <div 
-            *ngFor="let category of categories" 
+          @for (category of categories; track category.id) {
+          <div
             class="category-card"
             [class.active]="selectedCategory === category.id"
-            (click)="selectCategory(category.id)">
+            (click)="selectCategory(category.id)"
+          >
             <div class="category-image">
-              <img [src]="category.image" [alt]="category.name">
+              <img [src]="category.image" [alt]="category.name" />
             </div>
             <h3>{{ category.name }}</h3>
           </div>
+          }
         </div>
       </div>
     </div>
-
-  <!-- Filters Section -->
-  <div class="filters-section">
-    <div class="filters-header">
-      <div class="results-info">
-        <span class="product-count">{{ filteredProducts.length }} products</span>
-        <span *ngIf="getActiveFiltersCount() > 0" class="active-filters">
-          ({{ getActiveFiltersCount() }} filters applied)
-        </span>
-      </div>
-      
-      <div class="filter-actions">
-        <select [(ngModel)]="sortBy" (change)="applyFilters()" class="sort-select">
-          <option value="popular">Sort by: Popular</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="name">Name: A to Z</option>
-        </select>
-        
-        <button class="filter-toggle" (click)="showFilters = !showFilters">
-          <i class="filter-icon">⚙</i> Filters
-        </button>
-      </div>
-    </div>
-
-    <!-- Filter Panel -->
-    <div class="filter-panel" [class.show]="showFilters">
-      <div class="filter-group">
-        <h4>Price Range</h4>
-        <div class="price-inputs">
-          <input 
-            type="number" 
-            [(ngModel)]="currentMinPrice" 
-            (change)="applyFilters()"
-            [min]="minPrice"
-            [max]="currentMaxPrice"
-            placeholder="Min">
-          <span>-</span>
-          <input 
-            type="number" 
-            [(ngModel)]="currentMaxPrice" 
-            (change)="applyFilters()"
-            [min]="currentMinPrice"
-            [max]="maxPrice"
-            placeholder="Max">
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <div class="results-info">
+          <span class="product-count">{{ filteredProducts.length }} products</span>
+          @if (getActiveFiltersCount() > 0) {
+          <span class="active-filters"> ({{ getActiveFiltersCount() }} filters applied) </span>
+          }
         </div>
-        <div class="price-range">
-          <input 
-            type="range" 
-            [(ngModel)]="currentMinPrice" 
-            (input)="applyFilters()"
-            [min]="minPrice" 
-            [max]="maxPrice"
-            class="range-slider">
-          <input 
-            type="range" 
-            [(ngModel)]="currentMaxPrice" 
-            (input)="applyFilters()"
-            [min]="minPrice" 
-            [max]="maxPrice"
-            class="range-slider">
+        <div class="filter-actions">
+          <select [(ngModel)]="sortBy" (change)="applyFilters()" class="sort-select">
+            <option value="popular">Sort by: Popular</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+          <button class="filter-toggle" (click)="showFilters = !showFilters">
+            <i class="filter-icon">âš™</i> Filters
+          </button>
         </div>
       </div>
-
-      <div class="filter-group">
-        <h4>Colors</h4>
-        <div class="color-options">
-          <label *ngFor="let color of allColors" class="color-option">
-            <input 
-              type="checkbox" 
-              [checked]="isColorSelected(color)"
-              (change)="toggleColor(color)">
-            <span>{{ color }}</span>
+      <!-- Filter Panel -->
+      <div class="filter-panel" [class.show]="showFilters">
+        <div class="filter-group">
+          <h4>Price Range</h4>
+          <div class="price-inputs">
+            <input
+              type="number"
+              [(ngModel)]="currentMinPrice"
+              (change)="applyFilters()"
+              [min]="minPrice"
+              [max]="currentMaxPrice"
+              placeholder="Min"
+            />
+            <span>-</span>
+            <input
+              type="number"
+              [(ngModel)]="currentMaxPrice"
+              (change)="applyFilters()"
+              [min]="currentMinPrice"
+              [max]="maxPrice"
+              placeholder="Max"
+            />
+          </div>
+          <div class="price-range">
+            <input
+              type="range"
+              [(ngModel)]="currentMinPrice"
+              (input)="applyFilters()"
+              [min]="minPrice"
+              [max]="maxPrice"
+              class="range-slider"
+            />
+            <input
+              type="range"
+              [(ngModel)]="currentMaxPrice"
+              (input)="applyFilters()"
+              [min]="minPrice"
+              [max]="maxPrice"
+              class="range-slider"
+            />
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Colors</h4>
+          <div class="color-options">
+            @for (color of allColors; track color) {
+            <label class="color-option">
+              <input
+                type="checkbox"
+                [checked]="isColorSelected(color)"
+                (change)="toggleColor(color)"
+              />
+              <span>{{ color }}</span>
+            </label>
+            }
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Availability</h4>
+          <label class="checkbox-option">
+            <input type="checkbox" [(ngModel)]="onlyInStock" (change)="applyFilters()" />
+            <span>In Stock Only</span>
           </label>
         </div>
-      </div>
-
-      <div class="filter-group">
-        <h4>Availability</h4>
-        <label class="checkbox-option">
-          <input type="checkbox" [(ngModel)]="onlyInStock" (change)="applyFilters()">
-          <span>In Stock Only</span>
-        </label>
-      </div>
-
-      <div class="filter-actions-buttons">
-        <button class="btn-clear" (click)="clearFilters()">Clear All</button>
-        <button class="btn-apply" (click)="applyFilters()">Apply Filters</button>
+        <div class="filter-actions-buttons">
+          <button class="btn-clear" (click)="clearFilters()">Clear All</button>
+          <button class="btn-apply" (click)="applyFilters()">Apply Filters</button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Products Grid -->
-  <div class="products-grid">
-    <div *ngFor="let product of filteredProducts" class="product-card">
-      <div class="product-image">
-        <div class="favorite-pill" *ngIf="!isAdmin">
-          <app-favorite-toggle
-            [itemType]="'product'"
-            [itemId]="product.id"
-            [itemSlug]="'product-' + product.id"
-            [itemName]="product.name"
-            [itemImage]="product.image"
-            [itemPrice]="product.price"
-            [extra]="{ category: product.category }">
-          </app-favorite-toggle>
+    <!-- Products Grid -->
+    <div class="products-grid">
+      @for (product of filteredProducts; track product.id) {
+      <div class="product-card">
+        <div class="product-image">
+          @if (isAdmin) {
+          <!-- NEW: botón eliminar -->
+          <button
+            class="delete-btn"
+            (click)="confirmDeleteProduct(product.id, $event)"
+            title="Eliminar producto"
+          >
+            ×
+          </button>
+          } @if (!isAdmin) {
+          <div class="favorite-pill">
+            <app-favorite-toggle
+              [itemType]="'product'"
+              [itemId]="product.id"
+              [itemSlug]="'product-' + product.id"
+              [itemName]="product.name"
+              [itemImage]="product.image"
+              [itemPrice]="product.price"
+              [extra]="{ category: product.category }"
+            >
+            </app-favorite-toggle>
+          </div>
+          }
+          <img [src]="product.image" [alt]="product.name" />
+          @if (!product.inStock) {
+          <span class="out-of-stock-badge">Out of Stock</span>
+          } @if (product.oldPrice) {
+          <span class="discount-badge">
+            -{{ (((product.oldPrice - product.price) / product.oldPrice) * 100).toFixed(0) }}%
+          </span>
+          }
         </div>
-        <img [src]="product.image" [alt]="product.name">
-        <span *ngIf="!product.inStock" class="out-of-stock-badge">Out of Stock</span>
-        <span *ngIf="product.oldPrice" class="discount-badge">
-          -{{ ((product.oldPrice - product.price) / product.oldPrice * 100).toFixed(0) }}%
-        </span>
-      </div>
-      
-      <div class="product-info">
-        <span class="product-collection">{{ product.collection }}</span>
-        <h3 class="product-name">{{ product.name }}</h3>
-        <p class="product-description">{{ product.description }}</p>
-        
-        <div class="product-price">
-          <span class="current-price">€{{ product.price.toFixed(2) }}</span>
-          <span *ngIf="product.oldPrice" class="old-price">€{{ product.oldPrice.toFixed(2) }}</span>
-        </div>
-
-        <div class="product-colors">
-          <span class="colors-label">Colors:</span>
-          <div class="color-swatches">
-            <div 
-              *ngFor="let color of product.colors; let i = index" 
-              class="color-swatch"
-              [class.selected]="selectedProductColors[product.id] === i"
-              [style.backgroundColor]="color.code"
-              [title]="color.name"
-              (click)="selectColor(product.id, i); $event.stopPropagation()">
+        <div class="product-info">
+          <span class="product-collection">{{ product.collection }}</span>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          <div class="product-price">
+            <span class="current-price">â‚¬{{ product.price.toFixed(2) }}</span>
+            @if (product.oldPrice) {
+            <span class="old-price">â‚¬{{ product.oldPrice.toFixed(2) }}</span>
+            }
+          </div>
+          <div class="product-colors">
+            <span class="colors-label">Colors:</span>
+            <div class="color-swatches">
+              @for (color of product.colors; track color.code ?? color.codigo_hex ?? color.name ??
+              color; let i = $index) {
+              <div
+                class="color-swatch"
+                [class.selected]="selectedProductColors[product.id] === i"
+                [style.backgroundColor]="color.code"
+                [title]="color.name"
+                (click)="selectColor(product.id, i); $event.stopPropagation()"
+              ></div>
+              }
             </div>
           </div>
+          <div class="product-actions">
+            @if (!isAdmin) {
+            <button
+              class="btn-add-to-cart"
+              [disabled]="!product.inStock"
+              (click)="addToCart(product)"
+            >
+              Add to cart
+            </button>
+            } @if (isAdmin) {
+            <button
+              class="btn-add-to-cart admin-modify"
+              [disabled]="!product.inStock"
+              (click)="addToCart(product)"
+            >
+              <i class="fas fa-edit"></i> Modify
+            </button>
+            }
+          </div>
+        </div>
+        @if (filteredProducts.length === 0) {
+        <div class="no-products">
+          <div class="no-products-content">
+            <i class="no-products-icon">ðŸ”</i>
+            <h3>No products found</h3>
+            <p>Try adjusting your filters or browse all categories</p>
+            <button class="btn-reset" (click)="clearFilters()">Reset Filters</button>
+          </div>
+        </div>
+        }
       </div>
-      
-      <div class="product-actions">
-        <button *ngIf="!isAdmin" class="btn-add-to-cart" [disabled]="!product.inStock" (click)="addToCart(product)">
-          Add to cart
-        </button>
-        <button *ngIf="isAdmin" class="btn-add-to-cart admin-modify" [disabled]="!product.inStock" (click)="addToCart(product)">
-          <i class="fas fa-edit"></i> Modify
-        </button>
-      </div>
+      }
     </div>
+  </div>
+  }
 
-    <div *ngIf="filteredProducts.length === 0" class="no-products">
-      <div class="no-products-content">
-        <i class="no-products-icon">🔍</i>
-        <h3>No products found</h3>
-        <p>Try adjusting your filters or browse all categories</p>
-        <button class="btn-reset" (click)="clearFilters()">Reset Filters</button>
-      </div>
-    </div>
-  </div>
-  </div>
+  <!-- Cart Confirmation Modal -->
+  <app-cart-confirmation-modal
+    [isOpen]="showModal"
+    [item]="modalItem"
+    [adminMode]="modalAdminMode"
+    [productId]="modalProductId"
+    (save)="saveModified($event)"
+    (confirm)="confirmAddToCart()"
+    (cancel)="closeModal()"
+  >
+  </app-cart-confirmation-modal>
+
+  <!-- Toast Notification -->
+  @if (showToast) {
+  <app-toast-notification [message]="toastMessage" type="success"> </app-toast-notification>
+  }
 </div>
-
-<!-- Cart Confirmation Modal -->
-<app-cart-confirmation-modal
-  [isOpen]="showModal"
-  [item]="modalItem"
-  [adminMode]="modalAdminMode"
-  [productId]="modalProductId"
-  (save)="saveModified($event)"
-  (confirm)="confirmAddToCart()"
-  (cancel)="closeModal()">
-</app-cart-confirmation-modal>
-
-<!-- Toast Notification -->
-<app-toast-notification
-  *ngIf="showToast"
-  [message]="toastMessage"
-  type="success">
-</app-toast-notification>

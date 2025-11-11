@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 // Estilos para el navbar como overlay
 .navbar {
   position: absolute; /* se situa sobre el banner */
@@ -21,7 +23,7 @@ body.solid-navbar .navbar {
   left: 0;
   right: 0;
   /* Match the services/projects nav color from styles.scss */
-  background: rgba(101, 67, 33, 0.95) !important;
+  background: theme.color('primary-dark', 0.95) !important;
   backdrop-filter: blur(10px);
   color: white !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
@@ -80,7 +82,7 @@ body.solid-navbar .navbar .search-box {
   }
 }
 
-// Opciones de navegación
+// Opciones de navegaciÃ³n
 .nav-options {
   display: flex;
   gap: 8px;
@@ -111,7 +113,7 @@ body.solid-navbar .navbar .search-box {
   }
 }
 
-// Contenedor de búsqueda
+// Contenedor de bÃºsqueda
 .search-container {
   flex: 0 0 auto;
   width: 220px;
@@ -159,7 +161,7 @@ body.solid-navbar .navbar .search-box {
   }
 }
 
-// Botón hamburguesa
+// BotÃ³n hamburguesa
 .hamburger {
   margin-right: 8px;
   cursor: pointer;
@@ -324,7 +326,7 @@ body.solid-navbar .navbar .search-box {
   background: rgba(31,34,48,0.03);
 }
 
-/* Estado activo más visible */
+/* Estado activo mÃ¡s visible */
 .drawer-item.active {
   background: linear-gradient(90deg, rgba(103,58,183,0.12), rgba(195,35,125,0.06));
   color: white;
@@ -344,7 +346,7 @@ body.solid-navbar .navbar .search-box {
 }
 
 .sublist {
-  /* Aumentar sangría para indicar jerarquía respecto al drawer item padre */
+  /* Aumentar sangrÃ­a para indicar jerarquÃ­a respecto al drawer item padre */
   padding-left: 28px;
   margin-top: 6px;
   margin-bottom: 6px;
@@ -361,7 +363,7 @@ body.solid-navbar .navbar .search-box {
 }
 
 .sublist li:hover {
-  /* Hover más visible y contraste incremental */
+  /* Hover mÃ¡s visible y contraste incremental */
   background: rgba(103,58,183,0.10);
   color: #0f1720;
   transform: translateX(4px);
@@ -378,7 +380,7 @@ body.solid-navbar .navbar .search-box {
   justify-content: center;
   vertical-align: middle;
   color: inherit;
-  font-size: 18px; /* tamaño del mat-icon */
+  font-size: 18px; /* tamaÃ±o del mat-icon */
 }
 
 .sublist li mat-icon {
@@ -388,7 +390,7 @@ body.solid-navbar .navbar .search-box {
   line-height: 18px;
 }
 
-// Estilos para el menú desplegable móvil
+// Estilos para el menÃº desplegable mÃ³vil
 ::ng-deep .mobile-nav-menu {
   .mat-mdc-menu-content {
     padding: 8px 0;
@@ -423,3 +425,5 @@ body.solid-navbar .navbar .search-box {
     padding: 0 4px;
   }
 }
+
+

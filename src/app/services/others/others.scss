@@ -1,6 +1,8 @@
+﻿@use 'styles/theme' as theme;
+
 .others-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #fafafa, #fff);
+  background: linear-gradient(to bottom, theme.color('surface-muted'), theme.color('surface'));
   padding-bottom: 60px;
 }
 
@@ -20,7 +22,7 @@
     width: 50px;
     height: 50px;
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #654321;
+    border-top: 4px solid theme.color('primary-dark');
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
@@ -33,8 +35,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container {
@@ -46,7 +52,7 @@
   }
 
   .retry-button {
-    background: #654321;
+    background: theme.color('primary-dark');
     color: white;
     padding: 12px 30px;
     border: none;
@@ -64,7 +70,7 @@
 
 // Hero Section
 .hero {
-  background: linear-gradient(135deg, rgba(101, 67, 33, 0.95), rgba(139, 90, 43, 0.9));
+  background: linear-gradient(135deg, theme.color('primary-dark', 0.95), rgba(139, 90, 43, 0.9));
   color: white;
   padding: 80px 20px;
   text-align: center;
@@ -99,22 +105,22 @@
   .carousel-wrapper {
     overflow-x: auto;
     padding: 10px 0;
-    
+
     &::-webkit-scrollbar {
       height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1;
       border-radius: 10px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background: rgba(101, 67, 33, 0.5);
+      background: theme.color('primary-dark', 0.5);
       border-radius: 10px;
-      
+
       &:hover {
-        background: rgba(101, 67, 33, 0.7);
+        background: theme.color('primary-dark', 0.7);
       }
     }
   }
@@ -138,11 +144,11 @@
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
 
     &.active {
-      border-color: #4CAF50;
+      border-color: #4caf50;
       box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     }
 
@@ -198,7 +204,7 @@
     }
 
     .active-filters {
-      color: #4CAF50;
+      color: #4caf50;
       margin-left: 8px;
     }
   }
@@ -219,19 +225,19 @@
     transition: all 0.3s ease;
 
     &:hover {
-      border-color: #4CAF50;
+      border-color: #4caf50;
     }
 
     &:focus {
       outline: none;
-      border-color: #4CAF50;
+      border-color: #4caf50;
       box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
     }
   }
 
   .filter-toggle {
     padding: 10px 20px;
-    background: rgba(101, 67, 33, 0.95);
+    background: theme.color('primary-dark', 0.95);
     color: white;
     border: none;
     border-radius: 8px;
@@ -244,9 +250,9 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(101, 67, 33, 1);
+      background: theme.color('primary-dark', 1);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .filter-icon {
@@ -258,7 +264,7 @@
     background: white;
     border-radius: 12px;
     padding: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, padding 0.3s ease;
@@ -303,7 +309,7 @@
 
       &:focus {
         outline: none;
-        border-color: #4CAF50;
+        border-color: #4caf50;
       }
     }
 
@@ -331,7 +337,7 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: #4CAF50;
+        background: #4caf50;
         cursor: pointer;
       }
 
@@ -339,7 +345,7 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: #4CAF50;
+        background: #4caf50;
         cursor: pointer;
         border: none;
       }
@@ -365,7 +371,7 @@
         background: #e8e8e8;
       }
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         cursor: pointer;
       }
 
@@ -389,7 +395,7 @@
       background: #f8f8f8;
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       cursor: pointer;
       width: 18px;
       height: 18px;
@@ -420,7 +426,7 @@
     }
 
     .btn-clear {
-      background: #f5f5f5;
+      background: theme.color('gray-100');
       color: #333;
 
       &:hover {
@@ -429,7 +435,7 @@
     }
 
     .btn-apply {
-      background: #4CAF50;
+      background: #4caf50;
       color: white;
 
       &:hover {
@@ -454,12 +460,12 @@
     background: white;
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-8px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
     }
 
     .product-image {
@@ -499,7 +505,7 @@
         position: absolute;
         top: 15px;
         right: 15px;
-        background: #4CAF50;
+        background: #4caf50;
         color: white;
         padding: 6px 12px;
         border-radius: 6px;
@@ -545,7 +551,7 @@
         .current-price {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #4CAF50;
+          color: #4caf50;
         }
 
         .old-price {
@@ -577,18 +583,18 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            border: 2px solid #fff;
+            border: 2px solid theme.color('surface');
             box-shadow: 0 0 0 1px #ddd;
             cursor: pointer;
             transition: all 0.2s ease;
 
             &:hover {
               transform: scale(1.2);
-              box-shadow: 0 0 0 2px #4CAF50;
+              box-shadow: 0 0 0 2px #4caf50;
             }
 
             &.selected {
-              box-shadow: 0 0 0 3px #4CAF50;
+              box-shadow: 0 0 0 3px #4caf50;
               transform: scale(1.15);
             }
           }
@@ -598,7 +604,7 @@
       .btn-add-to-cart {
         width: 100%;
         padding: 14px 20px;
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         border: none;
         border-radius: 8px;
@@ -669,7 +675,7 @@
 
       .btn-reset {
         padding: 12px 30px;
-        background: #4CAF50;
+        background: #4caf50;
         color: white;
         border: none;
         border-radius: 8px;
@@ -715,7 +721,8 @@
     .filter-actions {
       flex-direction: column;
 
-      select, button {
+      select,
+      button {
         width: 100%;
       }
     }
@@ -724,5 +731,37 @@
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
+  }
+}
+
+/* --- Botón eliminar (X) común --- */
+.delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.95);
+  color: white;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: rgba(220, 38, 38, 1);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }

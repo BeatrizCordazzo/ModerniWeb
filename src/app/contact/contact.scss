@@ -1,10 +1,12 @@
+﻿@use 'styles/theme' as theme;
+
 .contact-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f5dc 0%, #e8dcc8 100%);
 }
 
 .contact-hero {
-  background: linear-gradient(rgba(139, 115, 85, 0.85), rgba(101, 67, 33, 0.85)), 
+  background: linear-gradient(theme.color('primary', 0.85), theme.color('primary-dark', 0.85)), 
               url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200');
   background-size: cover;
   background-position: center;
@@ -83,12 +85,12 @@
   box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 2px solid rgba(139, 115, 85, 0.2);
+  border: 2px solid theme.color('primary', 0.2);
 
   &:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 40px rgba(65, 43, 21, 0.4);
-    border-color: rgba(139, 115, 85, 0.4);
+    border-color: theme.color('primary', 0.4);
   }
 
   .icon {
@@ -133,13 +135,13 @@
 
   &.email {
     .icon {
-      background: linear-gradient(135deg, #8B7355 0%, #654321 100%);
+      background: linear-gradient(135deg, theme.color('primary') 0%, theme.color('primary-dark') 100%);
       color: white;
     }
 
     &:hover .icon {
       transform: scale(1.15);
-      box-shadow: 0 8px 20px rgba(101, 67, 33, 0.4);
+      box-shadow: 0 8px 20px theme.color('primary-dark', 0.4);
     }
   }
 
@@ -147,12 +149,12 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
-    color: #3e2723;
+    color: theme.color('espresso');
   }
 
   p {
     font-size: 1rem;
-    color: #6d4c41;
+    color: theme.color('text-muted');
     margin: 0 0 1rem;
   }
 
@@ -160,9 +162,9 @@
     display: inline-block;
     font-size: 0.95rem;
     font-weight: 500;
-    color: #654321;
+    color: theme.color('primary-dark');
     padding: 0.5rem 1rem;
-    background: rgba(139, 115, 85, 0.15);
+    background: theme.color('primary', 0.15);
     border-radius: 20px;
   }
 }
@@ -172,7 +174,7 @@
   border-radius: 20px;
   padding: 3rem;
   box-shadow: 0 10px 30px rgba(65, 43, 21, 0.3);
-  border: 2px solid rgba(139, 115, 85, 0.2);
+  border: 2px solid theme.color('primary', 0.2);
 
   @media (max-width: 768px) {
     padding: 2rem 1.5rem;
@@ -182,7 +184,7 @@
     text-align: center;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #3e2723;
+    color: theme.color('espresso');
     margin: 0 0 1rem;
 
     @media (max-width: 768px) {
@@ -193,7 +195,7 @@
   .form-intro {
     text-align: center;
     font-size: 1.1rem;
-    color: #6d4c41;
+    color: theme.color('text-muted');
     margin: 0 0 2.5rem;
   }
 }
@@ -221,14 +223,14 @@
     label {
       font-size: 0.95rem;
       font-weight: 600;
-      color: #3e2723;
+      color: theme.color('espresso');
       margin-bottom: 0.5rem;
     }
 
     input,
     textarea {
       padding: 0.875rem 1rem;
-      border: 2px solid rgba(139, 115, 85, 0.3);
+      border: 2px solid theme.color('primary', 0.3);
       border-radius: 10px;
       font-size: 1rem;
       font-family: inherit;
@@ -237,8 +239,8 @@
 
       &:focus {
         outline: none;
-        border-color: #8B7355;
-        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15);
+        border-color: theme.color('primary');
+        box-shadow: 0 0 0 3px theme.color('primary', 0.15);
         background: white;
       }
 
@@ -336,3 +338,5 @@
   color: #b71c1c;
   font-weight: 600;
 }
+
+

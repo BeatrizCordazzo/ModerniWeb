@@ -1,6 +1,8 @@
+﻿@use 'styles/theme' as theme;
+
 .projects-section {
   padding: 40px 0;
-  background: #ffffff;
+  background: theme.color('surface');
 }
 
 .projects-header {
@@ -19,7 +21,7 @@
 
 .projects-subtitle {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: theme.color('gray-500');
   margin: 0;
 }
 
@@ -94,3 +96,5 @@
     width: 100%;
   }
 }
+
+

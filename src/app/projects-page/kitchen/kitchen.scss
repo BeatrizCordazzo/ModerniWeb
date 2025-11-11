@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 .projects-category {
   padding: 60px 0;
   min-height: 100vh;
@@ -22,7 +24,7 @@
 
     .category-subtitle {
       font-size: 1.1rem;
-      color: #6b7280;
+      color: theme.color('gray-500');
       margin: 0;
     }
   }
@@ -40,6 +42,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
+    position: relative;
 
     &:hover {
       transform: translateY(-8px);
@@ -88,7 +91,7 @@
       }
 
       .project-location {
-        color: #6b7280;
+        color: theme.color('gray-500');
         font-size: 0.95rem;
         margin: 0 0 4px 0;
       }
@@ -109,13 +112,45 @@
           display: flex;
           align-items: center;
           gap: 6px;
-          color: #4b5563;
+          color: theme.color('charcoal');
           font-size: 0.9rem;
 
           i {
             font-style: normal;
           }
         }
+      }
+    }
+    
+    // Delete button
+    .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.95);
+      color: white;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background: rgba(220, 38, 38, 1);
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      }
+
+      &:active {
+        transform: scale(0.95);
       }
     }
   }
@@ -134,7 +169,7 @@
 
 .loading-container p {
   margin-top: 20px;
-  color: #6b7280;
+  color: theme.color('gray-500');
   font-size: 1.1rem;
 }
 
@@ -186,7 +221,7 @@
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  color: #6b7280;
+  color: theme.color('gray-500');
   font-size: 1.1rem;
 }
 
@@ -265,7 +300,7 @@
     .modal-description {
       font-size: 1.05rem;
       line-height: 1.7;
-      color: #4b5563;
+      color: theme.color('charcoal');
       margin: 0 0 32px 0;
     }
 
@@ -282,7 +317,7 @@
 
         strong {
           font-size: 0.9rem;
-          color: #6b7280;
+          color: theme.color('gray-500');
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -329,7 +364,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        border: 2px solid #e5e7eb;
+        border: 2px solid theme.color('gray-300');
         transition: transform 0.2s ease, box-shadow 0.2s ease;
 
         &:hover {
@@ -348,7 +383,7 @@
 
           .stat-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: theme.color('gray-500');
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
@@ -370,7 +405,7 @@
       padding: 24px;
       background: #f9fafb;
       border-radius: 12px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid theme.color('gray-300');
     }
 
     .section-title {
@@ -388,7 +423,7 @@
     }
 
     .section-subtitle {
-      color: #6b7280;
+      color: theme.color('gray-500');
       font-size: 0.95rem;
       margin: -8px 0 16px 0;
       font-style: italic;
@@ -408,7 +443,7 @@
 
         .info-label {
           font-size: 0.85rem;
-          color: #6b7280;
+          color: theme.color('gray-500');
           text-transform: uppercase;
           letter-spacing: 0.5px;
           margin-bottom: 8px;
@@ -479,7 +514,7 @@
           }
 
           span {
-            color: #6b7280;
+            color: theme.color('gray-500');
             font-size: 0.9rem;
           }
         }
@@ -500,7 +535,7 @@
           padding: 12px 16px;
           background: white;
           border-radius: 8px;
-          color: #374151;
+          color: theme.color('gray-700');
           font-size: 0.95rem;
           display: flex;
           align-items: center;
@@ -512,7 +547,7 @@
           }
 
           &::before {
-            content: "✓";
+            content: "âœ“";
             color: #10b981;
             font-weight: bold;
             margin-right: 12px;
@@ -548,7 +583,7 @@
 
           .spec-label {
             font-size: 0.8rem;
-            color: #6b7280;
+            color: theme.color('gray-500');
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
@@ -614,7 +649,7 @@
 
         p {
           margin: 0;
-          color: #4b5563;
+          color: theme.color('charcoal');
           font-size: 0.9rem;
           line-height: 1.6;
 
@@ -642,7 +677,7 @@
       }
 
       .cta-text {
-        color: #6b7280;
+        color: theme.color('gray-500');
         font-size: 1rem;
         margin: 0 0 24px 0;
       }
@@ -790,3 +825,5 @@
     }
   }
 }
+
+

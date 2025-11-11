@@ -1,0 +1,322 @@
+// Shared theme tokens and mixins for the Moderni app.
+
+// Typography ---------------------------------------------------------------
+$font-primary: 'Roboto', 'Helvetica Neue', sans-serif !default;
+
+// Color palette ------------------------------------------------------------
+$colors: (
+  'primary': #8b7355,
+  'primary-dark': #654321,
+  'espresso': #3e2723,
+  'text-muted': #6d4c41,
+  'text-soft': #8d6e63,
+  'ink': #333333,
+  'slate': #555555,
+  'navy': #0f172a,
+  'gold': #fbbf24,
+  'gold-dark': #b45309,
+  'gold-light': #fffbe6,
+  'danger': #e53935,
+  'danger-dark': #c62828,
+  'danger-strong': #b91c1c,
+  'brand-blue': #0b74de,
+  'success': #0f9d58,
+  'info': #1d4ed8,
+  'charcoal': #4b5563,
+  'gray-700': #374151,
+  'gray-500': #6b7280,
+  'gray-300': #e5e7eb,
+  'gray-200': #f3f4f6,
+  'gray-100': #f5f5f5,
+  'linen': #f5f2ed,
+  'sand': #fef3c7,
+  'surface': #ffffff,
+  'surface-alt': #f9f9f9,
+  'surface-ice': #fbfdff,
+  'surface-muted': #fafafa
+) !default;
+
+@function color($name, $alpha: null) {
+  $value: map-get($colors, $name);
+  @if $value == null {
+    @error 'Unknown color `#{$name}`. Available keys: #{map-keys($colors)}';
+  }
+  @if $alpha == null {
+    @return $value;
+  }
+  @return rgba($value, $alpha);
+}
+
+// Spacing & sizing ---------------------------------------------------------
+$space-unit: 0.25rem !default;
+
+@function space($multiplier) {
+  @return $space-unit * $multiplier;
+}
+
+$radii: (
+  'sm': 6px,
+  'md': 12px,
+  'lg': 20px,
+  'xl': 30px,
+  'pill': 999px
+) !default;
+
+@function radius($size: 'md') {
+  $value: map-get($radii, $size);
+  @if $value == null {
+    @error 'Unknown radius `#{$size}`. Available keys: #{map-keys($radii)}';
+  }
+  @return $value;
+}
+
+$shadows: (
+  'soft': 0 10px 30px rgba(color('primary'), 0.25),
+  'medium': 0 12px 32px rgba(color('primary-dark'), 0.28),
+  'lifted': 0 18px 40px rgba(#000, 0.12)
+) !default;
+
+@function shadow($name: 'soft') {
+  $value: map-get($shadows, $name);
+  @if $value == null {
+    @error 'Unknown shadow `#{$name}`. Available keys: #{map-keys($shadows)}';
+  }
+  @return $value;
+}
+
+$gradients: (
+  'cream': linear-gradient(180deg, #fafafa 0%, #ffffff 100%),
+  'brand': linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%),
+  'primary': linear-gradient(135deg, #8b7355 0%, #654321 100%),
+  'sunset': linear-gradient(135deg, #fbbf24 0%, #b45309 100%),
+  'danger': linear-gradient(135deg, #e53935 0%, #c62828 100%)
+) !default;
+
+@function gradient($name: 'cream') {
+  $value: map-get($gradients, $name);
+  @if $value == null {
+    @error 'Unknown gradient `#{$name}`. Available keys: #{map-keys($gradients)}';
+  }
+  @return $value;
+}
+
+$footer-offset: 120px !default;
+
+// Breakpoints ---------------------------------------------------------------
+$breakpoints: (
+  'desktop': 1440px,
+  'laptop': 1200px,
+  'tablet': 1024px,
+  'mobile': 768px,
+  'mobile-sm': 480px
+) !default;
+
+// Mixins -------------------------------------------------------------------
+@mixin card(
+  $padding: 2rem,
+  $radius: radius('lg'),
+  $bg: color('surface'),
+  $shadow: shadow('soft'),
+  $border-color: color('primary', 0.1)
+) {
+  background: $bg;
+  border-radius: $radius;
+  padding: $padding;
+  border: 1px solid $border-color;
+  box-shadow: $shadow;
+}
+
+@mixin glass-panel($bg: rgba(color('primary-dark'), 0.95), $text-color: color('surface')) {
+  background: $bg !important;
+  color: $text-color !important;
+  backdrop-filter: blur(10px);
+  box-shadow: shadow('soft') !important;
+}
+
+@mixin button(
+  $bg: gradient('primary'),
+  $color: color('surface'),
+  $shadow: shadow('medium'),
+  $radius: radius('md')
+) {
+  background: $bg;
+  color: $color;
+  border: none;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: shadow('lifted');
+  }
+
+  &:active {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+}
+
+@mixin outline-button($color: color('primary'), $radius: radius('md')) {
+  background: transparent;
+  color: $color;
+  border: 2px solid $color;
+  border-radius: $radius;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: $color;
+    color: color('surface');
+  }
+}
+
+@mixin pill($bg: color('primary', 0.12), $color: color('primary')) {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: radius('pill');
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: $bg;
+  color: $color;
+}
+
+@mixin flex-center($direction: row, $gap: 1rem, $justify: center) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+@mixin section-padding($top: 4rem, $bottom: 4rem) {
+  padding: $top 0 $bottom;
+}
+
+@mixin responsive-grid($min: 250px, $gap: 1.5rem) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min, 1fr));
+  gap: $gap;
+}
+
+@mixin scrollbar($thumb: color('primary'), $track: color('gray-200')) {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track;
+    border-radius: radius('pill');
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb;
+    border-radius: radius('pill');
+  }
+}
+
+@mixin nav-button-theme($text-color) {
+  button {
+    color: $text-color !important;
+
+    &:hover {
+      background-color: rgba($text-color, 0.15) !important;
+    }
+  }
+}
+
+@mixin nav-glass($background: rgba(color('primary-dark'), 0.95), $text-color: color('surface')) {
+  app-nav {
+    mat-toolbar.navbar {
+      background: $background !important;
+      backdrop-filter: blur(10px);
+      box-shadow: shadow('soft') !important;
+      color: $text-color !important;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    mat-icon {
+      color: $text-color !important;
+    }
+
+    .logo-container {
+      color: $text-color !important;
+    }
+
+    .search-box {
+      background: rgba($text-color, 0.15) !important;
+      border: 1px solid rgba($text-color, 0.3) !important;
+
+      input {
+        color: $text-color !important;
+
+        &::placeholder {
+          color: rgba($text-color, 0.7) !important;
+        }
+      }
+    }
+
+    @include nav-button-theme($text-color);
+  }
+}
+
+@mixin nav-home-hover(
+  $hover-bg: rgba(color('surface'), 0.95),
+  $text-hover: color('charcoal')
+) {
+  app-nav {
+    mat-toolbar.navbar {
+      background: transparent !important;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        background: $hover-bg !important;
+        box-shadow: shadow('soft') !important;
+
+        button,
+        .hamburger,
+        .icon-btn {
+          mat-icon {
+            color: $text-hover !important;
+          }
+        }
+
+        .search-box {
+          border-bottom-color: rgba(color('charcoal'), 0.2) !important;
+
+          input {
+            color: $text-hover !important;
+
+            &::placeholder {
+              color: rgba(color('charcoal'), 0.5) !important;
+            }
+          }
+
+          .search-icon {
+            color: $text-hover !important;
+          }
+        }
+
+        .logo-image {
+          filter: brightness(0.5);
+        }
+      }
+    }
+  }
+}
+
+@mixin respond-to($breakpoint) {
+  $size: map-get($breakpoints, $breakpoint);
+  @if $size {
+    @media (max-width: $size) {
+      @content;
+    }
+  } @else {
+    @warn 'Unknown breakpoint `#{$breakpoint}`. Available: #{map-keys($breakpoints)}';
+  }
+}

@@ -2,8 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Nav } from "../nav/nav";
 import { Projects } from "../projects/projects";
 import { Preview } from "../preview/preview";
+import { Reviews } from "../reviews/reviews";
 import { Footer } from "../footer/footer";
-import { CommonModule } from '@angular/common';
+
 
 interface Project {
   title: string;
@@ -13,7 +14,7 @@ interface Project {
 
 @Component({
   selector: 'app-home',
-  imports: [Nav, Projects, Preview, Footer, CommonModule],
+  imports: [Nav, Projects, Preview, Reviews, Footer],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })

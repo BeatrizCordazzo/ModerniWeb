@@ -5,65 +5,224 @@
     <div class="inner">
       <h1 class="title">Our Projects</h1>
       <p class="lead">Explore our completed works by room. Select a category to view the projects.</p>
+      @if (isAdmin) {
+        <div class="admin-toolbar">
+          <button class="admin-add-btn" (click)="toggleAddForm()">
+            {{ showAddForm ? 'Cerrar' : 'Añadir' }} nuevo proyecto
+          </button>
+        </div>
+      }
     </div>
   </section>
+
+  @if (isAdmin && showAddForm) {
+    <section class="admin-add-section" aria-live="polite">
+      <div class="inner">
+        <div class="admin-card">
+          <header class="admin-card-header">
+            <div>
+              <p class="eyebrow">Gestión de proyectos</p>
+              <h2>Crear nuevo proyecto</h2>
+            </div>
+            <button class="admin-close" type="button" (click)="toggleAddForm()" aria-label="Cerrar formulario">
+              &times;
+            </button>
+          </header>
+
+          <form [formGroup]="addProjectForm" (ngSubmit)="submitNewProject()" class="admin-add-form">
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Título*</span>
+                <input type="text" formControlName="titulo" placeholder="Ej. Cocina Moderna Minimalista">
+                @if (addProjectForm.get('titulo')?.invalid && addProjectForm.get('titulo')?.touched) {
+                  <small class="error-text">El título es obligatorio.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Categoría*</span>
+                <select formControlName="categoria">
+                  <option value="kitchen">Kitchen</option>
+                  <option value="bathroom">Bathroom</option>
+                  <option value="bedroom">Bedroom</option>
+                  <option value="livingroom">Living Room</option>
+                  <option value="others">Others</option>
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span>Cliente*</span>
+                <input type="text" formControlName="cliente" placeholder="Nombre del cliente">
+                @if (addProjectForm.get('cliente')?.invalid && addProjectForm.get('cliente')?.touched) {
+                  <small class="error-text">El cliente es obligatorio.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Ubicación*</span>
+                <input type="text" formControlName="ubicacion" placeholder="Ciudad, País">
+                @if (addProjectForm.get('ubicacion')?.invalid && addProjectForm.get('ubicacion')?.touched) {
+                  <small class="error-text">La ubicación es obligatoria.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Fecha completado*</span>
+                <input type="date" formControlName="fecha_completado">
+                @if (addProjectForm.get('fecha_completado')?.invalid && addProjectForm.get('fecha_completado')?.touched) {
+                  <small class="error-text">La fecha es obligatoria.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Duración (días)*</span>
+                <input type="number" formControlName="duracion_dias" min="1" placeholder="30">
+                @if (addProjectForm.get('duracion_dias')?.invalid && addProjectForm.get('duracion_dias')?.touched) {
+                  <small class="error-text">Introduce una duración válida.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Presupuesto*</span>
+                <input type="number" formControlName="presupuesto" min="0" step="0.01" placeholder="5000.00">
+                @if (addProjectForm.get('presupuesto')?.invalid && addProjectForm.get('presupuesto')?.touched) {
+                  <small class="error-text">Introduce un presupuesto válido.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Área (m²)*</span>
+                <input type="number" formControlName="area_m2" min="1" step="0.01" placeholder="25.5">
+                @if (addProjectForm.get('area_m2')?.invalid && addProjectForm.get('area_m2')?.touched) {
+                  <small class="error-text">Introduce un área válida.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Estilo*</span>
+                <input type="text" formControlName="estilo" placeholder="Moderno, Rústico, etc.">
+                @if (addProjectForm.get('estilo')?.invalid && addProjectForm.get('estilo')?.touched) {
+                  <small class="error-text">El estilo es obligatorio.</small>
+                }
+              </label>
+            </div>
+
+            <label class="form-field">
+              <span>Descripción*</span>
+              <textarea formControlName="descripcion" rows="3" placeholder="Describe el proyecto..."></textarea>
+              @if (addProjectForm.get('descripcion')?.invalid && addProjectForm.get('descripcion')?.touched) {
+                <small class="error-text">La descripción es obligatoria.</small>
+              }
+            </label>
+
+            <label class="form-field">
+              <span>Imágenes (URLs, una por línea)*</span>
+              <textarea formControlName="imagenes" rows="3" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+              @if (addProjectForm.get('imagenes')?.invalid && addProjectForm.get('imagenes')?.touched) {
+                <small class="error-text">Añade al menos una imagen.</small>
+              }
+            </label>
+
+            <label class="form-field">
+              <span>Materiales (uno por línea)</span>
+              <textarea formControlName="materiales" rows="2" placeholder="Madera de roble&#10;Granito&#10;Acero inoxidable"></textarea>
+            </label>
+
+            <div class="form-row checkbox-row">
+              <label class="checkbox-field">
+                <input type="checkbox" formControlName="destacado">
+                <span>Proyecto destacado</span>
+              </label>
+            </div>
+
+            @if (saveError) {
+              <p class="status-message error">{{ saveError }}</p>
+            }
+            @if (saveSuccess) {
+              <p class="status-message success">{{ saveSuccess }}</p>
+            }
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="toggleAddForm()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSaving">
+                {{ isSaving ? 'Guardando…' : 'Guardar proyecto' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  }
 
   <section class="projects-grid-section">
     <div class="inner">
       <!-- Loading State -->
-      <div *ngIf="isLoading" class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading projects...</p>
-      </div>
+      @if (isLoading) {
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <p>Loading projects...</p>
+        </div>
+      }
 
       <!-- Error State -->
-      <div *ngIf="errorMessage && !isLoading" class="error-container">
-        <p class="error-message">{{ errorMessage }}</p>
-        <button class="retry-button" (click)="retryLoad()">Retry</button>
-      </div>
+      @if (errorMessage && !isLoading) {
+        <div class="error-container">
+          <p class="error-message">{{ errorMessage }}</p>
+          <button class="retry-button" (click)="retryLoad()">Retry</button>
+        </div>
+      }
 
       <!-- Projects Grid -->
-      <div *ngIf="!isLoading && !errorMessage" class="projects-grid" role="list">
-        <article class="project-card" role="listitem" routerLink="kitchen" tabindex="0" aria-label="Kitchen">
-          <div class="media kitchen" aria-hidden="true"></div>
-          <h3 class="project-name">Kitchen</h3>
-          <p class="project-desc">Modern and functional designs</p>
-          <span class="project-count">{{ categoryCounts['kitchen'] }} projects</span>
-        </article>
-
-        <article class="project-card" role="listitem" routerLink="bathroom" tabindex="0" aria-label="Bathroom">
-          <div class="media bathroom" aria-hidden="true"></div>
-          <h3 class="project-name">Bathroom</h3>
-          <p class="project-desc">Comfort spaces</p>
-          <span class="project-count">{{ categoryCounts['bathroom'] }} projects</span>
-        </article>
-
-        <article class="project-card" role="listitem" routerLink="livingroom" tabindex="0" aria-label="Living room">
-          <div class="media livingroom" aria-hidden="true"></div>
-          <h3 class="project-name">Living Room</h3>
-          <p class="project-desc">Cozy environments</p>
-          <span class="project-count">{{ categoryCounts['livingroom'] }} projects</span>
-        </article>
-
-        <article class="project-card" role="listitem" routerLink="bedroom" tabindex="0" aria-label="Bedroom">
-          <div class="media bedroom" aria-hidden="true"></div>
-          <h3 class="project-name">Bedroom</h3>
-          <p class="project-desc">Rest spaces</p>
-          <span class="project-count">{{ categoryCounts['bedroom'] }} projects</span>
-        </article>
-
-        <article class="project-card" role="listitem" routerLink="others" tabindex="0" aria-label="Others">
-          <div class="media other" aria-hidden="true"></div>
-          <h3 class="project-name">Others</h3>
-          <p class="project-desc">Custom furniture</p>
-          <span class="project-count">{{ categoryCounts['others'] }} projects</span>
-        </article>
-      </div>
+      @if (!isLoading && !errorMessage) {
+        <div class="projects-grid" role="list">
+          <article class="project-card" role="listitem" routerLink="kitchen" tabindex="0" aria-label="Kitchen">
+            <div class="media kitchen" aria-hidden="true"></div>
+            <h3 class="project-name">Kitchen</h3>
+            <p class="project-desc">Modern and functional designs</p>
+            <span class="project-count">{{ categoryCounts['kitchen'] }} projects</span>
+          </article>
+          <article class="project-card" role="listitem" routerLink="bathroom" tabindex="0" aria-label="Bathroom">
+            <div class="media bathroom" aria-hidden="true"></div>
+            <h3 class="project-name">Bathroom</h3>
+            <p class="project-desc">Comfort spaces</p>
+            <span class="project-count">{{ categoryCounts['bathroom'] }} projects</span>
+          </article>
+          <article class="project-card" role="listitem" routerLink="livingroom" tabindex="0" aria-label="Living room">
+            <div class="media livingroom" aria-hidden="true"></div>
+            <h3 class="project-name">Living Room</h3>
+            <p class="project-desc">Cozy environments</p>
+            <span class="project-count">{{ categoryCounts['livingroom'] }} projects</span>
+          </article>
+          <article class="project-card" role="listitem" routerLink="bedroom" tabindex="0" aria-label="Bedroom">
+            <div class="media bedroom" aria-hidden="true"></div>
+            <h3 class="project-name">Bedroom</h3>
+            <p class="project-desc">Rest spaces</p>
+            <span class="project-count">{{ categoryCounts['bedroom'] }} projects</span>
+          </article>
+          <article class="project-card" role="listitem" routerLink="others" tabindex="0" aria-label="Others">
+            <div class="media other" aria-hidden="true"></div>
+            <h3 class="project-name">Others</h3>
+            <p class="project-desc">Custom furniture</p>
+            <span class="project-count">{{ categoryCounts['others'] }} projects</span>
+          </article>
+        </div>
+      }
     </div>
   </section>
 
   <!-- Outlet para las rutas hijas -->
   <router-outlet></router-outlet>
 </main>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteConfirm"
+  title="Confirmar eliminación"
+  message="¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer."
+  confirmLabel="Eliminar"
+  cancelLabel="Cancelar"
+  (confirm)="executeDelete()"
+  (cancel)="cancelDelete()">
+</app-confirmation-modal>
 
 <app-footer></app-footer>

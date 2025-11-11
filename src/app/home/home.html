@@ -6,32 +6,49 @@
     <button class="carousel-btn prev" (click)="previousSlide()" aria-label="Previous slide">
       <span>‹</span>
     </button>
-    
+
     <div class="carousel-track">
-      <div class="carousel-slide" *ngFor="let project of projects; let i = index" 
-           [class.active]="i === currentSlide">
-        <img [src]="project.image" [alt]="project.title">
-        <div class="carousel-caption">
-          <h2>{{project.title}}</h2>
-          <p>{{project.description}}</p>
+      @for (project of projects; track project.title; let i = $index) {
+        <div class="carousel-slide"
+          [class.active]="i === currentSlide">
+          <img [src]="project.image" [alt]="project.title">
+          <div class="carousel-caption">
+            <h2>{{project.title}}</h2>
+            <p>{{project.description}}</p>
+          </div>
         </div>
-      </div>
+      }
     </div>
-    
+
     <button class="carousel-btn next" (click)="nextSlide()" aria-label="Next slide">
       <span>›</span>
     </button>
-    
+
     <div class="carousel-indicators">
-      <button *ngFor="let project of projects; let i = index" 
-              [class.active]="i === currentSlide"
-              (click)="goToSlide(i)"
-              [attr.aria-label]="'Go to slide ' + (i + 1)">
-      </button>
+      @for (project of projects; track project.title; let i = $index) {
+        <button
+          [class.active]="i === currentSlide"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)">
+        </button>
+      }
     </div>
   </div>
 </section>
 
 <app-projects></app-projects>
 <app-preview></app-preview>
+
+@defer (on viewport) {
+  <app-reviews></app-reviews>
+} @placeholder {
+  <section class="defer-placeholder">
+    <p>Loading community feedback…</p>
+  </section>
+} @error {
+  <section class="defer-placeholder error">
+    <p>Reviews could not be loaded.</p>
+  </section>
+}
+
 <app-footer></app-footer>

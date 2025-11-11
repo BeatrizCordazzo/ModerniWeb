@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirmation-modal/custom-order-confirmation-modal';
@@ -8,6 +8,7 @@ import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
+import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 
 interface BathroomSet {
   id: number;
@@ -60,7 +61,7 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-bathroom',
-  imports: [CommonModule, FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent],
+  imports: [FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent, ConfirmationModal],
   templateUrl: './bathroom.html',
   styleUrl: './bathroom.scss'
 })
@@ -71,6 +72,8 @@ export class Bathroom implements OnInit {
   isAdmin = false;
   modalItem: ModalCartItem | null = null;
   modalProductId: number | null = null;
+  showDeleteConfirm = false;
+  productToDelete: number | null = null;
   
   // Toast notification state
   showToast = false;
@@ -579,4 +582,36 @@ export class Bathroom implements OnInit {
       }
     });
   }
+
+  confirmDeleteProduct(productId: number, event: Event) {
+  event.stopPropagation();
+  event.preventDefault();
+  this.productToDelete = productId;
+  this.showDeleteConfirm = true;
+}
+
+cancelDelete() {
+  this.showDeleteConfirm = false;
+  this.productToDelete = null;
+}
+
+executeDelete() {
+  if (!this.productToDelete) return;
+  this.datosService.deleteProduct(this.productToDelete).subscribe({
+    next: () => {
+      this.showDeleteConfirm = false;
+      this.productToDelete = null;
+      this.toastMessage = 'Producto eliminado correctamente.';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 2000);
+      this.loadBathroomSets(); // << recarga bathroom
+    },
+    error: (err) => {
+      console.error('Error eliminando producto', err);
+      this.toastMessage = 'Error eliminando el producto.';
+      this.showToast = true;
+      setTimeout(() => { this.showToast = false; }, 4000);
+    }
+  });
+}
 }

@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:1500 }
 .modal {
 	background: white;
@@ -19,7 +21,7 @@
 }
 .grid { display:flex; gap:12px; align-items:flex-start }
 .gallery { flex: 0 0 260px; display:flex; flex-direction:column; align-items:center }
-.gallery .main-image { width:100%; height:180px; display:flex; align-items:center; justify-content:center; background:#fafafa; border-radius:8px; overflow:hidden }
+.gallery .main-image { width:100%; height:180px; display:flex; align-items:center; justify-content:center; background:theme.color('surface-muted'); border-radius:8px; overflow:hidden }
 .gallery .main-image img { max-width:100%; max-height:100%; object-fit:contain }
 .gallery .no-image { width:100%; height:220px; display:flex; align-items:center; justify-content:center; color:#777 }
 .thumbs { margin-top:8px; display:flex; gap:8px; overflow:auto; padding-bottom:4px }
@@ -39,9 +41,11 @@
 .items-table-wrapper { overflow:auto; margin-top:8px }
 .items-table { width:100%; border-collapse:collapse; font-size:0.95rem }
 .items-table th, .items-table td { padding:8px 10px; border-bottom:1px solid #f0f0f4; text-align:left; vertical-align:middle }
-.items-table thead th { background:#fafafa; font-weight:600 }
+.items-table thead th { background:theme.color('surface-muted'); font-weight:600 }
 .cell-img img.thumb, .cell-img .extra-image img { width:80px; height:56px; object-fit:cover; border-radius:6px }
 .cell-price { width:120px }
 .cell-qty { width:72px }
 .cell-dims { width:140px }
 .cell-notes { width:240px }
+
+

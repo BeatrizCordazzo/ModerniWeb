@@ -1,8 +1,10 @@
+﻿@use 'styles/theme' as theme;
+
 // Carrusel de proyectos
 .carousel-section {
   position: relative;
   width: 100%;
-  background: #fff;
+  background: theme.color('surface');
   padding: 0;
   overflow: hidden;
 }
@@ -14,8 +16,20 @@
   margin: 0 auto;
   overflow: hidden;
 
-  @media (max-width: 768px) {
-    height: 400px;
+  @include theme.respond-to('laptop') {
+    height: 520px;
+  }
+
+  @include theme.respond-to('tablet') {
+    height: 440px;
+  }
+
+  @include theme.respond-to('mobile') {
+    height: 360px;
+  }
+
+  @include theme.respond-to('mobile-sm') {
+    height: 260px;
   }
 }
 
@@ -59,14 +73,30 @@
   padding: 3rem 2rem 2rem;
   text-align: center;
 
+  @include theme.respond-to('tablet') {
+    padding: 2.25rem 1.5rem 1.5rem;
+  }
+
+  @include theme.respond-to('mobile') {
+    padding: 1.75rem 1rem 1.25rem;
+  }
+
   h2 {
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 0.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 
-    @media (max-width: 768px) {
+    @include theme.respond-to('laptop') {
+      font-size: 2.1rem;
+    }
+
+    @include theme.respond-to('mobile') {
       font-size: 1.8rem;
+    }
+
+    @include theme.respond-to('mobile-sm') {
+      font-size: 1.5rem;
     }
   }
 
@@ -76,8 +106,17 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     margin-bottom: 30px;
 
-    @media (max-width: 768px) {
+    @include theme.respond-to('tablet') {
+      font-size: 1.05rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @include theme.respond-to('mobile') {
       font-size: 1rem;
+    }
+
+    @include theme.respond-to('mobile-sm') {
+      font-size: 0.95rem;
     }
   }
 }
@@ -108,7 +147,7 @@
   span {
     font-size: 2rem;
     font-weight: bold;
-    color: #333;
+    color: theme.color('ink');
   }
 
   &.prev {
@@ -119,20 +158,46 @@
     right: 2rem;
   }
 
-  @media (max-width: 768px) {
+  @include theme.respond-to('tablet') {
+    width: 44px;
+    height: 44px;
+
+    &.prev {
+      left: 1.25rem;
+    }
+
+    &.next {
+      right: 1.25rem;
+    }
+
+    span {
+      font-size: 1.6rem;
+    }
+  }
+
+  @include theme.respond-to('mobile') {
     width: 40px;
     height: 40px;
 
     &.prev {
-      left: 1rem;
+      left: 0.75rem;
     }
 
     &.next {
-      right: 1rem;
+      right: 0.75rem;
     }
 
     span {
       font-size: 1.5rem;
+    }
+  }
+
+  @include theme.respond-to('mobile-sm') {
+    width: 34px;
+    height: 34px;
+
+    span {
+      font-size: 1.2rem;
     }
   }
 }
@@ -145,6 +210,19 @@
   display: flex;
   gap: 0.5rem;
   z-index: 10;
+
+  @include theme.respond-to('tablet') {
+    bottom: 1.5rem;
+  }
+
+  @include theme.respond-to('mobile') {
+    bottom: 1.1rem;
+    gap: 0.4rem;
+  }
+
+  @include theme.respond-to('mobile-sm') {
+    bottom: 0.85rem;
+  }
 
   button {
     width: 12px;
@@ -167,3 +245,21 @@
     }
   }
 }
+
+.defer-placeholder {
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+  color: theme.color('slate');
+
+  &.error {
+    color: theme.color('danger-strong');
+  }
+
+  @include theme.respond-to('mobile') {
+    padding: 1.5rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+

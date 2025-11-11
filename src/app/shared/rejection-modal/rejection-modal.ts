@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-rejection-modal',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './rejection-modal.html',
   styleUrl: './rejection-modal.scss'
 })

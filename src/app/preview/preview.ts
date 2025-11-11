@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 interface ServicePreview {
   title: string;
@@ -11,7 +11,7 @@ interface ServicePreview {
 
 @Component({
   selector: 'app-preview',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './preview.html',
   styleUrl: './preview.scss'
 })

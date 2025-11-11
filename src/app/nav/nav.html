@@ -16,81 +16,87 @@
     <div class="search-container">
       <div class="search-box">
         <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"
-        />
-        <mat-icon class="search-icon">search</mat-icon>
+          />
+          <mat-icon class="search-icon">search</mat-icon>
+        </div>
       </div>
+      <button mat-icon-button class="icon-btn" routerLink="/profile" aria-label="Profile">
+        <mat-icon>person</mat-icon>
+      </button>
+      @if (!isAdmin) {
+        <button mat-icon-button class="icon-btn" routerLink="/cart" aria-label="Cart">
+          <mat-icon>shopping_cart</mat-icon>
+        </button>
+      }
+      <!-- Admin panel quick access (visible only when localStorage.loggedUser.rol === 'admin') -->
+      @if (isAdmin) {
+        <button mat-icon-button class="icon-btn" routerLink="/admin-carpintero" aria-label="Admin Carpintero">
+          <mat-icon>admin_panel_settings</mat-icon>
+        </button>
+      }
     </div>
-    <button mat-icon-button class="icon-btn" routerLink="/profile" aria-label="Profile">
-      <mat-icon>person</mat-icon>
-    </button>
-    <button *ngIf="!isAdmin" mat-icon-button class="icon-btn" routerLink="/cart" aria-label="Cart">
-      <mat-icon>shopping_cart</mat-icon>
-    </button>
-    <!-- Admin panel quick access (visible only when localStorage.loggedUser.rol === 'admin') -->
-    <button *ngIf="isAdmin" mat-icon-button class="icon-btn" routerLink="/admin-carpintero" aria-label="Admin Carpintero">
-      <mat-icon>admin_panel_settings</mat-icon>
-    </button>
-  </div>
-</mat-toolbar>
+  </mat-toolbar>
 
-<!-- Backdrop para el drawer cuando está abierto -->
-@if (drawerOpen) {
-  <div class="drawer-backdrop" (click)="closeDrawer()"></div>
-}
+  <!-- Backdrop para el drawer cuando está abierto -->
+  @if (drawerOpen) {
+    <div class="drawer-backdrop" (click)="closeDrawer()"></div>
+  }
 
-<!-- Drawer lateral personalizado -->
-<aside class="side-drawer" [class.open]="drawerOpen" role="navigation" [attr.aria-hidden]="!drawerOpen">
-  <div class="drawer-header">
-    <button mat-icon-button (click)="closeDrawer()" aria-label="Close menu"><mat-icon>close</mat-icon></button>
-    <a routerLink="/" class="drawer-logo" (click)="closeDrawer()" aria-label="Moderni home">
-      <img src="Moderni (2).png" alt="Moderni Logo" class="drawer-logo-img">
-    </a>
-  </div>
+  <!-- Drawer lateral personalizado -->
+  <aside class="side-drawer" [class.open]="drawerOpen" role="navigation" [attr.aria-hidden]="!drawerOpen">
+    <div class="drawer-header">
+      <button mat-icon-button (click)="closeDrawer()" aria-label="Close menu"><mat-icon>close</mat-icon></button>
+      <a routerLink="/" class="drawer-logo" (click)="closeDrawer()" aria-label="Moderni home">
+        <img src="Moderni (2).png" alt="Moderni Logo" class="drawer-logo-img">
+      </a>
+    </div>
 
-  <nav class="drawer-nav">
-    <ul>
-      <li>
-        <div class="drawer-item">
-          <a routerLink="/services" (click)="closeDrawer()">Services</a>
-          <button class="chevron-btn" (click)="toggleServices()" aria-label="Toggle services submenu">
-            <mat-icon class="chev">expand_more</mat-icon>
-          </button>
-        </div>
-        @if (servicesOpen) {
-          <ul class="sublist">
-            <li routerLink="/services/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
-            <li routerLink="/services/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
-            <li routerLink="/services/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
-            <li routerLink="/services/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
-            <li routerLink="/services/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
-          </ul>
+    <nav class="drawer-nav">
+      <ul>
+        <li>
+          <div class="drawer-item">
+            <a routerLink="/services" (click)="closeDrawer()">Services</a>
+            <button class="chevron-btn" (click)="toggleServices()" aria-label="Toggle services submenu">
+              <mat-icon class="chev">expand_more</mat-icon>
+            </button>
+          </div>
+          @if (servicesOpen) {
+            <ul class="sublist">
+              <li routerLink="/services/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
+              <li routerLink="/services/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
+              <li routerLink="/services/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
+              <li routerLink="/services/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
+              <li routerLink="/services/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
+            </ul>
+          }
+        </li>
+
+        <li>
+          <div class="drawer-item">
+            <a routerLink="/projects-page" (click)="closeDrawer()">Projects</a>
+            <button class="chevron-btn" (click)="toggleProjects()" aria-label="Toggle projects submenu">
+              <mat-icon class="chev">expand_more</mat-icon>
+            </button>
+          </div>
+          @if (projectsOpen) {
+            <ul class="sublist">
+              <li routerLink="/projects-page/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
+              <li routerLink="/projects-page/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
+              <li routerLink="/projects-page/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
+              <li routerLink="/projects-page/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
+              <li routerLink="/projects-page/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
+            </ul>
+          }
+        </li>
+
+        <li><a routerLink="/contact" (click)="closeDrawer()">Contact</a></li>
+        <li><a routerLink="/profile" (click)="closeDrawer()">Profile</a></li>
+        @if (!isAdmin) {
+          <li><a routerLink="/cart" (click)="closeDrawer()">Cart</a></li>
         }
-      </li>
-
-      <li>
-        <div class="drawer-item">
-          <a routerLink="/projects-page" (click)="closeDrawer()">Projects</a>
-          <button class="chevron-btn" (click)="toggleProjects()" aria-label="Toggle projects submenu">
-            <mat-icon class="chev">expand_more</mat-icon>
-          </button>
-        </div>
-        @if (projectsOpen) {
-          <ul class="sublist">
-            <li routerLink="/projects-page/kitchen" (click)="closeDrawer()"><mat-icon class="item-icon">restaurant</mat-icon>Kitchen</li>
-            <li routerLink="/projects-page/bedroom" (click)="closeDrawer()"><mat-icon class="item-icon">bed</mat-icon>Bedroom</li>
-            <li routerLink="/projects-page/bathroom" (click)="closeDrawer()"><mat-icon class="item-icon">bathtub</mat-icon>Bathroom</li>
-            <li routerLink="/projects-page/livingroom" (click)="closeDrawer()"><mat-icon class="item-icon">weekend</mat-icon>Livingroom</li>
-            <li routerLink="/projects-page/others" (click)="closeDrawer()"><mat-icon class="item-icon">more_horiz</mat-icon>Others</li>
-          </ul>
-        }
-      </li>
-
-      <li><a routerLink="/contact" (click)="closeDrawer()">Contact</a></li>
-      <li><a routerLink="/profile" (click)="closeDrawer()">Profile</a></li>
-      <li *ngIf="!isAdmin"><a routerLink="/cart" (click)="closeDrawer()">Cart</a></li>
-    </ul>
-  </nav>
-</aside>
+      </ul>
+    </nav>
+  </aside>
 
 
 

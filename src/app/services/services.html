@@ -5,8 +5,151 @@
     <div class="inner">
       <h1 class="title">Choose a service</h1>
       <p class="lead">Select one area to start (kitchen, bathroom, living room, bedroom or other).</p>
+      @if (isAdmin) {
+        <div class="admin-toolbar">
+          <button class="admin-add-btn" (click)="toggleAddForm()">
+            {{ showAddForm ? 'Cerrar' : 'Añadir' }} nuevo
+          </button>
+        </div>
+      }
     </div>
   </section>
+
+  @if (isAdmin && showAddForm) {
+    <section class="admin-add-section" aria-live="polite">
+      <div class="inner">
+        <div class="admin-card">
+          <header class="admin-card-header">
+            <div>
+              <p class="eyebrow">Gestión de muebles y servicios</p>
+              <h2>Crear nuevo elemento</h2>
+            </div>
+            <button class="admin-close" type="button" (click)="toggleAddForm()" aria-label="Cerrar formulario">
+              &times;
+            </button>
+          </header>
+
+          <form [formGroup]="addProductForm" (ngSubmit)="submitNewProduct()" class="admin-add-form">
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Nombre*</span>
+                <input type="text" formControlName="name" placeholder="Ej. Modern Kitchen">
+                @if (addProductForm.get('name')?.invalid && addProductForm.get('name')?.touched) {
+                  <small class="error-text">El nombre es obligatorio.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Categoría / Tipo*</span>
+                <select formControlName="type">
+                  @for (option of productTypeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span>Subcategoría</span>
+                @if (isCategoryLocked) {
+                  <input type="text" [value]="addProductForm.get('categoryName')?.value" readonly>
+                } @else {
+                  <select formControlName="categoryName">
+                    @for (category of individualCategoryOptions; track category) {
+                      <option [value]="category">{{ category }}</option>
+                    }
+                  </select>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Precio base*</span>
+                <input type="number" formControlName="price" placeholder="0.00" step="0.01" min="0">
+                @if (addProductForm.get('price')?.invalid && addProductForm.get('price')?.touched) {
+                  <small class="error-text">Introduce un precio válido.</small>
+                }
+              </label>
+
+              <label class="form-field">
+                <span>Precio anterior</span>
+                <input type="number" formControlName="oldPrice" placeholder="0.00" step="0.01" min="0">
+              </label>
+
+              <label class="form-field">
+                <span>Stock</span>
+                <input type="number" formControlName="stock" min="0" placeholder="0">
+              </label>
+            </div>
+
+            <div class="form-row checkbox-row">
+              <label class="checkbox-field">
+                <input type="checkbox" formControlName="inStock">
+                <span>Disponible para venta inmediata</span>
+              </label>
+            </div>
+
+            <label class="form-field">
+              <span>Descripción</span>
+              <textarea formControlName="description" rows="3" placeholder="Describe materiales, estilo o lo que incluye."></textarea>
+            </label>
+
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Colección</span>
+                <input type="text" formControlName="collection" placeholder="Ej. Nordic">
+              </label>
+              <label class="form-field">
+                <span>Estilo</span>
+                <input type="text" formControlName="style" placeholder="Contemporary, Rustic, etc.">
+              </label>
+              <label class="form-field">
+                <span>Imagen principal (URL)</span>
+                <input type="url" formControlName="image" placeholder="https://">
+              </label>
+            </div>
+
+            <div class="form-grid three">
+              <label class="form-field">
+                <span>Ancho</span>
+                <input type="text" formControlName="dimensionsWidth" placeholder="Ej. 3.5m">
+              </label>
+              <label class="form-field">
+                <span>Alto</span>
+                <input type="text" formControlName="dimensionsHeight" placeholder="Ej. 2.4m">
+              </label>
+              <label class="form-field">
+                <span>Profundidad</span>
+                <input type="text" formControlName="dimensionsDepth" placeholder="Ej. 60cm">
+              </label>
+            </div>
+
+            <label class="form-field">
+              <span>Incluye (una línea por elemento)</span>
+              <textarea formControlName="includes" rows="2" placeholder="Isla central&#10;Encimera de cuarzo&#10;Iluminación LED"></textarea>
+            </label>
+
+            <label class="form-field">
+              <span>Colores (uno por línea, formato: Nombre #HEX)</span>
+              <textarea formControlName="colors" rows="2" placeholder="Blanco #FFFFFF&#10;Negro #000000"></textarea>
+            </label>
+
+            @if (saveError) {
+              <p class="status-message error">{{ saveError }}</p>
+            }
+            @if (saveSuccess) {
+              <p class="status-message success">{{ saveSuccess }}</p>
+            }
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="toggleAddForm()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSaving">
+                {{ isSaving ? 'Guardando…' : 'Guardar producto' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  }
 
   <section class="services-grid-section">
     <div class="inner">

@@ -1,3 +1,5 @@
+﻿@use 'styles/theme' as theme;
+
 .modal-backdrop {
 	position: fixed;
 	inset: 0;
@@ -8,7 +10,7 @@
 	z-index: 1200;
 }
 .modal {
-	background: #ffffff;
+	background: theme.color('surface');
 	padding: 1.25rem;
 	width: 520px;
 	max-width: 95%;
@@ -23,8 +25,11 @@
 /* Local button styles to match app look */
 .btn { padding: 0.45rem 0.8rem; border-radius:4px; cursor:pointer; font-weight:600; }
 .btn-ghost { background: transparent; border: 1px solid #cfcfcf; color: #333; }
-.btn-primary { background: #1976d2; color: #fff; border: none; }
+.btn-primary { background: #1976d2; color: theme.color('surface'); border: none; }
 
 @media (max-width: 480px) {
 	.modal { width: 92%; padding: 1rem; }
 }
+
+
+
