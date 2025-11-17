@@ -640,16 +640,45 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
+    transition: opacity 0.3s ease;
+
+    &.loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
 
     .furniture-card {
       background: #f8f8f8;
       border-radius: 12px;
       overflow: hidden;
       transition: all 0.3s ease;
+      position: relative;
 
       &:hover {
         box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         transform: translateY(-5px);
+      }
+
+      .admin-remove-option {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(244, 67, 54, 0.9);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: #d32f2f;
+        }
       }
 
       .furniture-image {
@@ -711,6 +740,103 @@
         }
       }
     }
+  }
+
+  .admin-add-option {
+    margin-top: 25px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    h4 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .admin-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.9rem;
+        color: #555;
+
+        input {
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 0.95rem;
+
+          &:focus {
+            outline: none;
+            border-color: #4CAF50;
+          }
+        }
+
+        &.wide {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+
+    .btn-admin-add {
+      align-self: flex-start;
+      padding: 10px 20px;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #0f62b5;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .custom-furniture-loading,
+  .custom-furniture-error {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+
+  .custom-furniture-loading {
+    background: #f0f7f1;
+    color: #2e7d32;
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(46, 125, 50, 0.2);
+      border-top: 3px solid #2e7d32;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  .custom-furniture-error {
+    background: #fdecea;
+    color: #c62828;
   }
 
   .selections-list {
@@ -994,5 +1120,83 @@
 
     &:active {
       transform: scale(0.95);
+    }
+  }
+
+  .admin-option-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .admin-option-panel {
+      width: min(900px, 90%);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+
+      h3 {
+        margin: 0;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+      }
+    }
+
+    .panel-body {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .panel-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 20px;
+      border-top: 1px solid #eee;
+
+      .btn-cancel,
+      .btn-save {
+        border: none;
+        border-radius: 6px;
+        padding: 10px 18px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-cancel {
+        background: #eceff1;
+        color: #333;
+      }
+
+      .btn-save {
+        background: #1976d2;
+        color: #fff;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
     }
   }

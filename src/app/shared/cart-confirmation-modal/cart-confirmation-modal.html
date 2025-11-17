@@ -23,7 +23,7 @@
                   <label>Nombre
                     <input type="text" [(ngModel)]="editItem.name">
                   </label>
-                  <label>Precio (€)
+                  <label>Precio (&euro;)
                     <input type="number" step="0.01" [(ngModel)]="editItem.price">
                   </label>
                   <label>Imagen (URL)
@@ -44,12 +44,35 @@
                   <label>Dimensions (depth cm)
                     <input type="text" [(ngModel)]="editItem.dimensions.depth">
                   </label>
+                  @if (editItem?.isCustomFurniture) {
+                    <label>Tipo
+                      <input type="text" [(ngModel)]="editItem.type">
+                    </label>
+                    <label>Ancho (min cm)
+                      <input type="number" [(ngModel)]="editItem.minWidth">
+                    </label>
+                    <label>Ancho (max cm)
+                      <input type="number" [(ngModel)]="editItem.maxWidth">
+                    </label>
+                    <label>Alto (min cm)
+                      <input type="number" [(ngModel)]="editItem.minHeight">
+                    </label>
+                    <label>Alto (max cm)
+                      <input type="number" [(ngModel)]="editItem.maxHeight">
+                    </label>
+                    <label>Profundidad (cm)
+                      <input type="number" [(ngModel)]="editItem.depth">
+                    </label>
+                    <label>Colores (Nombre:#HEX)
+                      <input type="text" [(ngModel)]="editItem.colors">
+                    </label>
+                  }
                 </div>
               }
               <div class="product-info">
                 <div class="info-row">
                   <span class="label">Price:</span>
-                  <span class="value price">€{{ (adminMode ? editItem?.price : item.price)?.toFixed ? (adminMode ? editItem.price.toFixed(2) : item.price.toFixed(2)) : (adminMode ? editItem?.price : item?.price) }}</span>
+                  <span class="value price">&euro;{{ (adminMode ? editItem?.price : item.price)?.toFixed ? (adminMode ? editItem.price.toFixed(2) : item.price.toFixed(2)) : (adminMode ? editItem?.price : item?.price) }}</span>
                 </div>
                 @if ((adminMode ? editItem?.selectedColor : item?.selectedColor)) {
                   <div class="info-row">

@@ -1,4 +1,4 @@
-<div class="bedroom-page">
+﻿<div class="bedroom-page">
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
@@ -51,7 +51,7 @@
             <p class="description">{{ selectedSet.description }}</p>
             <div class="price-tag">
               <span class="price-label">Starting at:</span>
-              <span class="price">�{{ selectedSet.basePrice.toFixed(2) }}</span>
+              <span class="price">&euro;{{ selectedSet.basePrice.toFixed(2) }}</span>
             </div>
             <div class="dimensions-section">
               <h3>Standard Dimensions</h3>
@@ -99,7 +99,7 @@
             <div class="action-buttons">
               @if (!isAdmin) {
               <button class="btn-primary" (click)="addSetToCart()">
-                Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
+                Add to Cart - &euro;{{ selectedSet.basePrice.toFixed(2) }}
               </button>
               } @if (isAdmin) {
               <button class="btn-primary admin-modify" (click)="addSetToCart()">
@@ -120,13 +120,13 @@
           @for (set of bedroomSets; track set.id) {
           <div class="set-card" (click)="selectSet(set)">
             @if (isAdmin) {
-            <!-- NEW: botón eliminar -->
+            <!-- NEW: boton eliminar -->
             <button
               class="delete-btn"
               (click)="confirmDeleteProduct(set.id, $event)"
               title="Eliminar producto"
             >
-              ×
+              &times;
             </button>
             } @if (!isAdmin) {
             <div class="card-favorite">
@@ -150,7 +150,7 @@
               <p class="style">{{ set.style }}</p>
               <div class="price">
                 <span class="from">From</span>
-                <span class="amount">�{{ set.basePrice.toFixed(2) }}</span>
+                <span class="amount">&euro;{{ set.basePrice.toFixed(2) }}</span>
               </div>
               <div class="color-preview">
                 <span>Available in:</span>
@@ -254,30 +254,104 @@
         </div>
       </div>
       <!-- Step 2: Select Furniture -->
-      <div class="step-card" [class.disabled]="!isCustomSpaceValid()">
+      <div class="step-card">
         <div class="step-header">
           <span class="step-number">2</span>
           <h3>Select Furniture Items</h3>
         </div>
+        @if (customFurnitureError) {
+        <div class="custom-furniture-error">{{ customFurnitureError }}</div>
+        }
+        @if (isLoadingCustomFurniture) {
+        <div class="custom-furniture-loading">
+          <div class="spinner"></div>
+          <p>Cargando opciones personalizadas...</p>
+        </div>
+        }
         <div class="step-content">
-          <div class="furniture-grid">
+          <div class="furniture-grid" [class.loading]="isLoadingCustomFurniture">
             @for (furniture of customFurnitureOptions; track furniture.id) {
-            <div
-              class="furniture-card"
-              [class.disabled]="!isCustomSpaceValid()"
-              (click)="isCustomSpaceValid() && addCustomFurniture(furniture)"
-            >
+            <div class="furniture-card" (click)="!isAdmin && addCustomFurniture(furniture)">
+              @if (isAdmin) {
+              <button class="admin-remove-option" (click)="requestDeleteFurnitureOption(furniture, $event)">
+                &times;
+              </button>
+              }
               <img [src]="furniture.image" [alt]="furniture.name" />
               <div class="furniture-info">
                 <h4>{{ furniture.name }}</h4>
-                <p class="base-price">From �{{ furniture.basePrice.toFixed(2) }}</p>
-                <button class="add-btn" [disabled]="!isCustomSpaceValid()">
-                  <i class="fas fa-plus"></i> Add
+                <p class="base-price">From &euro;{{ furniture.basePrice.toFixed(2) }}</p>
+                <div class="furniture-dims">
+                  <small>
+                    W: {{ furniture.dimensions.minWidth }}-{{ furniture.dimensions.maxWidth }}cm<br />
+                    H: {{ furniture.dimensions.minHeight }}-{{ furniture.dimensions.maxHeight }}cm<br />
+                    D: {{ furniture.dimensions.depth }}cm
+                  </small>
+                </div>
+                <button
+                  class="add-btn"
+                  (click)="$event.stopPropagation(); isAdmin ? openEditFurnitureModal(furniture, $event) : addCustomFurniture(furniture)"
+                >
+                  @if (isAdmin) {
+                  <span><i class="fas fa-edit"></i> Modify</span>
+                  } @else {
+                  <i class="fas fa-plus"></i> Add to Design
+                  }
                 </button>
               </div>
             </div>
             }
           </div>
+          @if (isAdmin) {
+          <div class="admin-add-option">
+            <h4>Add new furniture option</h4>
+            <div class="admin-form-grid">
+              <label>
+                Nombre
+                <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="Ej. Bed Frame" />
+              </label>
+              <label>
+                Tipo
+                <input type="text" [(ngModel)]="newFurnitureForm.type" placeholder="bed, storage..." />
+              </label>
+              <label>
+                Precio base
+                <input type="number" min="0" step="0.01" [(ngModel)]="newFurnitureForm.basePrice" />
+              </label>
+              <label>
+                Imagen (URL)
+                <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
+              </label>
+              <label>
+                Ancho (min)
+                <input type="number" [(ngModel)]="newFurnitureForm.minWidth" />
+              </label>
+              <label>
+                Ancho (max)
+                <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" />
+              </label>
+              <label>
+                Alto (min)
+                <input type="number" [(ngModel)]="newFurnitureForm.minHeight" />
+              </label>
+              <label>
+                Alto (max)
+                <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" />
+              </label>
+              <label>
+                Profundidad
+                <input type="number" [(ngModel)]="newFurnitureForm.depth" />
+              </label>
+              <label class="wide">
+                Colores (Nombre:#HEX separados por comas)
+                <input type="text" [(ngModel)]="newFurnitureForm.colors" />
+              </label>
+            </div>
+            <button class="btn-admin-add" (click)="requestAddFurnitureOption()" [disabled]="isProcessingFurniture">
+              Add
+            </button>
+          </div>
+          }
         </div>
       </div>
       <!-- Step 3: Customize Selected Items -->
@@ -365,7 +439,7 @@
                 </div>
                 <div class="selection-price">
                   <span class="label">Price for this item:</span>
-                  <span class="price">�{{ calculateCustomPrice(selection).toFixed(2) }}</span>
+                  <span class="price">&euro;{{ calculateCustomPrice(selection).toFixed(2) }}</span>
                 </div>
               </div>
             </div>
@@ -375,7 +449,7 @@
           <div class="total-section">
             <div class="total-row">
               <span class="label">Total Bedroom Cost:</span>
-              <span class="total-price">�{{ getTotalCustomPrice().toFixed(2) }}</span>
+              <span class="total-price">&euro;{{ getTotalCustomPrice().toFixed(2) }}</span>
             </div>
             <button
               class="btn-submit"
@@ -402,7 +476,7 @@
       }
     </div>
   </section>
-  }
+   }
 </div>
 
 <!-- Cart Confirmation Modal -->
@@ -430,3 +504,16 @@
   (cancel)="closeCustomModal()"
 >
 </app-custom-order-confirmation-modal>
+
+<!-- Furniture CRUD Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showFurnitureConfirm"
+  [title]="furnitureConfirmTitle"
+  [message]="furnitureConfirmMessage"
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  (confirm)="confirmFurnitureAction()"
+  (cancel)="cancelFurnitureAction()"
+></app-confirmation-modal>
+
+

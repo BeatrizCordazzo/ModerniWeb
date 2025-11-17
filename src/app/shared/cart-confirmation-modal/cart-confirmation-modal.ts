@@ -13,6 +13,14 @@ export interface CartItem {
     code: string;
   };
   quantity?: number;
+  isCustomFurniture?: boolean;
+  type?: string;
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  depth?: number;
+  colors?: string;
 }
 
 @Component({
@@ -72,6 +80,9 @@ export class CartConfirmationModal {
           this.editItem.dimensions.height = this.editItem.dimensions.height ?? '';
           this.editItem.dimensions.depth = this.editItem.dimensions.depth ?? '';
         }
+        if (this.editItem.isCustomFurniture) {
+          this.ensureCustomFurnitureFields(this.editItem);
+        }
       }
     }
     if (changes['isOpen'] && !this.isOpen) {
@@ -80,6 +91,9 @@ export class CartConfirmationModal {
       if (this.editItem) {
         if (!this.editItem.selectedColor) this.editItem.selectedColor = { name: '', code: '' };
         if (!this.editItem.dimensions) this.editItem.dimensions = { width: '', height: '', depth: '' };
+        if (this.editItem.isCustomFurniture) {
+          this.ensureCustomFurnitureFields(this.editItem);
+        }
       }
     }
   }
@@ -102,8 +116,9 @@ export class CartConfirmationModal {
     this.save.emit(this.editItem);
 
     // Also attempt to persist directly from the modal if we have a product id
+    const skipDirectUpdate = !!this.editItem?.isCustomFurniture;
     const id = this.productId ?? (this.editItem && (this.editItem as any).id);
-    if (id) {
+    if (!skipDirectUpdate && id) {
       const payload: any = {
         id: id,
         name: this.editItem.name,
@@ -123,6 +138,8 @@ export class CartConfirmationModal {
       }).catch(err => {
         console.error('CartConfirmationModal: update_product fetch error', err);
       });
+    } else if (skipDirectUpdate) {
+      console.log('CartConfirmationModal.confirmSave: skipped direct product update for custom furniture option');
     } else {
       console.warn('CartConfirmationModal.confirmSave: no product id available, skipping direct update');
     }
@@ -205,5 +222,15 @@ export class CartConfirmationModal {
       hex = hex.split('').map(ch => ch + ch).join('');
     }
     return `#${hex.toLowerCase()}`;
+  }
+
+  private ensureCustomFurnitureFields(item: any) {
+    item.type = item.type ?? '';
+    item.minWidth = item.minWidth ?? '';
+    item.maxWidth = item.maxWidth ?? '';
+    item.minHeight = item.minHeight ?? '';
+    item.maxHeight = item.maxHeight ?? '';
+    item.depth = item.depth ?? '';
+    item.colors = item.colors ?? '';
   }
 }

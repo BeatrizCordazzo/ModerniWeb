@@ -61,7 +61,7 @@
             <option value="name">Name: A to Z</option>
           </select>
           <button class="filter-toggle" (click)="showFilters = !showFilters">
-            <i class="filter-icon">âš™</i> Filters
+            <i class="filter-icon"></i> Filters
           </button>
         </div>
       </div>
@@ -177,9 +177,9 @@
           <h3 class="product-name">{{ product.name }}</h3>
           <p class="product-description">{{ product.description }}</p>
           <div class="product-price">
-            <span class="current-price">â‚¬{{ product.price.toFixed(2) }}</span>
+            <span class="current-price">€{{ product.price.toFixed(2) }}</span>
             @if (product.oldPrice) {
-            <span class="old-price">â‚¬{{ product.oldPrice.toFixed(2) }}</span>
+            <span class="old-price">€{{ product.oldPrice.toFixed(2) }}</span>
             }
           </div>
           <div class="product-colors">
@@ -250,3 +250,15 @@
   <app-toast-notification [message]="toastMessage" type="success"> </app-toast-notification>
   }
 </div>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteConfirm"
+  title="Confirmar eliminación"
+  message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+  confirmLabel="Eliminar"
+  cancelLabel="Cancelar"
+  (confirm)="executeDelete()"
+  (cancel)="cancelDelete()"
+>
+</app-confirmation-modal>

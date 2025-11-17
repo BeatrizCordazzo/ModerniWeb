@@ -1,19 +1,13 @@
-﻿<div class="kitchen-page">
+<div class="kitchen-page">
   <!-- Hero Section -->
   <div class="hero">
     <h1>Complete Kitchen Solutions</h1>
     <p>Choose from our pre-designed sets or create your custom kitchen</p>
     <div class="hero-actions">
-      <button
-        class="hero-btn"
-        [class.active]="viewMode === 'sets'"
-        (click)="switchToSets()">
+      <button class="hero-btn" [class.active]="viewMode === 'sets'" (click)="switchToSets()">
         Pre-Designed Sets
       </button>
-      <button
-        class="hero-btn"
-        [class.active]="viewMode === 'custom'"
-        (click)="switchToCustom()">
+      <button class="hero-btn" [class.active]="viewMode === 'custom'" (click)="switchToCustom()">
         Make It Your Own
       </button>
     </div>
@@ -21,379 +15,482 @@
 
   <!-- Loading State -->
   @if (isLoading) {
-    <div class="loading-container">
-      <div class="spinner"></div>
-      <p>Loading kitchen sets...</p>
-    </div>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading kitchen sets...</p>
+  </div>
   }
 
   <!-- Error State -->
   @if (loadError && !isLoading) {
-    <div class="error-container">
-      <p class="error-message">{{ loadError }}</p>
-      <button class="retry-button" (click)="loadKitchenSets()">Retry</button>
-    </div>
+  <div class="error-container">
+    <p class="error-message">{{ loadError }}</p>
+    <button class="retry-button" (click)="loadKitchenSets()">Retry</button>
+  </div>
   }
 
   <!-- Pre-Designed Sets View -->
   @if (viewMode === 'sets' && !isLoading && !loadError) {
-    <div class="sets-section">
-      <!-- Selected Set Detail -->
-      @if (selectedSet && showColorPicker) {
-        <div class="selected-set-detail">
-          <div class="detail-container">
-            <button class="btn-back" (click)="selectedSet = null; showColorPicker = false">
-              â† Back to Sets
-            </button>
-            <div class="detail-content">
-              <div class="detail-image">
-                <img [src]="selectedSet.image" [alt]="selectedSet.name">
-              </div>
-              <div class="detail-info">
-                <h2>{{ selectedSet.name }}</h2>
-                <p class="style-tag">{{ selectedSet.style }}</p>
-                <p class="description">{{ selectedSet.description }}</p>
-                <div class="price-section">
-                  <span class="price-label">Starting at:</span>
-                  <span class="price">â‚¬{{ selectedSet.basePrice.toFixed(2) }}</span>
+  <div class="sets-section">
+    <!-- Selected Set Detail -->
+    @if (selectedSet && showColorPicker) {
+    <div class="selected-set-detail">
+      <div class="detail-container">
+        <button class="btn-back" (click)="selectedSet = null; showColorPicker = false">
+          ← Back to Sets
+        </button>
+        <div class="detail-content">
+          <div class="detail-image">
+            <img [src]="selectedSet.image" [alt]="selectedSet.name" />
+          </div>
+          <div class="detail-info">
+            <h2>{{ selectedSet.name }}</h2>
+            <p class="style-tag">{{ selectedSet.style }}</p>
+            <p class="description">{{ selectedSet.description }}</p>
+            <div class="price-section">
+              <span class="price-label">Starting at:</span>
+              <span class="price">�{{ selectedSet.basePrice.toFixed(2) }}</span>
+            </div>
+            <div class="dimensions">
+              <h3>Standard Dimensions</h3>
+              <div class="dimension-grid">
+                <div class="dimension-item">
+                  <span class="dim-label">Width:</span>
+                  <span class="dim-value">{{ selectedSet.dimensions.width }}</span>
                 </div>
-                <div class="dimensions">
-                  <h3>Standard Dimensions</h3>
-                  <div class="dimension-grid">
-                    <div class="dimension-item">
-                      <span class="dim-label">Width:</span>
-                      <span class="dim-value">{{ selectedSet.dimensions.width }}</span>
-                    </div>
-                    <div class="dimension-item">
-                      <span class="dim-label">Height:</span>
-                      <span class="dim-value">{{ selectedSet.dimensions.height }}</span>
-                    </div>
-                    <div class="dimension-item">
-                      <span class="dim-label">Depth:</span>
-                      <span class="dim-value">{{ selectedSet.dimensions.depth }}</span>
-                    </div>
-                  </div>
+                <div class="dimension-item">
+                  <span class="dim-label">Height:</span>
+                  <span class="dim-value">{{ selectedSet.dimensions.height }}</span>
                 </div>
-                <div class="includes-section">
-                  <h3>Includes:</h3>
-                  <ul class="includes-list">
-                    @for (item of selectedSet.includes; track item) {
-                      <li>
-                        <span class="check-icon">âœ“</span> {{ item }}
-                      </li>
-                    }
-                  </ul>
-                </div>
-                <div class="color-selection">
-                  <h3>Choose Your Color</h3>
-                  <div class="color-options">
-                    @for (color of selectedSet.availableColors; track color.code ?? color.codigo_hex ?? color.name ?? color) {
-                      <div
-                        class="color-card"
-                        [class.selected]="selectedSetColor?.name === color.name"
-                        (click)="selectSetColor(color)">
-                        <div class="color-preview" [style.backgroundColor]="color.code"></div>
-                        <span class="color-name">{{ color.name }}</span>
-                      </div>
-                    }
-                  </div>
-                </div>
-                <div class="action-buttons">
-                  @if (!isAdmin) {
-                    <button class="btn-add-cart" (click)="addSetToCart()">
-                      Add to Cart - â‚¬{{ selectedSet.basePrice.toFixed(2) }}
-                    </button>
-                  }
-                  @if (isAdmin) {
-                    <button class="btn-add-cart admin-modify" (click)="addSetToCart()">
-                      <i class="fas fa-edit"></i> Modify
-                    </button>
-                  }
+                <div class="dimension-item">
+                  <span class="dim-label">Depth:</span>
+                  <span class="dim-value">{{ selectedSet.dimensions.depth }}</span>
                 </div>
               </div>
             </div>
+            <div class="includes-section">
+              <h3>Includes:</h3>
+              <ul class="includes-list">
+                @for (item of selectedSet.includes; track item) {
+                <li><span class="check-icon">✓</span> {{ item }}</li>
+                }
+              </ul>
+            </div>
+            <div class="color-selection">
+              <h3>Choose Your Color</h3>
+              <div class="color-options">
+                @for (color of selectedSet.availableColors; track color.code ?? color.codigo_hex ??
+                color.name ?? color) {
+                <div
+                  class="color-card"
+                  [class.selected]="selectedSetColor?.name === color.name"
+                  (click)="selectSetColor(color)"
+                >
+                  <div class="color-preview" [style.backgroundColor]="color.code"></div>
+                  <span class="color-name">{{ color.name }}</span>
+                </div>
+                }
+              </div>
+            </div>
+            <div class="action-buttons">
+              @if (!isAdmin) {
+              <button class="btn-add-cart" (click)="addSetToCart()">
+                Add to Cart - �{{ selectedSet.basePrice.toFixed(2) }}
+              </button>
+              } @if (isAdmin) {
+              <button class="btn-add-cart admin-modify" (click)="addSetToCart()">
+                <i class="fas fa-edit"></i> Modify
+              </button>
+              }
+            </div>
           </div>
         </div>
-      }
-      <!-- Kitchen Sets Grid -->
-      @if (!selectedSet) {
-        <div class="sets-grid">
-          <h2 class="section-title">Choose Your Kitchen Style</h2>
-          <p class="section-subtitle">All sets come in standard sizes with customizable colors</p>
-          <div class="grid-container">
-            @for (set of kitchenSets; track set.id) {
-              <div class="set-card" (click)="selectSet(set)">
-                @if (!isAdmin) {
-                  <div class="card-favorite">
-                    <app-favorite-toggle
-                      [itemType]="'service'"
-                      [itemId]="set.id"
-                      [itemSlug]="'kitchen-set-' + set.id"
-                      [itemName]="set.name"
-                      [itemImage]="set.image"
-                      [itemPrice]="set.basePrice"
-                      [extra]="{ category: 'kitchen', style: set.style }">
-                    </app-favorite-toggle>
-                  </div>
+      </div>
+    </div>
+    }
+    <!-- Kitchen Sets Grid -->
+    @if (!selectedSet) {
+    <div class="sets-grid">
+      <h2 class="section-title">Choose Your Kitchen Style</h2>
+      <p class="section-subtitle">All sets come in standard sizes with customizable colors</p>
+      <div class="grid-container">
+        @for (set of kitchenSets; track set.id) {
+        <div class="set-card" (click)="selectSet(set)">
+          @if (!isAdmin) {
+          <div class="card-favorite">
+            <app-favorite-toggle
+              [itemType]="'service'"
+              [itemId]="set.id"
+              [itemSlug]="'kitchen-set-' + set.id"
+              [itemName]="set.name"
+              [itemImage]="set.image"
+              [itemPrice]="set.basePrice"
+              [extra]="{ category: 'kitchen', style: set.style }"
+            >
+            </app-favorite-toggle>
+          </div>
+          } @if (isAdmin) {
+          <button
+            class="delete-btn"
+            (click)="confirmDeleteProduct(set.id, $event); $event.stopPropagation()"
+            title="Eliminar producto"
+          >
+            �
+          </button>
+          }
+          <div class="set-image">
+            <img [src]="set.image" [alt]="set.name" />
+          </div>
+          <div class="set-info">
+            <h3>{{ set.name }}</h3>
+            <p class="set-style">{{ set.style }}</p>
+            <div class="set-price">
+              <span class="from">From</span>
+              <span class="price">�{{ set.basePrice.toFixed(2) }}</span>
+            </div>
+            <div class="color-previews">
+              <span class="colors-label">Available in:</span>
+              <div class="color-dots">
+                @for (color of set.availableColors; track color.code ?? color.codigo_hex ??
+                color.name ?? color) {
+                <div
+                  class="color-dot"
+                  [style.backgroundColor]="color.code"
+                  [title]="color.name"
+                ></div>
                 }
-                @if (isAdmin) {
-                  <button class="delete-btn" (click)="confirmDeleteProduct(set.id, $event)" title="Eliminar producto">
-                    ×
-                  </button>
-                }
-                <div class="set-image">
-                  <img [src]="set.image" [alt]="set.name">
-                </div>
-                <div class="set-info">
-                  <h3>{{ set.name }}</h3>
-                  <p class="set-style">{{ set.style }}</p>
-                  <div class="set-price">
-                    <span class="from">From</span>
-                    <span class="price">â‚¬{{ set.basePrice.toFixed(2) }}</span>
-                  </div>
-                  <div class="color-previews">
-                    <span class="colors-label">Available in:</span>
-                    <div class="color-dots">
-                      @for (color of set.availableColors; track color.code ?? color.codigo_hex ?? color.name ?? color) {
-                        <div
-                          class="color-dot"
-                          [style.backgroundColor]="color.code"
-                          [title]="color.name">
-                        </div>
-                      }
-                    </div>
-                  </div>
-                  @if (!isAdmin) {
-                    <button class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
-                      <i class="fas fa-shopping-bag"></i> Add to Cart
-                    </button>
-                  }
-                  @if (isAdmin) {
-                    <button class="btn-add-to-cart admin-modify" (click)="quickAddToCart(set); $event.stopPropagation()">
-                      <i class="fas fa-edit"></i> Modify
-                    </button>
-                  }
-                </div>
               </div>
+            </div>
+            @if (!isAdmin) {
+            <button class="btn-add-to-cart" (click)="quickAddToCart(set); $event.stopPropagation()">
+              <i class="fas fa-shopping-bag"></i> Add to Cart
+            </button>
+            } @if (isAdmin) {
+            <button
+              class="btn-add-to-cart admin-modify"
+              (click)="quickAddToCart(set); $event.stopPropagation()"
+            >
+              <i class="fas fa-edit"></i> Modify
+            </button>
             }
           </div>
-          <!-- Call to Action for Custom -->
-          <div class="custom-cta">
-            <div class="cta-content">
-              <h3>Need Something Different?</h3>
-              <p>Design your perfect kitchen with custom measurements and furniture selection</p>
-              <button class="btn-custom" (click)="switchToCustom()">
-                Make It Your Own â†’
-              </button>
-            </div>
-          </div>
         </div>
-      }
+        }
+      </div>
+      <!-- Call to Action for Custom -->
+      <div class="custom-cta">
+        <div class="cta-content">
+          <h3>Need Something Different?</h3>
+          <p>Design your perfect kitchen with custom measurements and furniture selection</p>
+          <button class="btn-custom" (click)="switchToCustom()">Make It Your Own →</button>
+        </div>
+      </div>
     </div>
+    }
+  </div>
   }
 
   <!-- Custom Design View -->
   @if (viewMode === 'custom') {
-    <div class="custom-section">
-      <div class="custom-container">
-        <h2 class="section-title">Design Your Custom Kitchen</h2>
-        <p class="section-subtitle">Enter your space dimensions and select the furniture you need</p>
-        <!-- Step 1: Space Dimensions -->
-        <div class="step-card">
-          <div class="step-header">
-            <span class="step-number">1</span>
-            <h3>Enter Your Space Dimensions</h3>
+  <div class="custom-section">
+    <div class="custom-container">
+      <h2 class="section-title">Design Your Custom Kitchen</h2>
+      <p class="section-subtitle">Enter your space dimensions and select the furniture you need</p>
+      <!-- Step 1: Space Dimensions -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3>Enter Your Space Dimensions</h3>
+        </div>
+        <div class="dimensions-form">
+          <div class="form-group">
+            <label>Width (cm)</label>
+            <input
+              type="number"
+              [(ngModel)]="customSpaceWidth"
+              placeholder="e.g., 350"
+              min="100"
+              max="1000"
+            />
           </div>
-          <div class="dimensions-form">
-            <div class="form-group">
-              <label>Width (cm)</label>
+          <div class="form-group">
+            <label>Height (cm)</label>
+            <input
+              type="number"
+              [(ngModel)]="customSpaceHeight"
+              placeholder="e.g., 240"
+              min="200"
+              max="300"
+            />
+          </div>
+          <div class="form-group">
+            <label>Depth (cm)</label>
+            <input
+              type="number"
+              [(ngModel)]="customSpaceDepth"
+              placeholder="e.g., 60"
+              min="40"
+              max="100"
+            />
+          </div>
+        </div>
+        @if (isCustomSpaceValid()) {
+        <div class="space-summary">
+          <span class="summary-icon">📏</span>
+          <span class="summary-text">
+            Your space: {{ customSpaceWidth }}cm × {{ customSpaceHeight }}cm ×
+            {{ customSpaceDepth }}cm
+          </span>
+        </div>
+        }
+      </div>
+            <!-- Step 2: Select Furniture -->
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h3>Select Your Furniture</h3>
+        </div>
+        @if (customFurnitureError) {
+        <div class="custom-furniture-error">{{ customFurnitureError }}</div>
+        }
+        @if (isLoadingCustomFurniture) {
+        <div class="custom-furniture-loading">
+          <div class="spinner"></div>
+          <p>Cargando opciones personalizadas...</p>
+        </div>
+        }
+        <div class="furniture-grid" [class.loading]="isLoadingCustomFurniture">
+          @for (furniture of customFurnitureOptions; track furniture.id) {
+          <div class="furniture-card">
+            @if (isAdmin) {
+            <button class="admin-remove-option" (click)="requestDeleteFurnitureOption(furniture, $event)">
+              &times;
+            </button>
+            }
+            <div class="furniture-image">
+              <img [src]="furniture.image" [alt]="furniture.name" />
+            </div>
+            <div class="furniture-info">
+              <h4>{{ furniture.name }}</h4>
+              <p class="furniture-type">{{ furniture.type }}</p>
+              <div class="furniture-price">From &euro;{{ furniture.basePrice.toFixed(2) }}</div>
+              <div class="furniture-dims">
+                <small>
+                  W: {{ furniture.dimensions.minWidth }}-{{ furniture.dimensions.maxWidth }}cm<br />
+                  H: {{ furniture.dimensions.minHeight }}-{{
+                    furniture.dimensions.maxHeight
+                  }}cm<br />
+                  D: {{ furniture.dimensions.depth }}cm
+                </small>
+              </div>
+              <button
+                class="btn-add-furniture"
+                (click)="isAdmin ? openEditFurnitureModal(furniture, $event) : addCustomFurniture(furniture)"
+              >
+                @if (isAdmin) {
+                <span><i class="fas fa-edit"></i> Modify</span>
+                } @else {
+                Add to Design
+                }
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        @if (isAdmin) {
+        <div class="admin-add-option">
+          <h4>Add new furniture option</h4>
+          <div class="admin-form-grid">
+            <label>
+              Nombre
+              <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="Ej. Base Cabinet" />
+            </label>
+            <label>
+              Tipo
+              <input type="text" [(ngModel)]="newFurnitureForm.type" placeholder="cabinet, island..." />
+            </label>
+            <label>
+              Precio base
               <input
                 type="number"
-                [(ngModel)]="customSpaceWidth"
-                placeholder="e.g., 350"
-                min="100"
-                max="1000">
-              </div>
-              <div class="form-group">
-                <label>Height (cm)</label>
-                <input
-                  type="number"
-                  [(ngModel)]="customSpaceHeight"
-                  placeholder="e.g., 240"
-                  min="200"
-                  max="300">
-                </div>
-                <div class="form-group">
-                  <label>Depth (cm)</label>
+                min="0"
+                step="0.01"
+                [(ngModel)]="newFurnitureForm.basePrice"
+                placeholder="999.99"
+              />
+            </label>
+            <label>
+              Imagen (URL)
+              <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
+            </label>
+            <label>
+              Ancho (m�n)
+              <input type="number" [(ngModel)]="newFurnitureForm.minWidth" min="1" />
+            </label>
+            <label>
+              Ancho (m�x)
+              <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" min="1" />
+            </label>
+            <label>
+              Alto (m�n)
+              <input type="number" [(ngModel)]="newFurnitureForm.minHeight" min="1" />
+            </label>
+            <label>
+              Alto (m�x)
+              <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" min="1" />
+            </label>
+            <label>
+              Profundidad
+              <input type="number" [(ngModel)]="newFurnitureForm.depth" min="1" />
+            </label>
+            <label class="wide">
+              Colores (Nombre:#HEX separados por comas)
+              <input
+                type="text"
+                [(ngModel)]="newFurnitureForm.colors"
+                placeholder="White:#FFFFFF, Gray:#808080"
+              />
+            </label>
+          </div>
+          <button class="btn-admin-add" (click)="requestAddFurnitureOption()" [disabled]="isProcessingFurniture">
+            Add
+          </button>
+        </div>
+        }
+      </div>
+      <!-- Step 3: Your Selections -->
+      @if (customSelections.length > 0) {
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h3>Your Custom Design</h3>
+        </div>
+        <div class="selections-list">
+          @for (selection of customSelections; track selection.furniture.id + '-' +
+          (selection.selectedColor?.code ?? selection.selectedColor?.name ?? '') + '-' +
+          selection.customWidth + 'x' + selection.customHeight + '-' + selection.quantity; let i =
+          $index) {
+          <div class="selection-item">
+            <div class="selection-info">
+              <h4>{{ selection.furniture.name }}</h4>
+              <div class="selection-controls">
+                <div class="control-group">
+                  <label>Width (cm)</label>
                   <input
                     type="number"
-                    [(ngModel)]="customSpaceDepth"
-                    placeholder="e.g., 60"
-                    min="40"
-                    max="100">
-                  </div>
+                    [(ngModel)]="selection.customWidth"
+                    [min]="selection.furniture.dimensions.minWidth"
+                    [max]="selection.furniture.dimensions.maxWidth"
+                  />
                 </div>
-                @if (isCustomSpaceValid()) {
-                  <div class="space-summary">
-                    <span class="summary-icon">ðŸ“</span>
-                    <span class="summary-text">
-                      Your space: {{ customSpaceWidth }}cm Ã— {{ customSpaceHeight }}cm Ã— {{ customSpaceDepth }}cm
-                    </span>
-                  </div>
-                }
+                <div class="control-group">
+                  <label>Height (cm)</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="selection.customHeight"
+                    [min]="selection.furniture.dimensions.minHeight"
+                    [max]="selection.furniture.dimensions.maxHeight"
+                  />
+                </div>
+                <div class="control-group">
+                  <label>Quantity</label>
+                  <input type="number" [(ngModel)]="selection.quantity" min="1" max="10" />
+                </div>
               </div>
-              <!-- Step 2: Select Furniture -->
-              <div class="step-card">
-                <div class="step-header">
-                  <span class="step-number">2</span>
-                  <h3>Select Your Furniture</h3>
-                </div>
-                <div class="furniture-grid">
-                  @for (furniture of customFurnitureOptions; track furniture.id) {
-                    <div class="furniture-card">
-                      <div class="furniture-image">
-                        <img [src]="furniture.image" [alt]="furniture.name">
-                      </div>
-                      <div class="furniture-info">
-                        <h4>{{ furniture.name }}</h4>
-                        <p class="furniture-type">{{ furniture.type }}</p>
-                        <div class="furniture-price">From â‚¬{{ furniture.basePrice.toFixed(2) }}</div>
-                        <div class="furniture-dims">
-                          <small>
-                            W: {{ furniture.dimensions.minWidth }}-{{ furniture.dimensions.maxWidth }}cm<br>
-                            H: {{ furniture.dimensions.minHeight }}-{{ furniture.dimensions.maxHeight }}cm<br>
-                            D: {{ furniture.dimensions.depth }}cm
-                          </small>
-                        </div>
-                        <button class="btn-add-furniture" (click)="addCustomFurniture(furniture)">
-                          Add to Design
-                        </button>
-                      </div>
-                    </div>
+              <div class="color-select">
+                <label>Color:</label>
+                <select [(ngModel)]="selection.selectedColor">
+                  @for (color of selection.furniture.availableColors; track color.code ??
+                  color.codigo_hex ?? color.name ?? color) {
+                  <option [ngValue]="color">
+                    {{ color.name }}
+                  </option>
                   }
-                </div>
+                </select>
               </div>
-              <!-- Step 3: Your Selections -->
-              @if (customSelections.length > 0) {
-                <div class="step-card">
-                  <div class="step-header">
-                    <span class="step-number">3</span>
-                    <h3>Your Custom Design</h3>
-                  </div>
-                  <div class="selections-list">
-                    @for (selection of customSelections; track selection.furniture.id + '-' + (selection.selectedColor?.code ?? selection.selectedColor?.name ?? '') + '-' + selection.customWidth + 'x' + selection.customHeight + '-' + selection.quantity; let i = $index) {
-                      <div class="selection-item">
-                        <div class="selection-info">
-                          <h4>{{ selection.furniture.name }}</h4>
-                          <div class="selection-controls">
-                            <div class="control-group">
-                              <label>Width (cm)</label>
-                              <input
-                                type="number"
-                                [(ngModel)]="selection.customWidth"
-                                [min]="selection.furniture.dimensions.minWidth"
-                                [max]="selection.furniture.dimensions.maxWidth">
-                              </div>
-                              <div class="control-group">
-                                <label>Height (cm)</label>
-                                <input
-                                  type="number"
-                                  [(ngModel)]="selection.customHeight"
-                                  [min]="selection.furniture.dimensions.minHeight"
-                                  [max]="selection.furniture.dimensions.maxHeight">
-                                </div>
-                                <div class="control-group">
-                                  <label>Quantity</label>
-                                  <input
-                                    type="number"
-                                    [(ngModel)]="selection.quantity"
-                                    min="1"
-                                    max="10">
-                                  </div>
-                                </div>
-                                <div class="color-select">
-                                  <label>Color:</label>
-                                  <select [(ngModel)]="selection.selectedColor">
-                                    @for (color of selection.furniture.availableColors; track color.code ?? color.codigo_hex ?? color.name ?? color) {
-                                      <option [ngValue]="color">
-                                        {{ color.name }}
-                                      </option>
-                                    }
-                                  </select>
-                                </div>
-                                <div class="selection-price">
-                                  Subtotal: â‚¬{{ calculateCustomPrice(selection).toFixed(2) }}
-                                </div>
-                              </div>
-                              <button class="btn-remove" (click)="removeCustomSelection(i)">
-                                Remove
-                              </button>
-                            </div>
-                          }
-                        </div>
-                        <div class="total-section">
-                          <div class="total-row">
-                            <span class="total-label">Total Estimate:</span>
-                            <span class="total-price">â‚¬{{ getTotalCustomPrice().toFixed(2) }}</span>
-                          </div>
-                          <p class="estimate-note">
-                            *This is an estimated price. Final price will be confirmed by our carpenters after reviewing your specifications.
-                          </p>
-                          <button
-                            class="btn-send-order"
-                            [disabled]="!isCustomSpaceValid() || customSelections.length === 0"
-                            (click)="sendCustomOrderToCarpenters()">
-                            Send to Carpenters for Quote
-                          </button>
-                        </div>
-                      </div>
-                    }
-                    @if (customSelections.length === 0 && isCustomSpaceValid()) {
-                      <div class="empty-state">
-                        <span class="empty-icon">ðŸ› ï¸</span>
-                        <h3>Start Building Your Kitchen</h3>
-                        <p>Select furniture items from above to begin designing your custom kitchen</p>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
+              <div class="selection-price">
+                Subtotal: �{{ calculateCustomPrice(selection).toFixed(2) }}
+              </div>
             </div>
-
-            <!-- Cart Confirmation Modal -->
-            <app-cart-confirmation-modal
-              [isOpen]="showModal"
-              [item]="modalItem"
-              [adminMode]="modalAdminMode"
-              [productId]="modalProductId"
-              (save)="saveModified($event)"
-              (confirm)="confirmAddToCart()"
-              (cancel)="closeModal()">
-          </app-cart-confirmation-modal>
-
-          <!-- Toast Notification -->
-          @if (showToast) {
-            <app-toast-notification
-              [message]="toastMessage"
-              type="success">
-            </app-toast-notification>
+            <button class="btn-remove" (click)="removeCustomSelection(i)">Remove</button>
+          </div>
           }
+        </div>
+        <div class="total-section">
+          <div class="total-row">
+            <span class="total-label">Total Estimate:</span>
+            <span class="total-price">�{{ getTotalCustomPrice().toFixed(2) }}</span>
+          </div>
+          <p class="estimate-note">
+            *This is an estimated price. Final price will be confirmed by our carpenters after
+            reviewing your specifications.
+          </p>
+          <button
+            class="btn-send-order"
+            [disabled]="!isCustomSpaceValid() || customSelections.length === 0"
+            (click)="sendCustomOrderToCarpenters()"
+          >
+            Send to Carpenters for Quote
+          </button>
+        </div>
+      </div>
+      } @if (customSelections.length === 0 && isCustomSpaceValid()) {
+      <div class="empty-state">
+        <span class="empty-icon">🛠️</span>
+        <h3>Start Building Your Kitchen</h3>
+        <p>Select furniture items from above to begin designing your custom kitchen</p>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>
 
-          <!-- Custom Order Confirmation Modal -->
-          <app-custom-order-confirmation-modal
-            [isOpen]="showCustomModal"
-            [order]="customOrderData"
-            (confirm)="confirmSendCustomOrder()"
-            (cancel)="closeCustomModal()">
-          </app-custom-order-confirmation-modal>
-          
-          <!-- Delete Confirmation Modal -->
-          <app-confirmation-modal
-            [isOpen]="showDeleteConfirm"
-            title="Confirmar eliminación"
-            message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-            confirmLabel="Eliminar"
-            cancelLabel="Cancelar"
-            (confirm)="executeDelete()"
-            (cancel)="cancelDelete()">
-          </app-confirmation-modal>
+<!-- Cart Confirmation Modal -->
+<app-cart-confirmation-modal
+  [isOpen]="showModal"
+  [item]="modalItem"
+  [adminMode]="modalAdminMode"
+  [productId]="modalProductId"
+  (save)="saveModified($event)"
+  (confirm)="confirmAddToCart()"
+  (cancel)="closeModal()"
+>
+</app-cart-confirmation-modal>
+
+<!-- Toast Notification -->
+@if (showToast) {
+<app-toast-notification [message]="toastMessage" type="success"> </app-toast-notification>
+}
+
+<!-- Custom Order Confirmation Modal -->
+<app-custom-order-confirmation-modal
+  [isOpen]="showCustomModal"
+  [order]="customOrderData"
+  (confirm)="confirmSendCustomOrder()"
+  (cancel)="closeCustomModal()"
+>
+</app-custom-order-confirmation-modal>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteConfirm"
+  title="Confirmar eliminaci�n"
+  message="�Est�s seguro de que deseas eliminar este producto? Esta acci�n no se puede deshacer."
+  confirmLabel="Eliminar"
+  cancelLabel="Cancelar"
+  (confirm)="executeDelete()"
+  (cancel)="cancelDelete()"
+>
+</app-confirmation-modal>
+
+<!-- Furniture CRUD Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showFurnitureConfirm"
+  [title]="furnitureConfirmTitle"
+  [message]="furnitureConfirmMessage"
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  (confirm)="confirmFurnitureAction()"
+  (cancel)="cancelFurnitureAction()"
+></app-confirmation-modal>

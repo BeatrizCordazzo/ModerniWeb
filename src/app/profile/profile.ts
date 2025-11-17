@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Datos, FavoriteItem, ContactMessage, OrderReviewPayload } from '../datos';
+import { ArchitectProject, Datos, FavoriteItem, ContactMessage, OrderReviewPayload } from '../datos';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
@@ -79,7 +79,7 @@ interface ReviewFormState {
   styleUrl: './profile.scss'
 })
 export class Profile implements OnInit, OnDestroy {
-  activeTab: 'credentials' | 'orders' | 'favorites' | 'rejected' | 'messages' = 'credentials';
+  activeTab: 'credentials' | 'orders' | 'favorites' | 'rejected' | 'messages' | 'projects' = 'credentials';
   user: User | null = null;
   originalUser: User | null = null;
   isLoading = true;
@@ -88,6 +88,20 @@ export class Profile implements OnInit, OnDestroy {
   userRole = '';
   isAdminUser = false;
   adminUnreadCount = 0;
+  isArchitectUser = false;
+  architectProjects: ArchitectProject[] = [];
+  architectProjectsLoading = false;
+  architectProjectsError = '';
+  architectProjectForm: { title: string; notes: string; file: File | null } = {
+    title: '',
+    notes: '',
+    file: null
+  };
+  architectProjectFileName = '';
+  architectProjectSubmitting = false;
+  architectProjectSubmitError = '';
+  architectProjectSubmitSuccess = '';
+  @ViewChild('architectFileInput') architectFileInput?: ElementRef<HTMLInputElement>;
 
   constructor(private router: Router, private datosService: Datos) {}
 
@@ -111,6 +125,13 @@ export class Profile implements OnInit, OnDestroy {
         this.isAdminUser = false;
         this.adminUnreadCount = 0;
         this.userMessages = [];
+        this.isArchitectUser = false;
+        this.architectProjects = [];
+        this.architectProjectForm = { title: '', notes: '', file: null };
+        this.architectProjectFileName = '';
+        this.architectProjectSubmitting = false;
+        this.architectProjectSubmitError = '';
+        this.architectProjectSubmitSuccess = '';
         // Optionally navigate to profile root to refresh UI
         this.router.navigate(['/profile']);
       }
@@ -125,11 +146,17 @@ export class Profile implements OnInit, OnDestroy {
           this.originalUser = { ...user };
           this.userRole = this.normalizeRole(user?.rol);
           this.isAdminUser = this.userRole === 'admin';
+          this.isArchitectUser = this.userRole === 'arquitecto';
           this.isLoading = false;
           // Load real orders for this logged user
           this.fetchOrders(user.email);
           this.initializeFavorites();
           this.initializeMessages();
+          if (this.isArchitectUser) {
+            this.loadArchitectProjects();
+          } else {
+            this.architectProjects = [];
+          }
         } else {
           this.notLogged = true;
           this.isLoading = false;
@@ -154,6 +181,7 @@ export class Profile implements OnInit, OnDestroy {
             this.originalUser = { ...this.user };
             this.userRole = this.normalizeRole(parsed.rol || parsed.role);
             this.isAdminUser = this.userRole === 'admin';
+            this.isArchitectUser = this.userRole === 'arquitecto';
             this.isLoading = false;
             this.notLogged = false;
             if (this.user.email) {
@@ -161,6 +189,11 @@ export class Profile implements OnInit, OnDestroy {
             }
             this.initializeFavorites();
             this.initializeMessages();
+            if (this.isArchitectUser) {
+              this.loadArchitectProjects();
+            } else {
+              this.architectProjects = [];
+            }
             return;
           }
         } catch (e) {
@@ -479,6 +512,119 @@ export class Profile implements OnInit, OnDestroy {
         order.reviewError = err?.error?.error || 'Unable to submit your review right now.';
       }
     });
+  }
+
+  loadArchitectProjects(): void {
+    if (!this.isArchitectUser) {
+      this.architectProjects = [];
+      this.architectProjectsError = '';
+      this.architectProjectsLoading = false;
+      return;
+    }
+    this.architectProjectsLoading = true;
+    this.architectProjectsError = '';
+    this.datosService.getArchitectProjects().subscribe({
+      next: (projects) => {
+        this.architectProjects = projects || [];
+        this.architectProjectsLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading architect projects', err);
+        this.architectProjectsLoading = false;
+        if (err && err.status === 401) {
+          this.architectProjectsError = 'Please log in to view your architect projects.';
+        } else {
+          this.architectProjectsError = 'Unable to load your architect projects.';
+        }
+      }
+    });
+  }
+
+  submitArchitectProject(): void {
+    if (!this.isArchitectUser || this.architectProjectSubmitting) {
+      return;
+    }
+    const notes = this.architectProjectForm.notes.trim();
+    if (!notes) {
+      this.architectProjectSubmitError = 'Please describe the project.';
+      this.architectProjectSubmitSuccess = '';
+      return;
+    }
+    if (!this.architectProjectForm.file) {
+      this.architectProjectSubmitError = 'Please attach a file.';
+      this.architectProjectSubmitSuccess = '';
+      return;
+    }
+
+    const formData = new FormData();
+    if (this.architectProjectForm.title.trim()) {
+      formData.append('project_title', this.architectProjectForm.title.trim());
+    }
+    formData.append('project_notes', notes);
+    formData.append('project_file', this.architectProjectForm.file, this.architectProjectForm.file.name);
+
+    this.architectProjectSubmitting = true;
+    this.architectProjectSubmitError = '';
+    this.architectProjectSubmitSuccess = '';
+
+    this.datosService.submitArchitectProject(formData).subscribe({
+      next: () => {
+        this.architectProjectSubmitting = false;
+        this.architectProjectSubmitSuccess = 'Project sent to the carpenter.';
+        this.architectProjectForm = { title: '', notes: '', file: null };
+        this.architectProjectFileName = '';
+        if (this.architectFileInput?.nativeElement) {
+          this.architectFileInput.nativeElement.value = '';
+        }
+        this.loadArchitectProjects();
+      },
+      error: (err) => {
+        console.error('Error submitting architect project', err);
+        this.architectProjectSubmitting = false;
+        this.architectProjectSubmitError =
+          err?.error?.error || 'Unable to send your project right now.';
+      }
+    });
+  }
+
+  onArchitectFileChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const file = target?.files && target.files.length ? target.files[0] : null;
+    this.architectProjectForm.file = file;
+    this.architectProjectFileName = file ? file.name : '';
+  }
+
+  get architectPendingList(): ArchitectProject[] {
+    return this.filterArchitectProjectsByStatus('pending');
+  }
+
+  get architectAcceptedList(): ArchitectProject[] {
+    return this.filterArchitectProjectsByStatus('accepted');
+  }
+
+  get architectRejectedList(): ArchitectProject[] {
+    return this.filterArchitectProjectsByStatus('rejected');
+  }
+
+  getArchitectProjectFileUrl(project: ArchitectProject): string {
+    if (!project?.file_url) {
+      return '';
+    }
+    if (project.file_url.startsWith('http')) {
+      return project.file_url;
+    }
+    const base = this.datosService.url.endsWith('/') ? this.datosService.url : `${this.datosService.url}/`;
+    const relative = project.file_url.startsWith('/') ? project.file_url.substring(1) : project.file_url;
+    return base + relative;
+  }
+
+  private filterArchitectProjectsByStatus(
+    status: 'pending' | 'accepted' | 'rejected'
+  ): ArchitectProject[] {
+    const needle = status.toLowerCase();
+    return this.architectProjects.filter(
+      (project) => (project.status || '').toLowerCase() === needle
+    );
   }
 
   private initializeFavorites(): void {

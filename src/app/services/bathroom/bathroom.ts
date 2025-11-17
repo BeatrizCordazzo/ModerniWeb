@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { CartConfirmationModal, CartItem } from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
+import {
+  CartConfirmationModal,
+  CartItem,
+} from '../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirmation-modal/custom-order-confirmation-modal';
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
-import { Datos, Product as ApiProduct, Color } from '../../datos';
+import { Datos, Product as ApiProduct, Color, CustomFurnitureOptionPayload } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
@@ -27,7 +30,7 @@ interface BathroomSet {
 }
 
 interface CustomFurniture {
-  id: string;
+  id: number;
   name: string;
   type: string;
   basePrice: number;
@@ -50,6 +53,19 @@ interface CustomSelection {
   quantity: number;
 }
 
+interface NewFurnitureForm {
+  name: string;
+  type: string;
+  basePrice: number | null;
+  image: string;
+  minWidth: number | null;
+  maxWidth: number | null;
+  minHeight: number | null;
+  maxHeight: number | null;
+  depth: number | null;
+  colors: string;
+}
+
 type ModalCartItem = CartItem & {
   id?: number;
   dimensions?: {
@@ -61,9 +77,16 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-bathroom',
-  imports: [FormsModule, CartConfirmationModal, ToastNotification, CustomOrderConfirmationModal, FavoriteToggleComponent, ConfirmationModal],
+  imports: [
+    FormsModule,
+    CartConfirmationModal,
+    ToastNotification,
+    CustomOrderConfirmationModal,
+    FavoriteToggleComponent,
+    ConfirmationModal,
+  ],
   templateUrl: './bathroom.html',
-  styleUrl: './bathroom.scss'
+  styleUrl: './bathroom.scss',
 })
 export class Bathroom implements OnInit {
   // Modal state
@@ -74,7 +97,7 @@ export class Bathroom implements OnInit {
   modalProductId: number | null = null;
   showDeleteConfirm = false;
   productToDelete: number | null = null;
-  
+
   // Toast notification state
   showToast = false;
   toastMessage = '';
@@ -82,37 +105,45 @@ export class Bathroom implements OnInit {
   // Custom order modal state
   showCustomModal = false;
   customOrderData: any = null;
-  
+
   // Loading state
   isLoading = true;
   loadError = '';
-  
+
   bathroomSets: BathroomSet[] = [];
 
-  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
+  constructor(
+    private datosService: Datos,
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadBathroomSets();
+    this.loadCustomFurnitureOptions();
     this.datosService.getLoggedUser().subscribe({
       next: (u: any) => {
-        const role = u && u.rol ? u.rol : (u && u.role ? u.role : null);
+        const role = u && u.rol ? u.rol : u && u.role ? u.role : null;
         this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
       },
-      error: () => { this.isAdmin = false; }
+      error: () => {
+        this.isAdmin = false;
+      },
     });
     // Update local list when a product is changed elsewhere
     this.datosService.productUpdated$.subscribe((prod: any) => {
       if (!prod || !prod.id) return;
-      const idx = this.bathroomSets.findIndex(s => s.id === prod.id);
+      const idx = this.bathroomSets.findIndex((s) => s.id === prod.id);
       if (idx !== -1) {
         this.bathroomSets[idx] = {
           ...this.bathroomSets[idx],
           name: prod.name ?? this.bathroomSets[idx].name,
           basePrice: prod.price ?? this.bathroomSets[idx].basePrice,
           image: prod.image ?? this.bathroomSets[idx].image,
-          dimensions: prod.dimensions ?? this.bathroomSets[idx].dimensions
+          dimensions: prod.dimensions ?? this.bathroomSets[idx].dimensions,
         };
-        if (this.selectedSet && this.selectedSet.id === prod.id) this.selectedSet = this.bathroomSets[idx];
+        if (this.selectedSet && this.selectedSet.id === prod.id)
+          this.selectedSet = this.bathroomSets[idx];
       }
     });
   }
@@ -120,10 +151,10 @@ export class Bathroom implements OnInit {
   loadBathroomSets() {
     this.isLoading = true;
     this.loadError = '';
-    
+
     this.datosService.getBathroomSets().subscribe({
       next: (apiProducts: ApiProduct[]) => {
-        this.bathroomSets = apiProducts.map(ap => ({
+        this.bathroomSets = apiProducts.map((ap) => ({
           id: ap.id,
           name: ap.name,
           style: ap.style || '',
@@ -134,24 +165,84 @@ export class Bathroom implements OnInit {
           dimensions: {
             width: ap.dimensions?.width || '',
             height: ap.dimensions?.height || '',
-            depth: ap.dimensions?.depth || ''
+            depth: ap.dimensions?.depth || '',
           },
-          availableColors: ap.colors
+          availableColors: ap.colors,
         }));
-        
+
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading bathroom sets:', error);
         this.loadError = 'Failed to load bathroom sets. Please try again later.';
         this.isLoading = false;
-      }
+      },
     });
   }
 
-  customFurnitureOptions: CustomFurniture[] = [
+  loadCustomFurnitureOptions() {
+    this.isLoadingCustomFurniture = true;
+    this.customFurnitureError = '';
+
+    this.datosService.getCustomFurnitureOptions('bathroom').subscribe({
+      next: (options: any[]) => {
+        if (Array.isArray(options)) {
+          this.customFurnitureOptions = options.map((option) => this.mapOptionToFurniture(option));
+        } else {
+          this.customFurnitureOptions = [];
+        }
+        this.isLoadingCustomFurniture = false;
+      },
+      error: (error) => {
+        console.error('Error loading bathroom custom furniture options:', error);
+        this.customFurnitureError = 'No se pudieron cargar las opciones personalizadas del baño.';
+        this.isLoadingCustomFurniture = false;
+      },
+    });
+  }
+
+  private mapOptionToFurniture(option: any): CustomFurniture {
+    const dimensions = option?.dimensions ?? option ?? {};
+    const rawId = option?.id ?? option?.optionId ?? Date.now();
+    const numericId = Number(rawId);
+    const safeId = Number.isFinite(numericId) ? numericId : Date.now();
+    const safeColors =
+      Array.isArray(option?.availableColors) && option.availableColors.length > 0
+        ? option.availableColors
+        : [{ name: 'Personalizado', code: '#C0C0C0' }];
+
+    return {
+      id: safeId,
+      name: option?.name ?? 'Custom Option',
+      type: option?.type ?? 'fixture',
+      basePrice: Number(option?.basePrice ?? option?.price ?? 0),
+      image:
+        option?.image || option?.image_url || 'https://via.placeholder.com/400x400.png?text=Custom',
+      dimensions: {
+        minWidth: Number(dimensions?.minWidth ?? option?.minWidth ?? 0),
+        maxWidth: Number(dimensions?.maxWidth ?? option?.maxWidth ?? 0),
+        minHeight: Number(dimensions?.minHeight ?? option?.minHeight ?? 0),
+        maxHeight: Number(dimensions?.maxHeight ?? option?.maxHeight ?? 0),
+        depth: Number(dimensions?.depth ?? option?.depth ?? 0),
+      },
+      availableColors: safeColors.map((color: any) => ({
+        name: color?.name ?? color?.nombre ?? 'Color',
+        code: color?.code ?? color?.codigo_hex ?? '#C0C0C0',
+      })),
+    };
+  }
+
+  private getFallbackFurnitureOptions(): CustomFurniture[] {
+    return this.fallbackFurnitureOptions.map((option) => ({
+      ...option,
+      dimensions: { ...option.dimensions },
+      availableColors: option.availableColors.map((color) => ({ ...color })),
+    }));
+  }
+
+  private readonly fallbackFurnitureOptions: CustomFurniture[] = [
     {
-      id: 'vanity',
+      id: 1001,
       name: 'Bathroom Vanity',
       type: 'storage',
       basePrice: 599.95,
@@ -171,7 +262,7 @@ export class Bathroom implements OnInit {
       ]
     },
     {
-      id: 'mirror',
+      id: 1002,
       name: 'Bathroom Mirror',
       type: 'accessory',
       basePrice: 199.95,
@@ -191,7 +282,7 @@ export class Bathroom implements OnInit {
       ]
     },
     {
-      id: 'storage-cabinet',
+      id: 1003,
       name: 'Storage Cabinet',
       type: 'storage',
       basePrice: 399.95,
@@ -211,7 +302,7 @@ export class Bathroom implements OnInit {
       ]
     },
     {
-      id: 'shower-enclosure',
+      id: 1004,
       name: 'Shower Enclosure',
       type: 'fixture',
       basePrice: 899.95,
@@ -231,7 +322,7 @@ export class Bathroom implements OnInit {
       ]
     },
     {
-      id: 'bathtub',
+      id: 1005,
       name: 'Bathtub',
       type: 'fixture',
       basePrice: 1299.95,
@@ -250,7 +341,7 @@ export class Bathroom implements OnInit {
       ]
     },
     {
-      id: 'towel-rack',
+      id: 1006,
       name: 'Heated Towel Rack',
       type: 'accessory',
       basePrice: 299.95,
@@ -270,6 +361,22 @@ export class Bathroom implements OnInit {
       ]
     }
   ];
+
+  customFurnitureOptions: CustomFurniture[] = [];
+  isLoadingCustomFurniture = false;
+  customFurnitureError = '';
+  newFurnitureForm: NewFurnitureForm = this.createEmptyFurnitureForm();
+  editFurnitureForm: NewFurnitureForm = this.createEmptyFurnitureForm();
+  editingFurnitureId: number | null = null;
+  showEditOptionModal = false;
+  showFurnitureConfirm = false;
+  furnitureConfirmTitle = '';
+  furnitureConfirmMessage = '';
+  furnitureConfirmAction: 'add' | 'update' | 'delete' | null = null;
+  pendingFurniturePayload: CustomFurnitureOptionPayload | null = null;
+  pendingFurnitureId: number | null = null;
+  optionPendingDelete: CustomFurniture | null = null;
+  isProcessingFurniture = false;
 
   viewMode: 'sets' | 'custom' = 'sets';
   selectedSet: BathroomSet | null = null;
@@ -308,13 +415,307 @@ export class Bathroom implements OnInit {
       selectedColor: furniture.availableColors[0],
       customWidth: furniture.dimensions.minWidth,
       customHeight: furniture.dimensions.minHeight,
-      quantity: 1
+      quantity: 1,
     };
     this.customSelections.push(selection);
   }
 
   removeCustomSelection(index: number) {
     this.customSelections.splice(index, 1);
+  }
+
+  openEditFurnitureModal(furniture: CustomFurniture, event?: Event) {
+    if (!this.isAdmin) return;
+    event?.stopPropagation();
+    this.editingFurnitureId = furniture.id;
+    this.editFurnitureForm = this.convertFurnitureToForm(furniture);
+    this.showEditOptionModal = true;
+  }
+
+  closeEditFurnitureModal() {
+    this.showEditOptionModal = false;
+    this.editingFurnitureId = null;
+    this.editFurnitureForm = this.createEmptyFurnitureForm();
+  }
+
+  requestDeleteFurnitureOption(furniture: CustomFurniture, event?: Event) {
+    if (!this.isAdmin) return;
+    event?.stopPropagation();
+    this.furnitureConfirmAction = 'delete';
+    this.pendingFurnitureId = furniture.id;
+    this.optionPendingDelete = furniture;
+    this.pendingFurniturePayload = null;
+    this.furnitureConfirmTitle = 'Confirmar exclusión';
+    this.furnitureConfirmMessage = `¿Deseas excluir "${furniture.name}" de las opciones disponibles?`;
+    this.showFurnitureConfirm = true;
+  }
+
+  requestAddFurnitureOption() {
+    if (!this.isAdmin) return;
+
+    const payload = this.buildFurniturePayloadFromForm(this.newFurnitureForm);
+    if (!payload) {
+      return;
+    }
+
+    this.furnitureConfirmAction = 'add';
+    this.pendingFurniturePayload = payload;
+    this.pendingFurnitureId = null;
+    this.furnitureConfirmTitle = 'Confirmar nuevo mueble';
+    this.furnitureConfirmMessage = `¿Deseas añadir "${payload.name}" a las opciones del baño?`;
+    this.showFurnitureConfirm = true;
+  }
+
+  requestSaveEditedOption() {
+    if (!this.isAdmin || !this.editingFurnitureId) return;
+
+    const payload = this.buildFurniturePayloadFromForm(this.editFurnitureForm);
+    if (!payload) {
+      return;
+    }
+    payload.id = this.editingFurnitureId;
+
+    this.furnitureConfirmAction = 'update';
+    this.pendingFurniturePayload = payload;
+    this.pendingFurnitureId = this.editingFurnitureId;
+    this.furnitureConfirmTitle = 'Confirmar modificación';
+    this.furnitureConfirmMessage = `¿Deseas guardar los cambios de "${payload.name}"?`;
+    this.showFurnitureConfirm = true;
+  }
+
+  confirmFurnitureAction() {
+    if (!this.furnitureConfirmAction) return;
+    this.showFurnitureConfirm = false;
+    this.executeFurnitureAction();
+  }
+
+  cancelFurnitureAction() {
+    this.showFurnitureConfirm = false;
+    this.pendingFurniturePayload = null;
+    this.pendingFurnitureId = null;
+    this.furnitureConfirmAction = null;
+    this.optionPendingDelete = null;
+  }
+
+  private executeFurnitureAction() {
+    if (!this.furnitureConfirmAction) return;
+
+    const action = this.furnitureConfirmAction;
+    this.isProcessingFurniture = true;
+
+    if (action === 'add' && this.pendingFurniturePayload) {
+      this.datosService.createCustomFurnitureOption(this.pendingFurniturePayload).subscribe({
+        next: (res) => {
+          if (res?.success && res.option) {
+            const option = this.mapOptionToFurniture(res.option);
+            this.handleFurnitureActionSuccess('add', option);
+          } else {
+            this.handleFurnitureActionError('No se pudo crear el mueble.');
+          }
+        },
+        error: (error) => {
+          console.error('Error creating furniture option', error);
+          this.handleFurnitureActionError('Error creando el nuevo mueble.');
+        },
+      });
+      return;
+    }
+
+    if (action === 'update' && this.pendingFurniturePayload && this.pendingFurnitureId) {
+      const payload = this.pendingFurniturePayload;
+      const id = this.pendingFurnitureId;
+      this.datosService.updateCustomFurnitureOption(id, payload).subscribe({
+        next: (res) => {
+          if (res?.success && res.option) {
+            const option = this.mapOptionToFurniture(res.option);
+            this.handleFurnitureActionSuccess('update', option);
+          } else {
+            this.handleFurnitureActionError('No se pudo actualizar el mueble.');
+          }
+        },
+        error: (error) => {
+          console.error('Error updating furniture option', error);
+          this.handleFurnitureActionError('Error guardando los cambios del mueble.');
+        },
+      });
+      return;
+    }
+
+    if (action === 'delete' && this.pendingFurnitureId) {
+      const id = this.pendingFurnitureId;
+      this.datosService.deleteCustomFurnitureOption(id).subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.handleFurnitureActionSuccess('delete');
+          } else {
+            this.handleFurnitureActionError('No se pudo excluir el mueble.');
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting furniture option', error);
+          this.handleFurnitureActionError('Error excluyendo el mueble.');
+        },
+      });
+    }
+  }
+
+  private handleFurnitureActionSuccess(
+    action: 'add' | 'update' | 'delete',
+    option?: CustomFurniture
+  ) {
+    if (action === 'add' && option) {
+      this.customFurnitureOptions = [...this.customFurnitureOptions, option];
+      this.toastMessage = `${option.name} añadido correctamente.`;
+      this.newFurnitureForm = this.createEmptyFurnitureForm();
+    }
+
+    if (action === 'update' && option) {
+      const idx = this.customFurnitureOptions.findIndex((f) => f.id === option.id);
+      if (idx !== -1) {
+        this.customFurnitureOptions[idx] = option;
+        this.customFurnitureOptions = [...this.customFurnitureOptions];
+        this.updateSelectionsWithFurniture(option);
+      }
+      this.toastMessage = `${option.name} actualizado correctamente.`;
+      this.closeEditFurnitureModal();
+    }
+
+    if (action === 'delete') {
+      const deletedOption = this.optionPendingDelete;
+      const targetId = deletedOption?.id ?? this.pendingFurnitureId;
+      if (targetId != null) {
+        this.customFurnitureOptions = this.customFurnitureOptions.filter((f) => f.id !== targetId);
+        this.removeSelectionsByFurnitureId(targetId);
+      }
+      this.toastMessage = deletedOption
+        ? `${deletedOption.name} excluido correctamente.`
+        : 'Mueble excluido correctamente.';
+    }
+
+    this.showToast = true;
+    setTimeout(() => (this.showToast = false), 2500);
+    this.resetFurnitureActionState();
+  }
+
+  private handleFurnitureActionError(message: string) {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => (this.showToast = false), 3500);
+    this.resetFurnitureActionState();
+  }
+
+  private resetFurnitureActionState() {
+    this.isProcessingFurniture = false;
+    this.furnitureConfirmAction = null;
+    this.pendingFurniturePayload = null;
+    this.pendingFurnitureId = null;
+    this.optionPendingDelete = null;
+  }
+
+  private convertFurnitureToForm(furniture: CustomFurniture): NewFurnitureForm {
+    return {
+      name: furniture.name,
+      type: furniture.type,
+      basePrice: furniture.basePrice,
+      image: furniture.image,
+      minWidth: furniture.dimensions.minWidth,
+      maxWidth: furniture.dimensions.maxWidth,
+      minHeight: furniture.dimensions.minHeight,
+      maxHeight: furniture.dimensions.maxHeight,
+      depth: furniture.dimensions.depth,
+      colors: furniture.availableColors.map((color) => `${color.name}:${color.code}`).join(', '),
+    };
+  }
+
+  private buildFurniturePayloadFromForm(
+    form: NewFurnitureForm
+  ): CustomFurnitureOptionPayload | null {
+    const {
+      name,
+      type,
+      basePrice,
+      image,
+      minWidth,
+      maxWidth,
+      minHeight,
+      maxHeight,
+      depth,
+      colors,
+    } = form;
+
+    if (
+      !name.trim() ||
+      !type.trim() ||
+      basePrice == null ||
+      minWidth == null ||
+      maxWidth == null ||
+      minHeight == null ||
+      maxHeight == null ||
+      depth == null
+    ) {
+      alert('Completa todos los campos obligatorios antes de continuar.');
+      return null;
+    }
+
+    return {
+      service: 'bathroom',
+      name: name.trim(),
+      type: type.trim(),
+      basePrice: Number(basePrice),
+      image: image?.trim() || 'https://via.placeholder.com/400x400.png?text=Nuevo+mueble',
+      minWidth: Number(minWidth),
+      maxWidth: Number(maxWidth),
+      minHeight: Number(minHeight),
+      maxHeight: Number(maxHeight),
+      depth: Number(depth),
+      availableColors: this.parseColorInput(colors),
+    };
+  }
+
+  private updateSelectionsWithFurniture(furniture: CustomFurniture) {
+    this.customSelections = this.customSelections.map((selection) =>
+      selection.furniture.id === furniture.id ? { ...selection, furniture } : selection
+    );
+  }
+
+  private removeSelectionsByFurnitureId(furnitureId: number) {
+    this.customSelections = this.customSelections.filter(
+      (selection) => selection.furniture.id !== furnitureId
+    );
+  }
+
+  private parseColorInput(input: string): Color[] {
+    const fallback: Color[] = [{ name: 'Personalizado', code: '#C0C0C0' }];
+    if (!input || !input.trim()) {
+      return fallback;
+    }
+
+    const parsed = input.split(',').map((item) => {
+      const [name, hex] = item.split(':').map((value) => value.trim());
+      if (!name) {
+        return null;
+      }
+      const code = hex?.startsWith('#') ? hex : hex ? `#${hex}` : '#C0C0C0';
+      return { name, code };
+    });
+
+    const colors = parsed.filter((color): color is Color => !!color && !!color.name);
+    return colors.length ? colors : fallback;
+  }
+
+  private createEmptyFurnitureForm(): NewFurnitureForm {
+    return {
+      name: '',
+      type: '',
+      basePrice: null,
+      image: '',
+      minWidth: null,
+      maxWidth: null,
+      minHeight: null,
+      maxHeight: null,
+      depth: null,
+      colors: '',
+    };
   }
 
   calculateCustomPrice(selection: CustomSelection): number {
@@ -332,9 +733,7 @@ export class Bathroom implements OnInit {
   }
 
   isCustomSpaceValid(): boolean {
-    return this.customSpaceWidth > 0 && 
-           this.customSpaceHeight > 0 && 
-           this.customSpaceDepth > 0;
+    return this.customSpaceWidth > 0 && this.customSpaceHeight > 0 && this.customSpaceDepth > 0;
   }
 
   sendCustomOrderToCarpenters() {
@@ -346,18 +745,19 @@ export class Bathroom implements OnInit {
     const orderData = {
       // human readable title to store as project/pedido name
       title: (() => {
-        const names = this.customSelections.map(s => s.furniture.name).filter(Boolean);
+        const names = this.customSelections.map((s) => s.furniture.name).filter(Boolean);
         const setName = this.selectedSet?.name;
-        const base = setName || (names.length ? names.slice(0,3).join(', ') : 'Pedido personalizado');
+        const base =
+          setName || (names.length ? names.slice(0, 3).join(', ') : 'Pedido personalizado');
         return `Pedido personalizado - ${base}`;
       })(),
       type: 'custom-bathroom',
       spaceDimensions: {
         width: this.customSpaceWidth,
         height: this.customSpaceHeight,
-        depth: this.customSpaceDepth
+        depth: this.customSpaceDepth,
       },
-      furniture: this.customSelections.map(sel => ({
+      furniture: this.customSelections.map((sel) => ({
         name: sel.furniture.name,
         type: sel.furniture.type,
         color: sel.selectedColor.name,
@@ -365,15 +765,17 @@ export class Bathroom implements OnInit {
         dimensions: {
           width: sel.customWidth,
           height: sel.customHeight,
-          depth: sel.furniture.dimensions.depth
+          depth: sel.furniture.dimensions.depth,
         },
         quantity: sel.quantity,
-        price: this.calculateCustomPrice(sel)
+        price: this.calculateCustomPrice(sel),
       })),
       // collect images selected/associated with the furniture items so carpintero can preview them
-      images: Array.from(new Set(this.customSelections.map(s => s.furniture.image).filter(Boolean))),
+      images: Array.from(
+        new Set(this.customSelections.map((s) => s.furniture.image).filter(Boolean))
+      ),
       totalPrice: this.getTotalCustomPrice(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // open confirmation modal
@@ -386,9 +788,13 @@ export class Bathroom implements OnInit {
     console.log('Sending custom order to carpenters:', this.customOrderData);
     this.datosService.createCustomOrder(this.customOrderData).subscribe({
       next: (res) => {
-        this.toastMessage = `Custom bathroom order submitted! Total: €${this.customOrderData.totalPrice.toFixed(2)}`;
+        this.toastMessage = `Custom bathroom order submitted! Total: €${this.customOrderData.totalPrice.toFixed(
+          2
+        )}`;
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 3500);
+        setTimeout(() => {
+          this.showToast = false;
+        }, 3500);
 
         this.customSelections = [];
         this.customSpaceWidth = 0;
@@ -400,7 +806,7 @@ export class Bathroom implements OnInit {
       error: (err) => {
         console.error('Error submitting custom order', err);
         alert('Error enviando el pedido personalizado. Intenta de nuevo.');
-      }
+      },
     });
   }
 
@@ -424,9 +830,9 @@ export class Bathroom implements OnInit {
       image: this.selectedSet.image,
       selectedColor: {
         name: this.selectedSetColor.name,
-        code: this.selectedSetColor.code
+        code: this.selectedSetColor.code,
       },
-      dimensions: this.selectedSet.dimensions ?? null
+      dimensions: this.selectedSet.dimensions ?? null,
     };
     this.modalAdminMode = this.isAdmin;
     this.showModal = true;
@@ -435,7 +841,7 @@ export class Bathroom implements OnInit {
   quickAddToCart(set: BathroomSet) {
     // Add set to cart with default/first color
     const defaultColor = set.availableColors[0];
-    
+
     this.modalProductId = set.id;
     this.modalItem = {
       id: set.id,
@@ -445,9 +851,9 @@ export class Bathroom implements OnInit {
       image: set.image,
       selectedColor: {
         name: defaultColor.name,
-        code: defaultColor.code
+        code: defaultColor.code,
       },
-      dimensions: set.dimensions ?? null
+      dimensions: set.dimensions ?? null,
     };
     this.modalAdminMode = this.isAdmin;
     this.showModal = true;
@@ -467,16 +873,21 @@ export class Bathroom implements OnInit {
               price: this.modalItem!.price,
               image: this.modalItem!.image,
               selectedColor: this.modalItem!.selectedColor,
-              dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
+              dimensions:
+                this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null,
             });
             this.closeModal();
             this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
             this.showToast = true;
-            setTimeout(() => { this.showToast = false; }, 3500);
+            setTimeout(() => {
+              this.showToast = false;
+            }, 3500);
           } else {
             this.closeModal();
             alert('You must be logged in to add items to the cart. Please log in first.');
-            try { this.router.navigate(['/login']); } catch (e) {}
+            try {
+              this.router.navigate(['/login']);
+            } catch (e) {}
           }
         },
         error: () => {
@@ -489,19 +900,26 @@ export class Bathroom implements OnInit {
                 price: this.modalItem!.price,
                 image: this.modalItem!.image,
                 selectedColor: this.modalItem!.selectedColor,
-                dimensions: this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null
+                dimensions:
+                  this.selectedSet?.dimensions || (this.modalItem as any).dimensions || null,
               });
               this.closeModal();
               this.toastMessage = `${this.currentProductName} has been added to cart successfully!`;
               this.showToast = true;
-              setTimeout(() => { this.showToast = false; }, 3500);
+              setTimeout(() => {
+                this.showToast = false;
+              }, 3500);
               return;
             }
-          } catch (e) { /* ignore */ }
+          } catch (e) {
+            /* ignore */
+          }
           this.closeModal();
           alert('You must be logged in to add items to the cart. Please log in first.');
-          try { this.router.navigate(['/login']); } catch (e) {}
-        }
+          try {
+            this.router.navigate(['/login']);
+          } catch (e) {}
+        },
       });
     }
   }
@@ -521,15 +939,19 @@ export class Bathroom implements OnInit {
     if (targetId == null) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
-    const idx = this.bathroomSets.findIndex(s => s.id === targetId);
+    const idx = this.bathroomSets.findIndex((s) => s.id === targetId);
     if (idx === -1) {
       this.toastMessage = 'Cambios guardados';
       this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 1500);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 1500);
       return;
     }
 
@@ -551,7 +973,7 @@ export class Bathroom implements OnInit {
       name: edited.name ?? currentSet.name,
       basePrice: updatedPrice,
       image: edited.image ?? currentSet.image,
-      dimensions: updatedDimensions
+      dimensions: updatedDimensions,
     };
     this.bathroomSets[idx] = updatedSet;
     if (this.selectedSet && this.selectedSet.id === targetId) {
@@ -562,7 +984,7 @@ export class Bathroom implements OnInit {
       id: targetId,
       name: updatedSet.name,
       price: updatedSet.basePrice,
-      image: updatedSet.image
+      image: updatedSet.image,
     };
     if (updatedDimensions) {
       payload.dimensions = updatedDimensions;
@@ -572,46 +994,54 @@ export class Bathroom implements OnInit {
       next: () => {
         this.toastMessage = 'Cambios guardados en el servidor.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 2000);
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
       },
       error: (err) => {
         console.error('Error updating product', err);
         this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
         this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 4000);
-      }
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
     });
   }
 
   confirmDeleteProduct(productId: number, event: Event) {
-  event.stopPropagation();
-  event.preventDefault();
-  this.productToDelete = productId;
-  this.showDeleteConfirm = true;
-}
+    event.stopPropagation();
+    event.preventDefault();
+    this.productToDelete = productId;
+    this.showDeleteConfirm = true;
+  }
 
-cancelDelete() {
-  this.showDeleteConfirm = false;
-  this.productToDelete = null;
-}
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.productToDelete = null;
+  }
 
-executeDelete() {
-  if (!this.productToDelete) return;
-  this.datosService.deleteProduct(this.productToDelete).subscribe({
-    next: () => {
-      this.showDeleteConfirm = false;
-      this.productToDelete = null;
-      this.toastMessage = 'Producto eliminado correctamente.';
-      this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 2000);
-      this.loadBathroomSets(); // << recarga bathroom
-    },
-    error: (err) => {
-      console.error('Error eliminando producto', err);
-      this.toastMessage = 'Error eliminando el producto.';
-      this.showToast = true;
-      setTimeout(() => { this.showToast = false; }, 4000);
-    }
-  });
-}
+  executeDelete() {
+    if (!this.productToDelete) return;
+    this.datosService.deleteProduct(this.productToDelete).subscribe({
+      next: () => {
+        this.showDeleteConfirm = false;
+        this.productToDelete = null;
+        this.toastMessage = 'Producto eliminado correctamente.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 2000);
+        this.loadBathroomSets(); // << recarga bathroom
+      },
+      error: (err) => {
+        console.error('Error eliminando producto', err);
+        this.toastMessage = 'Error eliminando el producto.';
+        this.showToast = true;
+        setTimeout(() => {
+          this.showToast = false;
+        }, 4000);
+      },
+    });
+  }
 }

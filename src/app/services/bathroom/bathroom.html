@@ -175,7 +175,7 @@
         <div class="cta-content">
           <h3>Need Something Different?</h3>
           <p>Design your perfect bathroom with custom measurements and fixture selection</p>
-          <button class="btn-custom" (click)="switchToCustom()">Make It Your Own â†’</button>
+          <button class="btn-custom" (click)="switchToCustom()">Make It Your Own</button>
         </div>
       </div>
     </div>
@@ -238,9 +238,23 @@
           <span class="step-number">2</span>
           <h3>Select Your Fixtures & Furniture</h3>
         </div>
-        <div class="furniture-grid">
+        @if (customFurnitureError) {
+        <div class="custom-furniture-error">{{ customFurnitureError }}</div>
+        }
+        @if (isLoadingCustomFurniture) {
+        <div class="custom-furniture-loading">
+          <div class="spinner"></div>
+          <p>Cargando opciones personalizadas...</p>
+        </div>
+        }
+        <div class="furniture-grid" [class.loading]="isLoadingCustomFurniture">
           @for (furniture of customFurnitureOptions; track furniture.id) {
           <div class="furniture-card">
+            @if (isAdmin) {
+            <button class="admin-remove-option" (click)="requestDeleteFurnitureOption(furniture, $event)">
+              &times;
+            </button>
+            }
             <div class="furniture-image">
               <img [src]="furniture.image" [alt]="furniture.name" />
             </div>
@@ -257,13 +271,84 @@
                   D: {{ furniture.dimensions.depth }}cm
                 </small>
               </div>
-              <button class="btn-add-furniture" (click)="addCustomFurniture(furniture)">
+              <button
+                class="btn-add-furniture"
+                (click)="isAdmin ? openEditFurnitureModal(furniture, $event) : addCustomFurniture(furniture)"
+              >
+                @if (isAdmin) {
+                <span><i class="fas fa-edit"></i> Modify</span>
+                } @else {
                 Add to Design
+                }
               </button>
             </div>
           </div>
           }
         </div>
+        @if (isAdmin) {
+        <div class="admin-add-option">
+          <h4>Añadir nueva opción de mueble</h4>
+          <div class="admin-form-grid">
+            <label>
+              Nombre
+              <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="Ej. Vanity Deluxe" />
+            </label>
+            <label>
+              Tipo
+              <input type="text" [(ngModel)]="newFurnitureForm.type" placeholder="fixture, storage..." />
+            </label>
+            <label>
+              Precio base
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                [(ngModel)]="newFurnitureForm.basePrice"
+                placeholder="999.99"
+              />
+            </label>
+            <label>
+              Imagen (URL)
+              <input
+                type="text"
+                [(ngModel)]="newFurnitureForm.image"
+                placeholder="https://..."
+              />
+            </label>
+            <label>
+              Ancho (mín)
+              <input type="number" [(ngModel)]="newFurnitureForm.minWidth" min="1" />
+            </label>
+            <label>
+              Ancho (máx)
+              <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" min="1" />
+            </label>
+            <label>
+              Alto (mín)
+              <input type="number" [(ngModel)]="newFurnitureForm.minHeight" min="1" />
+            </label>
+            <label>
+              Alto (máx)
+              <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" min="1" />
+            </label>
+            <label>
+              Profundidad
+              <input type="number" [(ngModel)]="newFurnitureForm.depth" min="1" />
+            </label>
+            <label class="wide">
+              Colores (Nombre:#HEX separados por comas)
+              <input
+                type="text"
+                [(ngModel)]="newFurnitureForm.colors"
+                placeholder="Blanco:#FFFFFF, Negro:#000000"
+              />
+            </label>
+          </div>
+          <button class="btn-admin-add" (click)="requestAddFurnitureOption()" [disabled]="isProcessingFurniture">
+            Añadir
+          </button>
+        </div>
+        }
       </div>
       @if (customSelections.length > 0) {
       <div class="step-card">
@@ -352,6 +437,67 @@
   }
 </div>
 
+@if (showEditOptionModal) {
+<div class="admin-option-modal" role="dialog" aria-modal="true">
+  <div class="admin-option-panel">
+    <div class="panel-header">
+      <h3>Modificar opción</h3>
+      <button class="close-btn" (click)="closeEditFurnitureModal()">&times;</button>
+    </div>
+    <div class="panel-body">
+      <div class="admin-form-grid">
+        <label>
+          Nombre
+          <input type="text" [(ngModel)]="editFurnitureForm.name" />
+        </label>
+        <label>
+          Tipo
+          <input type="text" [(ngModel)]="editFurnitureForm.type" />
+        </label>
+        <label>
+          Precio base
+          <input type="number" step="0.01" [(ngModel)]="editFurnitureForm.basePrice" />
+        </label>
+        <label>
+          Imagen (URL)
+          <input type="text" [(ngModel)]="editFurnitureForm.image" />
+        </label>
+        <label>
+          Ancho (mín)
+          <input type="number" [(ngModel)]="editFurnitureForm.minWidth" />
+        </label>
+        <label>
+          Ancho (máx)
+          <input type="number" [(ngModel)]="editFurnitureForm.maxWidth" />
+        </label>
+        <label>
+          Alto (mín)
+          <input type="number" [(ngModel)]="editFurnitureForm.minHeight" />
+        </label>
+        <label>
+          Alto (máx)
+          <input type="number" [(ngModel)]="editFurnitureForm.maxHeight" />
+        </label>
+        <label>
+          Profundidad
+          <input type="number" [(ngModel)]="editFurnitureForm.depth" />
+        </label>
+        <label class="wide">
+          Colores (Nombre:#HEX separados por comas)
+          <input type="text" [(ngModel)]="editFurnitureForm.colors" />
+        </label>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn-cancel" (click)="closeEditFurnitureModal()">Cancelar</button>
+      <button class="btn-save" (click)="requestSaveEditedOption()" [disabled]="isProcessingFurniture">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+}
+
 <!-- Cart Confirmation Modal -->
 <app-cart-confirmation-modal
   [isOpen]="showModal"
@@ -389,3 +535,14 @@
   (cancel)="cancelDelete()"
 >
 </app-confirmation-modal>
+
+<!-- Furniture CRUD Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showFurnitureConfirm"
+  [title]="furnitureConfirmTitle"
+  [message]="furnitureConfirmMessage"
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  (confirm)="confirmFurnitureAction()"
+  (cancel)="cancelFurnitureAction()"
+></app-confirmation-modal>

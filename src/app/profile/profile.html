@@ -41,7 +41,7 @@
             <p class="member-since">Member since {{user?.memberSince}}</p>
           }
           <div class="profile-actions">
-            <button class="logout-btn" (click)="logout()">Cerrar sesi?n</button>
+            <button class="logout-btn" (click)="logout()">Cerrar sesión</button>
           </div>
         </div>
       </section>
@@ -83,6 +83,17 @@
           </svg>
           Favorites
         </button>
+        @if (isArchitectUser) {
+          <button
+            class="tab"
+            [class.active]="activeTab === 'projects'"
+            (click)="activeTab = 'projects'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 4h14c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h14V6H5zm2 2h10v2H7V8zm0 4h6v2H7v-2z"/>
+            </svg>
+            Projects
+          </button>
+        }
         <button
           class="tab"
           [class.active]="activeTab === 'messages'"
@@ -557,6 +568,148 @@
             }
           </section>
         }
+        @if (activeTab === 'projects') {
+          <section class="architect-projects-section">
+            <div class="architect-card submit-card">
+              <div>
+                <h2>Submit new project for the carpenter</h2>
+                <p class="small-muted">Upload the plan and notes so the carpentry team can review it.</p>
+              </div>
+              <form class="architect-form" (submit)="submitArchitectProject(); $event.preventDefault()">
+                <label>
+                  Project title (optional)
+                  <input
+                    type="text"
+                    name="architectProjectTitle"
+                    [(ngModel)]="architectProjectForm.title"
+                    placeholder="Kitchen remodel for the Torres family"
+                  />
+                </label>
+                <label>
+                  Description
+                  <textarea
+                    name="architectProjectNotes"
+                    rows="5"
+                    [(ngModel)]="architectProjectForm.notes"
+                    placeholder="Add the context, measurements, finishes and expectations"
+                  ></textarea>
+                </label>
+                <label class="file-upload">
+                  Attachment
+                  <input
+                    #architectFileInput
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar"
+                    (change)="onArchitectFileChange($event)"
+                  />
+                  <span class="file-name" [class.placeholder]="!architectProjectFileName">
+                    {{ architectProjectFileName || 'No file selected yet' }}
+                  </span>
+                </label>
+                @if (architectProjectSubmitError) {
+                  <div class="error-state">{{ architectProjectSubmitError }}</div>
+                }
+                @if (architectProjectSubmitSuccess) {
+                  <div class="success-state">{{ architectProjectSubmitSuccess }}</div>
+                }
+                <button class="primary-btn" type="submit" [disabled]="architectProjectSubmitting">
+                  {{ architectProjectSubmitting ? 'Sending...' : 'Send project' }}
+                </button>
+              </form>
+            </div>
+
+            <div class="architect-card status-card">
+              <div class="status-header">
+                <div>
+                  <h2>Your submissions</h2>
+                  <p class="small-muted">We will notify you once the admin accepts or rejects them.</p>
+                </div>
+                <button class="ghost-btn" type="button" (click)="loadArchitectProjects()" [disabled]="architectProjectsLoading">
+                  Refresh
+                </button>
+              </div>
+              @if (architectProjectsLoading) {
+                <div class="loading-state">Loading projects...</div>
+              }
+              @if (architectProjectsError) {
+                <div class="error-state">{{ architectProjectsError }}</div>
+              }
+              @if (!architectProjectsLoading && !architectProjectsError) {
+                <div class="status-columns">
+                  <div class="status-column">
+                    <h3>Pending</h3>
+                    @if (architectPendingList.length === 0) {
+                      <p class="small-muted empty">No pending submissions.</p>
+                    }
+                    @for (proj of architectPendingList; track proj.id ?? proj) {
+                      <article class="project-pill">
+                        <div class="pill-header">
+                          <h4>{{ proj.project_title || ('Project #' + proj.id) }}</h4>
+                          <span class="pill-date">{{ proj.created_at | date:'short' }}</span>
+                        </div>
+                        <p>{{ proj.project_notes }}</p>
+                        @if (proj.file_url) {
+                          <a class="pill-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
+                            View attachment
+                          </a>
+                        }
+                      </article>
+                    }
+                  </div>
+                  <div class="status-column">
+                    <h3>Accepted</h3>
+                    @if (architectAcceptedList.length === 0) {
+                      <p class="small-muted empty">No accepted projects yet.</p>
+                    }
+                    @for (proj of architectAcceptedList; track proj.id ?? proj) {
+                      <article class="project-pill accepted">
+                        <div class="pill-header">
+                          <h4>{{ proj.project_title || ('Project #' + proj.id) }}</h4>
+                          <span class="pill-date">{{ proj.decided_at || proj.created_at }}</span>
+                        </div>
+                        <p>{{ proj.project_notes }}</p>
+                        <div class="pill-meta">Accepted by admin</div>
+                        @if (proj.file_url) {
+                          <a class="pill-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
+                            View attachment
+                          </a>
+                        }
+                        @if (proj.admin_comment) {
+                          <div class="pill-comment">{{ proj.admin_comment }}</div>
+                        }
+                      </article>
+                    }
+                  </div>
+                  <div class="status-column">
+                    <h3>Rejected</h3>
+                    @if (architectRejectedList.length === 0) {
+                      <p class="small-muted empty">Nothing rejected.</p>
+                    }
+                    @for (proj of architectRejectedList; track proj.id ?? proj) {
+                      <article class="project-pill rejected">
+                        <div class="pill-header">
+                          <h4>{{ proj.project_title || ('Project #' + proj.id) }}</h4>
+                          <span class="pill-date">{{ proj.decided_at || proj.created_at }}</span>
+                        </div>
+                        <p>{{ proj.project_notes }}</p>
+                        <div class="pill-meta">Rejected by admin</div>
+                        @if (proj.admin_comment) {
+                          <div class="pill-comment">{{ proj.admin_comment }}</div>
+                        }
+                        @if (proj.file_url) {
+                          <a class="pill-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
+                            Download file
+                          </a>
+                        }
+                      </article>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
         @if (activeTab === 'messages') {
           <section class="messages-section">
             <div class="messages-heading">

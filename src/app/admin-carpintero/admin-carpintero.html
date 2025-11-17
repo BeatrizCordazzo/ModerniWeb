@@ -153,6 +153,154 @@
         </div>
       </mat-tab>
 
+      <mat-tab label="Architect Projects">
+        <div class="tab-content architect-tab">
+          <div class="tab-heading">
+            <h2>Architect Projects (Pending)</h2>
+            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('pending')">Refresh</button>
+          </div>
+          @if (architectPendingLoading) {
+            <div class="loading-state">Loading projects...</div>
+          }
+          @if (architectPendingError) {
+            <div class="error-state">{{ architectPendingError }}</div>
+          }
+          @if (!architectPendingLoading && !architectPendingError) {
+            @if (architectProjectsPending.length === 0) {
+              <p class="empty-state">No pending submissions from architects.</p>
+            }
+            @if (architectProjectsPending.length) {
+              <div class="lista-wrapper">
+                <table class="architect-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Architect</th>
+                      <th>Submitted</th>
+                      <th>Message</th>
+                      <th>File</th>
+                      <th>Comment</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (proj of architectProjectsPending; track proj.id ?? proj) {
+                      <tr>
+                        <td>#{{ proj.id }}</td>
+                        <td>
+                          <div class="architect-author">
+                            <strong>{{ proj.architect_name || ('Architect #' + proj.architect_id) }}</strong>
+                            <div class="small-muted">{{ proj.architect_email || '-' }}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div>{{ proj.created_at | date:'short' }}</div>
+                          @if (proj.project_title) {
+                            <div class="small-muted">{{ proj.project_title }}</div>
+                          }
+                        </td>
+                        <td>
+                          <p class="architect-notes">{{ proj.project_notes }}</p>
+                        </td>
+                        <td>
+                          @if (proj.file_url) {
+                            <a class="file-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
+                              {{ proj.file_original_name || 'Download file' }}
+                            </a>
+                          } @else {
+                            <span class="small-muted">No file</span>
+                          }
+                        </td>
+                        <td class="architect-comment">
+                          <textarea
+                            rows="3"
+                            placeholder="Optional admin comment"
+                            [(ngModel)]="architectDecisionComments[proj.id]"
+                            [attr.name]="'architectComment' + proj.id"
+                          ></textarea>
+                        </td>
+                        <td class="architect-actions">
+                          <button
+                            type="button"
+                            class="btn btn-accept"
+                            [disabled]="architectDecisionSaving[proj.id]"
+                            (click)="decideArchitectProject(proj, 'accepted')"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-reject"
+                            [disabled]="architectDecisionSaving[proj.id]"
+                            (click)="decideArchitectProject(proj, 'rejected')"
+                          >
+                            Reject
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Architect Projects Accepted">
+        <div class="tab-content architect-tab">
+          <div class="tab-heading">
+            <h2>Architect Projects (Accepted)</h2>
+            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('accepted')">Refresh</button>
+          </div>
+          @if (architectAcceptedLoading) {
+            <div class="loading-state">Loading accepted projects...</div>
+          }
+          @if (architectAcceptedError) {
+            <div class="error-state">{{ architectAcceptedError }}</div>
+          }
+          @if (!architectAcceptedLoading && !architectAcceptedError) {
+            @if (architectProjectsAccepted.length === 0) {
+              <p class="empty-state">No accepted architect projects yet.</p>
+            }
+            @if (architectProjectsAccepted.length) {
+              <div class="architect-cards">
+                @for (proj of architectProjectsAccepted; track proj.id ?? proj) {
+                  <article class="architect-card">
+                    <header>
+                      <div>
+                        <h3>{{ proj.project_title || ('Project #' + proj.id) }}</h3>
+                        <p class="small-muted">
+                          {{ proj.architect_name || ('Architect #' + proj.architect_id) }} ·
+                          {{ proj.decided_at || proj.created_at }}
+                        </p>
+                      </div>
+                      <span class="status-pill status-accepted">Accepted</span>
+                    </header>
+                    <p class="architect-notes">{{ proj.project_notes }}</p>
+                    <div class="file-link-block">
+                      @if (proj.file_url) {
+                        <a class="file-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
+                          {{ proj.file_original_name || 'View attachment' }}
+                        </a>
+                      } @else {
+                        <span class="small-muted">No file uploaded</span>
+                      }
+                    </div>
+                    @if (proj.admin_comment) {
+                      <div class="admin-comment">
+                        <strong>Admin comment:</strong>
+                        <p>{{ proj.admin_comment }}</p>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+            }
+          }
+        </div>
+      </mat-tab>
+
       <mat-tab label="Pedidos">
         <div class="tab-content">
           <h2>Pedidos (carrito)</h2>
@@ -251,6 +399,185 @@
             </div>
           }
         </div>
+      </mat-tab>
+
+      <mat-tab label="Clientes">
+        <div class="tab-content clients-tab">
+          <div class="clients-header">
+            <div>
+              <h2>Clientes & Arquitectos</h2>
+              <p class="small-muted">Gestiona los usuarios que pueden crear pedidos y proyectos.</p>
+            </div>
+            <div class="clients-actions">
+              <input
+                type="search"
+                placeholder="Buscar por nombre, email o rol"
+                [(ngModel)]="managedUsersSearch"
+              />
+              <button class="btn btn-ghost" type="button" (click)="refreshManagedUsers()">Refrescar</button>
+              <button class="btn btn-primary" type="button" (click)="startCreateUser()">Nuevo</button>
+            </div>
+          </div>
+
+          @if (managedUsersLoading) {
+            <div class="loading-state">Cargando usuarios...</div>
+          }
+          @if (managedUsersError) {
+            <div class="error-state">{{ managedUsersError }}</div>
+          }
+
+          @if (!managedUsersLoading) {
+            <div class="clients-grid">
+              <div class="clients-card list-card">
+                <div class="list-header">
+                  <div>
+                    <h3>Listado de usuarios</h3>
+                    <p class="small-muted">
+                      {{ filteredManagedUsers.length }} resultado(s)
+                    </p>
+                  </div>
+                </div>
+                <div class="lista-wrapper">
+                  <table class="client-table">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (filteredManagedUsers.length === 0) {
+                        <tr>
+                          <td colspan="5" class="empty-row">No hay usuarios con ese filtro.</td>
+                        </tr>
+                      }
+                      @for (user of filteredManagedUsers; track user.id) {
+                        <tr>
+                          <td>
+                            <div class="user-name">
+                              <strong>{{ user.nombre }}</strong>
+                              @if (user.fecha_registro) {
+                                <span class="small-muted">
+                                  Alta: {{ user.fecha_registro | date: 'shortDate' }}
+                                </span>
+                              }
+                            </div>
+                          </td>
+                          <td>
+                            <span
+                              class="role-pill"
+                              [ngClass]="{ 'role-architect': user.rol === 'arquitecto' }"
+                            >
+                              {{ user.rol | titlecase }}
+                            </span>
+                          </td>
+                          <td>{{ user.email }}</td>
+                          <td>{{ user.telefono || '-' }}</td>
+                          <td class="user-actions">
+                            <button type="button" class="btn btn-ghost" (click)="openEditUserModal(user)">
+                              Modificar
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-reject"
+                              (click)="confirmDeleteManagedUser(user)"
+                            >
+                              Excluir
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="clients-card form-card">
+                <h3>{{ editingUserId ? 'Modificar usuario' : 'Añadir usuario' }}</h3>
+                <form class="user-form" (ngSubmit)="submitUserForm()">
+                  <label>
+                    Nombre
+                    <input type="text" name="userName" [(ngModel)]="createUserForm.nombre" required />
+                  </label>
+                  <label>
+                    Email
+                    <input type="email" name="userEmail" [(ngModel)]="createUserForm.email" required />
+                  </label>
+                  <label>
+                    Teléfono
+                    <input type="text" name="userPhone" [(ngModel)]="createUserForm.telefono" />
+                  </label>
+                  <label>
+                    Rol
+                    <select name="userRole" [(ngModel)]="createUserForm.rol">
+                      <option value="cliente">Cliente</option>
+                      <option value="arquitecto">Arquitecto</option>
+                    </select>
+                  </label>
+                  <label>
+                    Contraseña
+                    <input type="password" name="userPassword" [(ngModel)]="createUserForm.password" required minlength="4" />
+                    <small class="small-muted">
+                      Mínimo 4 caracteres.
+                    </small>
+                  </label>
+                  <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" [disabled]="savingUser">
+                      {{ savingUser ? 'Guardando...' : 'Añadir usuario' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          }
+        </div>
+        @if (showUserModal) {
+        <div class="user-modal-backdrop" (click)="closeUserModal()">
+          <div class="user-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>Modificar usuario</h3>
+              <button type="button" class="close-btn" (click)="closeUserModal()" aria-label="Cerrar">
+                &times;
+              </button>
+            </div>
+            <form class="user-form" (ngSubmit)="submitEditUserForm()">
+              <label>
+                Nombre
+                <input type="text" name="editName" [(ngModel)]="editUserForm.nombre" required />
+              </label>
+              <label>
+                Email
+                <input type="email" name="editEmail" [(ngModel)]="editUserForm.email" required />
+              </label>
+              <label>
+                Teléfono
+                <input type="text" name="editPhone" [(ngModel)]="editUserForm.telefono" />
+              </label>
+              <label>
+                Rol
+                <select name="editRole" [(ngModel)]="editUserForm.rol">
+                  <option value="cliente">Cliente</option>
+                  <option value="arquitecto">Arquitecto</option>
+                </select>
+              </label>
+              <label>
+                Contraseña (opcional)
+                <input type="password" name="editPassword" [(ngModel)]="editUserForm.password" minlength="4" />
+                <small class="small-muted">Déjala vacía para mantener la actual.</small>
+              </label>
+              <div class="form-actions">
+                <button type="button" class="btn btn-ghost" (click)="closeUserModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" [disabled]="savingUser">
+                  {{ savingUser ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        }
       </mat-tab>
 
       <mat-tab>

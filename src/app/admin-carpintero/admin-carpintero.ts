@@ -11,7 +11,16 @@ import { ConfirmationModal } from '../shared/confirmation-modal/confirmation-mod
 import { PriceModal } from '../shared/price-modal/price-modal.component';
 import { FurnitureDetailModal } from '../shared/furniture-detail-modal/furniture-detail-modal';
 import { ToastNotification } from '../shared/toast-notification/toast-notification';
-import { ContactMessage } from '../datos';
+import { ArchitectProject, ContactMessage, ManagedUser, ManagedUserPayload } from '../datos';
+
+type ManagedUserRole = 'cliente' | 'arquitecto';
+interface UserFormModel {
+  nombre: string;
+  email: string;
+  telefono: string;
+  rol: ManagedUserRole;
+  password: string;
+}
 
 @Component({
   selector: 'app-admin-carpintero',
@@ -64,6 +73,25 @@ export class AdminCarpintero implements OnInit {
   messagesError = '';
   unreadMessageCount = 0;
 
+  managedUsers: ManagedUser[] = [];
+  managedUsersLoading = false;
+  managedUsersError = '';
+  managedUsersSearch = '';
+  editingUserId: number | null = null;
+  savingUser = false;
+  createUserForm: UserFormModel = this.createEmptyUserForm();
+  editUserForm: UserFormModel = this.createEmptyUserForm();
+  showUserModal = false;
+
+  architectProjectsPending: ArchitectProject[] = [];
+  architectProjectsAccepted: ArchitectProject[] = [];
+  architectPendingLoading = false;
+  architectAcceptedLoading = false;
+  architectPendingError = '';
+  architectAcceptedError = '';
+  architectDecisionComments: Record<number, string> = {};
+  architectDecisionSaving: Record<number, boolean> = {};
+
 
   constructor(private datos: Datos, private router: Router) {}
 
@@ -78,6 +106,9 @@ export class AdminCarpintero implements OnInit {
         this.userRole = user.rol;
         this.loadPending();
         this.loadMessages();
+        this.loadManagedUsers();
+        this.loadArchitectProjects('pending');
+        this.loadArchitectProjects('accepted');
       },
       error: () => {
         // fallback: check localStorage
@@ -92,6 +123,9 @@ export class AdminCarpintero implements OnInit {
             this.userRole = parsed.rol;
             this.loadPending();
             this.loadMessages();
+            this.loadManagedUsers();
+            this.loadArchitectProjects('pending');
+            this.loadArchitectProjects('accepted');
             return;
           }
         } catch (e) {}
@@ -191,6 +225,256 @@ export class AdminCarpintero implements OnInit {
     });
   }
 
+  loadManagedUsers(): void {
+    this.managedUsersLoading = true;
+    this.managedUsersError = '';
+    this.datos.getManagedUsers().subscribe({
+      next: (users) => {
+        this.managedUsers = users ?? [];
+        this.managedUsersLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading managed users', err);
+        this.managedUsersError = 'No se pudieron cargar los usuarios.';
+        this.managedUsersLoading = false;
+      }
+    });
+  }
+
+  loadArchitectProjects(status: 'pending' | 'accepted' = 'pending'): void {
+    const isPending = status === 'pending';
+    if (isPending) {
+      this.architectPendingLoading = true;
+      this.architectPendingError = '';
+    } else {
+      this.architectAcceptedLoading = true;
+      this.architectAcceptedError = '';
+    }
+    this.datos.getArchitectProjects(status).subscribe({
+      next: (projects) => {
+        if (isPending) {
+          this.architectProjectsPending = projects ?? [];
+          this.architectPendingLoading = false;
+        } else {
+          this.architectProjectsAccepted = projects ?? [];
+          this.architectAcceptedLoading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Error loading architect projects', err);
+        if (isPending) {
+          this.architectPendingError = 'No se pudieron cargar los proyectos de arquitecto.';
+          this.architectPendingLoading = false;
+        } else {
+          this.architectAcceptedError = 'No se pudieron cargar los aceptados.';
+          this.architectAcceptedLoading = false;
+        }
+      }
+    });
+  }
+
+  decideArchitectProject(project: ArchitectProject, decision: 'accepted' | 'rejected'): void {
+    if (!project || !project.id || this.architectDecisionSaving[project.id]) {
+      return;
+    }
+    this.architectDecisionSaving[project.id] = true;
+    const comment = (this.architectDecisionComments[project.id] || '').trim();
+    this.datos.updateArchitectProjectStatus(project.id, decision, comment).subscribe({
+      next: () => {
+        this.showToast(
+          decision === 'accepted' ? 'Proyecto aceptado' : 'Proyecto rechazado',
+          'success'
+        );
+        delete this.architectDecisionSaving[project.id];
+        delete this.architectDecisionComments[project.id];
+        this.loadArchitectProjects('pending');
+        this.loadArchitectProjects('accepted');
+      },
+      error: (err) => {
+        console.error('Error updating architect project', err);
+        this.showToast('No se pudo actualizar el proyecto.', 'error');
+        delete this.architectDecisionSaving[project.id];
+      }
+    });
+  }
+
+  getArchitectProjectFileUrl(project: ArchitectProject): string {
+    if (!project?.file_url) {
+      return '';
+    }
+    if (project.file_url.startsWith('http')) {
+      return project.file_url;
+    }
+    const base = this.datos.url.endsWith('/') ? this.datos.url : this.datos.url + '/';
+    const relative = project.file_url.startsWith('/') ? project.file_url.substring(1) : project.file_url;
+    return base + relative;
+  }
+
+  refreshManagedUsers(): void {
+    this.loadManagedUsers();
+  }
+
+  get filteredManagedUsers(): ManagedUser[] {
+    const search = this.managedUsersSearch.trim().toLowerCase();
+    if (!search) return this.managedUsers;
+    return this.managedUsers.filter((user) => {
+      const nombre = (user.nombre || '').toLowerCase();
+      const email = (user.email || '').toLowerCase();
+      const telefono = (user.telefono || '').toLowerCase();
+      const rol = (user.rol || '').toLowerCase();
+      return (
+        nombre.includes(search) ||
+        email.includes(search) ||
+        telefono.includes(search) ||
+        rol.includes(search)
+      );
+    });
+  }
+
+  startCreateUser(): void {
+    this.editingUserId = null;
+    this.createUserForm = this.createEmptyUserForm();
+  }
+
+  openEditUserModal(user: ManagedUser): void {
+    if (!user) return;
+    this.editingUserId = user.id;
+    this.editUserForm = {
+      nombre: user.nombre || '',
+      email: user.email || '',
+      telefono: user.telefono || '',
+      rol: (user.rol as ManagedUserRole) || 'cliente',
+      password: ''
+    };
+    this.showUserModal = true;
+  }
+
+  closeUserModal(): void {
+    this.showUserModal = false;
+    this.editingUserId = null;
+    this.editUserForm = this.createEmptyUserForm();
+  }
+
+  submitUserForm(): void {
+    const form = this.createUserForm;
+    if (!form.nombre.trim() || !form.email.trim()) {
+      this.showToast('Nombre y email son obligatorios', 'warning');
+      return;
+    }
+    const passwordValue = form.password.trim();
+    if (passwordValue.length < 4) {
+      this.showToast('Ingresa una contrasena de al menos 4 caracteres', 'warning');
+      return;
+    }
+
+    const payload: ManagedUserPayload & {
+      nombre: string;
+      email: string;
+      rol: ManagedUserRole;
+      password: string;
+    } = {
+      nombre: form.nombre.trim(),
+      email: form.email.trim(),
+      rol: form.rol,
+      telefono: form.telefono.trim() ? form.telefono.trim() : null,
+      password: passwordValue
+    };
+
+    this.savingUser = true;
+    this.datos.createManagedUser(payload).subscribe({
+      next: () => {
+        this.showToast('Usuario creado', 'success');
+        this.savingUser = false;
+        this.startCreateUser();
+        this.loadManagedUsers();
+      },
+      error: (err: any) => {
+        console.error('Error guardando usuario', err);
+        const message = err?.error?.error || 'No se pudo crear el usuario';
+        this.showToast(message, 'error');
+        this.savingUser = false;
+      }
+    });
+  }
+
+  submitEditUserForm(): void {
+    if (!this.editingUserId) {
+      this.showToast('Selecciona un usuario para modificar', 'warning');
+      return;
+    }
+    const form = this.editUserForm;
+    if (!form.nombre.trim() || !form.email.trim()) {
+      this.showToast('Nombre y email son obligatorios', 'warning');
+      return;
+    }
+    const passwordValue = form.password.trim();
+    if (passwordValue && passwordValue.length < 4) {
+      this.showToast('La contrasena debe tener al menos 4 caracteres', 'warning');
+      return;
+    }
+
+    const payload: ManagedUserPayload = {
+      nombre: form.nombre.trim(),
+      email: form.email.trim(),
+      telefono: form.telefono.trim() ? form.telefono.trim() : null,
+      rol: form.rol
+    };
+    if (passwordValue) {
+      payload.password = passwordValue;
+    }
+
+    this.savingUser = true;
+    this.datos.updateManagedUser(this.editingUserId, payload).subscribe({
+      next: () => {
+        this.showToast('Usuario modificado', 'success');
+        this.savingUser = false;
+        this.closeUserModal();
+        this.loadManagedUsers();
+      },
+      error: (err) => {
+        console.error('Error guardando usuario', err);
+        const message = err?.error?.error || 'No se pudo actualizar el usuario';
+        this.showToast(message, 'error');
+        this.savingUser = false;
+      }
+    });
+  }
+
+  confirmDeleteManagedUser(user: ManagedUser): void {
+    if (!user || !user.id) return;
+    this.confirmMessage = `¿Deseas excluir a ${user.nombre}?`;
+    this.confirmAction = 'deleteManagedUser';
+    this.confirmTargetId = user.id;
+    this.showConfirmModal = true;
+  }
+
+  private deleteManagedUser(id: number): void {
+    this.datos.deleteManagedUser(id).subscribe({
+      next: () => {
+        this.showToast('Usuario excluido', 'success');
+        this.managedUsers = this.managedUsers.filter((u) => u.id !== id);
+        if (this.editingUserId === id) {
+          this.closeUserModal();
+          this.startCreateUser();
+        }
+      },
+      error: (err) => {
+        console.error('Error deleting user', err);
+        this.showToast('No se pudo excluir el usuario', 'error');
+      }
+    });
+  }
+
+  private createEmptyUserForm(): UserFormModel {
+    return {
+      nombre: '',
+      email: '',
+      telefono: '',
+      rol: 'cliente',
+      password: ''
+    };
+  }
+
   // Getters to split orders into columns similar to projects
   get orderTodoList(): any[] {
     return this.orders.filter(o => {
@@ -215,10 +499,31 @@ export class AdminCarpintero implements OnInit {
 
   // Called when admin switches tabs (index 0 = pendientes, 1 = todo, 2 = pedidos)
   onTabChange(index: number): void {
-    if (index === 0) this.loadPending();
-    else if (index === 1) this.loadAcceptedProjects();
-    else if (index === 2) this.loadOrders();
-    else if (index === 3) this.loadMessages();
+    switch (index) {
+      case 0:
+        this.loadPending();
+        break;
+      case 1:
+        this.loadAcceptedProjects();
+        break;
+      case 2:
+        this.loadArchitectProjects('pending');
+        break;
+      case 3:
+        this.loadArchitectProjects('accepted');
+        break;
+      case 4:
+        this.loadOrders();
+        break;
+      case 5:
+        this.loadManagedUsers();
+        break;
+      case 6:
+        this.loadMessages();
+        break;
+      default:
+        break;
+    }
   }
 
   // Grouped getters for To-Do columns
@@ -374,6 +679,8 @@ export class AdminCarpintero implements OnInit {
       }
     } else if (action === 'saveAllAccepted') {
       this.saveAllAccepted();
+    } else if (action === 'deleteManagedUser' && target) {
+      this.deleteManagedUser(target);
     }
   }
 

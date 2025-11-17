@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import { FormsModule } from '@angular/forms';
 import {
   CartConfirmationModal,
@@ -10,6 +9,7 @@ import { Datos, Product as ApiProduct, Color } from '../../datos';
 import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
+import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 
 interface FurnitureCategory {
   id: string;
@@ -41,7 +41,7 @@ type ModalCartItem = CartItem & {
 
 @Component({
   selector: 'app-others',
-  imports: [FormsModule, CartConfirmationModal, ToastNotification, FavoriteToggleComponent],
+  imports: [FormsModule, CartConfirmationModal, ToastNotification, FavoriteToggleComponent, ConfirmationModal],
   templateUrl: './others.html',
   styleUrl: './others.scss',
 })
