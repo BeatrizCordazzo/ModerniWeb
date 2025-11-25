@@ -102,6 +102,18 @@ export interface ArchitectProject {
   updated_at?: string | null;
 }
 
+export interface SketchupProject {
+  id: number;
+  admin_id?: number;
+  title?: string | null;
+  notes?: string | null;
+  file_path: string;
+  file_original_name?: string | null;
+  embed_url?: string | null;
+  file_url?: string | null;
+  created_at?: string;
+}
+
 export interface FavoriteItem {
   id: number;
   item_type: 'product' | 'service' | 'custom';
@@ -181,6 +193,19 @@ export class Datos {
 
   logout(): Observable<any> {
     return this.http.post(this.url + 'logout.php', {}, { withCredentials: true });
+  }
+
+  savePushToken(payload: { token: string; userId?: number; platform?: string }): Observable<any> {
+    const body: any = {
+      token: payload.token,
+      platform: payload.platform ?? 'web'
+    };
+
+    if (payload.userId) {
+      body.userId = payload.userId;
+    }
+
+    return this.http.post(this.url + 'save_fcm_token.php', body, { withCredentials: true });
   }
 
   // Get all products or filter by category
@@ -700,6 +725,46 @@ export class Datos {
 
   getCurrentFavorites(): FavoriteItem[] {
     return this.favoritesSubject.value;
+  }
+
+  // ==== SketchUp projects (admin) ====
+  getSketchupProjects(): Observable<SketchupProject[]> {
+    return this.http
+      .get<{ success: boolean; projects: SketchupProject[] }>(
+        this.url + 'get_sketchup_projects.php',
+        { withCredentials: true }
+      )
+      .pipe(map((res) => (res && res.success && Array.isArray(res.projects) ? res.projects : [])));
+  }
+
+  uploadSketchupProject(payload: {
+    file: File;
+    title?: string;
+    notes?: string;
+    embedUrl?: string;
+  }): Observable<SketchupProject> {
+    const form = new FormData();
+    form.append('skp_file', payload.file);
+    if (payload.title) form.append('title', payload.title);
+    if (payload.notes) form.append('notes', payload.notes);
+    const embed = payload.embedUrl?.trim();
+    if (embed) form.append('embed_url', embed);
+
+    return this.http
+      .post<{ success: boolean; project: SketchupProject }>(
+        this.url + 'upload_sketchup_project.php',
+        form,
+        { withCredentials: true }
+      )
+      .pipe(map((res) => (res && res.success && res.project ? res.project : ({} as SketchupProject))));
+  }
+
+  deleteSketchupProject(projectId: number): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(
+      this.url + 'delete_sketchup_project.php',
+      { project_id: projectId },
+      { withCredentials: true }
+    );
   }
 
   // ==== Contact messages ====

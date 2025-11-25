@@ -30,18 +30,22 @@
               </thead>
               <tbody>
                 @for (p of pendingPresupuestos; track p.presupuesto_id ?? p.id ?? p) {
-                  <tr>
-                    <td>{{ p.presupuesto_id }}</td>
-                    <td>{{ p.cliente_nombre }}</td>
-                    <td>{{ p.proyecto_nombre }}</td>
-                    <td>{{ p.total }}</td>
-                    <td><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
-                    <td>{{ p.fecha_creacion }}</td>
-                    <td class="actions-cell">
-                      <button class="btn btn-accept" (click)="accept(p.presupuesto_id)">Aceptar</button>
-                      <button class="btn btn-reject" (click)="openReject(p.presupuesto_id)">Rechazar</button>
-                    </td>
-                  </tr>
+                <tr>
+                  <td>{{ p.presupuesto_id }}</td>
+                  <td>{{ p.cliente_nombre }}</td>
+                  <td>{{ p.proyecto_nombre }}</td>
+                  <td>{{ p.total }}</td>
+                  <td><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
+                  <td>{{ p.fecha_creacion }}</td>
+                  <td class="actions-cell">
+                    <button class="btn btn-accept" (click)="accept(p.presupuesto_id)">
+                      Aceptar
+                    </button>
+                    <button class="btn btn-reject" (click)="openReject(p.presupuesto_id)">
+                      Rechazar
+                    </button>
+                  </td>
+                </tr>
                 }
               </tbody>
             </table>
@@ -53,100 +57,124 @@
         <div class="tab-content">
           <h2>To-Do - Proyectos aceptados</h2>
           @if (acceptedProjects.length === 0) {
-            <div>No hay proyectos aceptados.</div>
+          <div>No hay proyectos aceptados.</div>
           }
           <div class="columns-wrapper">
             <div class="column">
               <h3>To-Do</h3>
               @if (todoProjectsList.length === 0) {
-                <div class="small-muted">No hay proyectos en To-Do.</div>
-              }
-              @for (proj of todoProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
-                <div class="project-card">
-                  <div class="project-row">
-                    <div>
-                      <h3>{{ proj.proyecto_nombre }}</h3>
-                      <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                      <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
-                    </div>
-                    <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+              <div class="small-muted">No hay proyectos en To-Do.</div>
+              } @for (proj of todoProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
                   </div>
-                  <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
-                  <div class="project-desc">{{ proj.descripcion }}</div>
-                  <div class="progress-controls">
-                    <label class="small-muted">Estado:</label>
-                    <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
-                      <option value="to-do">To-Do</option>
-                      <option value="in progress">In Progress</option>
-                      <option value="done">Done</option>
-                    </select>
-                    <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                  <div class="project-meta">
+                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                </div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
+                    (ngModelChange)="setPendingStatus(proj, $event)"
+                  >
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">
+                    Guardar
+                  </button>
+                </div>
+              </div>
               }
             </div>
 
             <div class="column">
               <h3>In Progress</h3>
               @if (inProgressProjectsList.length === 0) {
-                <div class="small-muted">No hay proyectos en progreso.</div>
-              }
-              @for (proj of inProgressProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
-                <div class="project-card">
-                  <div class="project-row">
-                    <div>
-                      <h3>{{ proj.proyecto_nombre }}</h3>
-                      <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                      <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
-                    </div>
-                    <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+              <div class="small-muted">No hay proyectos en progreso.</div>
+              } @for (proj of inProgressProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
                   </div>
-                  <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
-                  <div class="project-desc">{{ proj.descripcion }}</div>
-                  <div class="progress-controls">
-                    <label class="small-muted">Estado:</label>
-                    <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
-                      <option value="to-do">To-Do</option>
-                      <option value="in progress">In Progress</option>
-                      <option value="done">Done</option>
-                    </select>
-                    <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                  <div class="project-meta">
+                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                </div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
+                    (ngModelChange)="setPendingStatus(proj, $event)"
+                  >
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">
+                    Guardar
+                  </button>
+                </div>
+              </div>
               }
             </div>
 
             <div class="column">
               <h3>Done</h3>
               @if (doneProjectsList.length === 0) {
-                <div class="small-muted">No hay proyectos finalizados.</div>
-              }
-              @for (proj of doneProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
-                <div class="project-card">
-                  <div class="project-row">
-                    <div>
-                      <h3>{{ proj.proyecto_nombre }}</h3>
-                      <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                      <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
-                    </div>
-                    <div class="project-meta">Estado: <strong>{{ proj.carpintero_estado }}</strong></div>
+              <div class="small-muted">No hay proyectos finalizados.</div>
+              } @for (proj of doneProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ proj.proyecto_nombre }}</h3>
+                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
                   </div>
-                  <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button></div>
-                  <div class="project-desc">{{ proj.descripcion }}</div>
-                  <div class="progress-controls">
-                    <label class="small-muted">Estado:</label>
-                    <select [ngModel]="proj.pendingEstado ?? proj.carpintero_estado" (ngModelChange)="setPendingStatus(proj, $event)">
-                      <option value="to-do">To-Do</option>
-                      <option value="in progress">In Progress</option>
-                      <option value="done">Done</option>
-                    </select>
-                    <button class="btn btn-primary" (click)="requestSaveProject(proj)">Guardar</button>
+                  <div class="project-meta">
+                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                </div>
+                <div class="project-desc">{{ proj.descripcion }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
+                    (ngModelChange)="setPendingStatus(proj, $event)"
+                  >
+                    <option value="to-do">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="requestSaveProject(proj)">
+                    Guardar
+                  </button>
+                </div>
+              </div>
               }
             </div>
           </div>
-          <div style="margin-top: 1rem; text-align: right;">
+          <div style="margin-top: 1rem; text-align: right">
             <button class="btn btn-ghost" (click)="loadAcceptedProjects()">Refrescar</button>
             <button class="btn btn-primary" (click)="requestSaveAll()">Guardar todos</button>
           </div>
@@ -157,93 +185,98 @@
         <div class="tab-content architect-tab">
           <div class="tab-heading">
             <h2>Architect Projects (Pending)</h2>
-            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('pending')">Refresh</button>
+            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('pending')">
+              Refresh
+            </button>
           </div>
           @if (architectPendingLoading) {
-            <div class="loading-state">Loading projects...</div>
-          }
-          @if (architectPendingError) {
-            <div class="error-state">{{ architectPendingError }}</div>
-          }
-          @if (!architectPendingLoading && !architectPendingError) {
-            @if (architectProjectsPending.length === 0) {
-              <p class="empty-state">No pending submissions from architects.</p>
-            }
-            @if (architectProjectsPending.length) {
-              <div class="lista-wrapper">
-                <table class="architect-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Architect</th>
-                      <th>Submitted</th>
-                      <th>Message</th>
-                      <th>File</th>
-                      <th>Comment</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (proj of architectProjectsPending; track proj.id ?? proj) {
-                      <tr>
-                        <td>#{{ proj.id }}</td>
-                        <td>
-                          <div class="architect-author">
-                            <strong>{{ proj.architect_name || ('Architect #' + proj.architect_id) }}</strong>
-                            <div class="small-muted">{{ proj.architect_email || '-' }}</div>
-                          </div>
-                        </td>
-                        <td>
-                          <div>{{ proj.created_at | date:'short' }}</div>
-                          @if (proj.project_title) {
-                            <div class="small-muted">{{ proj.project_title }}</div>
-                          }
-                        </td>
-                        <td>
-                          <p class="architect-notes">{{ proj.project_notes }}</p>
-                        </td>
-                        <td>
-                          @if (proj.file_url) {
-                            <a class="file-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
-                              {{ proj.file_original_name || 'Download file' }}
-                            </a>
-                          } @else {
-                            <span class="small-muted">No file</span>
-                          }
-                        </td>
-                        <td class="architect-comment">
-                          <textarea
-                            rows="3"
-                            placeholder="Optional admin comment"
-                            [(ngModel)]="architectDecisionComments[proj.id]"
-                            [attr.name]="'architectComment' + proj.id"
-                          ></textarea>
-                        </td>
-                        <td class="architect-actions">
-                          <button
-                            type="button"
-                            class="btn btn-accept"
-                            [disabled]="architectDecisionSaving[proj.id]"
-                            (click)="decideArchitectProject(proj, 'accepted')"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-reject"
-                            [disabled]="architectDecisionSaving[proj.id]"
-                            (click)="decideArchitectProject(proj, 'rejected')"
-                          >
-                            Reject
-                          </button>
-                        </td>
-                      </tr>
+          <div class="loading-state">Loading projects...</div>
+          } @if (architectPendingError) {
+          <div class="error-state">{{ architectPendingError }}</div>
+          } @if (!architectPendingLoading && !architectPendingError) { @if
+          (architectProjectsPending.length === 0) {
+          <p class="empty-state">No pending submissions from architects.</p>
+          } @if (architectProjectsPending.length) {
+          <div class="lista-wrapper">
+            <table class="architect-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Architect</th>
+                  <th>Submitted</th>
+                  <th>Message</th>
+                  <th>File</th>
+                  <th>Comment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (proj of architectProjectsPending; track proj.id ?? proj) {
+                <tr>
+                  <td>#{{ proj.id }}</td>
+                  <td>
+                    <div class="architect-author">
+                      <strong>{{
+                        proj.architect_name || 'Architect #' + proj.architect_id
+                      }}</strong>
+                      <div class="small-muted">{{ proj.architect_email || '-' }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>{{ proj.created_at | date : 'short' }}</div>
+                    @if (proj.project_title) {
+                    <div class="small-muted">{{ proj.project_title }}</div>
                     }
-                  </tbody>
-                </table>
-              </div>
-            }
-          }
+                  </td>
+                  <td>
+                    <p class="architect-notes">{{ proj.project_notes }}</p>
+                  </td>
+                  <td>
+                    @if (proj.file_url) {
+                    <a
+                      class="file-link"
+                      [href]="getArchitectProjectFileUrl(proj)"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {{ proj.file_original_name || 'Download file' }}
+                    </a>
+                    } @else {
+                    <span class="small-muted">No file</span>
+                    }
+                  </td>
+                  <td class="architect-comment">
+                    <textarea
+                      rows="3"
+                      placeholder="Optional admin comment"
+                      [(ngModel)]="architectDecisionComments[proj.id]"
+                      [attr.name]="'architectComment' + proj.id"
+                    ></textarea>
+                  </td>
+                  <td class="architect-actions">
+                    <button
+                      type="button"
+                      class="btn btn-accept"
+                      [disabled]="architectDecisionSaving[proj.id]"
+                      (click)="decideArchitectProject(proj, 'accepted')"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-reject"
+                      [disabled]="architectDecisionSaving[proj.id]"
+                      (click)="decideArchitectProject(proj, 'rejected')"
+                    >
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          } }
         </div>
       </mat-tab>
 
@@ -251,52 +284,172 @@
         <div class="tab-content architect-tab">
           <div class="tab-heading">
             <h2>Architect Projects (Accepted)</h2>
-            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('accepted')">Refresh</button>
+            <button class="btn btn-ghost" type="button" (click)="loadArchitectProjects('accepted')">
+              Refresh
+            </button>
           </div>
           @if (architectAcceptedLoading) {
-            <div class="loading-state">Loading accepted projects...</div>
-          }
-          @if (architectAcceptedError) {
-            <div class="error-state">{{ architectAcceptedError }}</div>
-          }
-          @if (!architectAcceptedLoading && !architectAcceptedError) {
-            @if (architectProjectsAccepted.length === 0) {
-              <p class="empty-state">No accepted architect projects yet.</p>
-            }
-            @if (architectProjectsAccepted.length) {
-              <div class="architect-cards">
-                @for (proj of architectProjectsAccepted; track proj.id ?? proj) {
-                  <article class="architect-card">
-                    <header>
-                      <div>
-                        <h3>{{ proj.project_title || ('Project #' + proj.id) }}</h3>
-                        <p class="small-muted">
-                          {{ proj.architect_name || ('Architect #' + proj.architect_id) }} ·
-                          {{ proj.decided_at || proj.created_at }}
-                        </p>
-                      </div>
-                      <span class="status-pill status-accepted">Accepted</span>
-                    </header>
-                    <p class="architect-notes">{{ proj.project_notes }}</p>
-                    <div class="file-link-block">
-                      @if (proj.file_url) {
-                        <a class="file-link" [href]="getArchitectProjectFileUrl(proj)" target="_blank" rel="noopener">
-                          {{ proj.file_original_name || 'View attachment' }}
-                        </a>
-                      } @else {
-                        <span class="small-muted">No file uploaded</span>
-                      }
-                    </div>
-                    @if (proj.admin_comment) {
-                      <div class="admin-comment">
-                        <strong>Admin comment:</strong>
-                        <p>{{ proj.admin_comment }}</p>
-                      </div>
-                    }
-                  </article>
+          <div class="loading-state">Loading accepted projects...</div>
+          } @if (architectAcceptedError) {
+          <div class="error-state">{{ architectAcceptedError }}</div>
+          } @if (!architectAcceptedLoading && !architectAcceptedError) { @if
+          (architectProjectsAccepted.length === 0) {
+          <p class="empty-state">No accepted architect projects yet.</p>
+          } @if (architectProjectsAccepted.length) {
+          <div class="architect-cards">
+            @for (proj of architectProjectsAccepted; track proj.id ?? proj) {
+            <article class="architect-card">
+              <header>
+                <div>
+                  <h3>{{ proj.project_title || 'Project #' + proj.id }}</h3>
+                  <p class="small-muted">
+                    {{ proj.architect_name || 'Architect #' + proj.architect_id }} ·
+                    {{ proj.decided_at || proj.created_at }}
+                  </p>
+                </div>
+                <span class="status-pill status-accepted">Accepted</span>
+              </header>
+              <p class="architect-notes">{{ proj.project_notes }}</p>
+              <div class="file-link-block">
+                @if (proj.file_url) {
+                <a
+                  class="file-link"
+                  [href]="getArchitectProjectFileUrl(proj)"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{ proj.file_original_name || 'View attachment' }}
+                </a>
+                } @else {
+                <span class="small-muted">No file uploaded</span>
                 }
               </div>
+              @if (proj.admin_comment) {
+              <div class="admin-comment">
+                <strong>Admin comment:</strong>
+                <p>{{ proj.admin_comment }}</p>
+              </div>
+              }
+            </article>
             }
+          </div>
+          } }
+        </div>
+      </mat-tab>
+
+      <mat-tab label="SketchUp">
+        <div class="tab-content sketchup-tab">
+          <div class="tab-heading">
+            <h2>Modelos SketchUp</h2>
+            <button class="btn btn-ghost" type="button" (click)="loadSketchupProjects()">
+              Refrescar
+            </button>
+          </div>
+
+          <div class="skp-upload">
+            <div class="form-grid">
+              <label>
+                Archivo (.skp)
+                <input type="file" accept=".skp" (change)="onSketchupFileChange($event)" />
+              </label>
+              <label>
+                Título (opcional)
+                <input type="text" [(ngModel)]="sketchupTitle" placeholder="Nombre del modelo" />
+              </label>
+                <label>
+                  Notas (opcional)
+                  <textarea
+                    rows="3"
+                    [(ngModel)]="sketchupNotes"
+                    placeholder="Notas internas"
+                  ></textarea>
+                </label>
+                <label>
+                  Iframe / URL de 3D Warehouse
+                  <textarea
+                    rows="2"
+                    [(ngModel)]="sketchupEmbedCode"
+                    placeholder="Pega la URL o el iframe de 3D Warehouse"
+                  ></textarea>
+                  <small class="field-hint">Solo necesitas el iframe que entrega 3D Warehouse.</small>
+                </label>
+              </div>
+            <div class="actions-row">
+              <button
+                class="btn btn-primary"
+                type="button"
+                [disabled]="sketchupUploading"
+                (click)="uploadSketchupModel()"
+              >
+                {{ sketchupUploading ? 'Subiendo...' : 'Subir modelo' }}
+              </button>
+              @if (sketchupError) {
+              <span class="error-state inline">{{ sketchupError }}</span>
+              }
+            </div>
+          </div>
+
+          @if (sketchupLoading) {
+          <div class="loading-state">Cargando modelos...</div>
+          } @if (!sketchupLoading && sketchupProjects.length === 0) {
+          <p class="empty-state">Aún no hay modelos SketchUp subidos.</p>
+          } @if (!sketchupLoading && sketchupProjects.length) {
+          <div class="skp-list">
+            @for (proj of sketchupProjects; track proj.id ?? proj) {
+            <article class="skp-card">
+              <header>
+                <div>
+                  <h3>{{ proj.title || proj.file_original_name || 'Modelo #' + proj.id }}</h3>
+                  @if (proj.created_at) {
+                  <p class="small-muted">{{ proj.created_at | date : 'short' }}</p>
+                  }
+                </div>
+                <div class="skp-actions">
+                  <a
+                    class="file-link"
+                    [href]="getSketchupFileUrl(proj)"
+                    target="_blank"
+                    rel="noopener"
+                    >
+                      Descargar
+                    </a>
+                    <button class="btn btn-ghost" type="button" (click)="openSketchupViewer(proj)">
+                      Ver
+                    </button>
+                    <button
+                      class="btn btn-danger"
+                      type="button"
+                      [disabled]="sketchupDeleting[proj.id]"
+                      (click)="confirmDeleteSketchup(proj)"
+                    >
+                      {{ sketchupDeleting[proj.id] ? 'Excluyendo...' : 'Excluir' }}
+                    </button>
+                  </div>
+                </header>
+              @if (proj.notes) {
+              <p class="skp-notes">{{ proj.notes }}</p>
+              }
+            </article>
+            }
+          </div>
+          } @if (sketchupViewerUrl) {
+          <div class="skp-viewer">
+            <div class="viewer-header">
+              <h3>{{ sketchupSelectedName || 'Vista previa SketchUp' }}</h3>
+              <p class="small-muted">Se abre con el embed de 3D Warehouse.</p>
+            </div>
+            <iframe
+              [src]="sketchupViewerUrl"
+              frameborder="0"
+              scrolling="no"
+              marginheight="0"
+              marginwidth="0"
+              width="100%"
+              height="520"
+              allowfullscreen
+            >
+            </iframe>
+          </div>
           }
         </div>
       </mat-tab>
@@ -305,98 +458,127 @@
         <div class="tab-content">
           <h2>Pedidos (carrito)</h2>
           @if (orders.length === 0) {
-            <div>No hay pedidos.</div>
-          }
-          @if (orders.length) {
-            <div class="columns-wrapper">
-              <div class="column">
-                <h3>To-Do</h3>
-                @if (orderTodoList.length === 0) {
-                  <div class="small-muted">No hay pedidos en To-Do.</div>
-                }
-                @for (o of orderTodoList; track o.id ?? o.pedido_id ?? o) {
-                  <div class="project-card">
-                    <div class="project-row">
-                      <div>
-                        <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
-                        <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
-                        <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
-                      </div>
-                      <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'pendiente' }}</strong></div>
+          <div>No hay pedidos.</div>
+          } @if (orders.length) {
+          <div class="columns-wrapper">
+            <div class="column">
+              <h3>To-Do</h3>
+              @if (orderTodoList.length === 0) {
+              <div class="small-muted">No hay pedidos en To-Do.</div>
+              } @for (o of orderTodoList; track o.id ?? o.pedido_id ?? o) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <div class="project-meta small-muted">
+                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
                     </div>
-                    <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
-                    <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
-                    <div class="progress-controls">
-                      <label class="small-muted">Estado:</label>
-                      <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
-                        <option value="pendiente">To-Do</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="done">Done</option>
-                      </select>
-                      <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                    <div class="project-meta small-muted">
+                      Total: {{ o.total || o.totalPrice || '-' }}
                     </div>
                   </div>
-                }
-              </div>
-              <div class="column">
-                <h3>In Progress</h3>
-                @if (orderInProgressList.length === 0) {
-                  <div class="small-muted">No hay pedidos en progreso.</div>
-                }
-                @for (o of orderInProgressList; track o.id ?? o.pedido_id ?? o) {
-                  <div class="project-card">
-                    <div class="project-row">
-                      <div>
-                        <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
-                        <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
-                        <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
-                      </div>
-                      <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'in progress' }}</strong></div>
-                    </div>
-                    <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
-                    <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
-                    <div class="progress-controls">
-                      <label class="small-muted">Estado:</label>
-                      <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
-                        <option value="pendiente">To-Do</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="done">Done</option>
-                      </select>
-                      <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
-                    </div>
+                  <div class="project-meta">
+                    Estado: <strong>{{ o.estado || o.status || 'pendiente' }}</strong>
                   </div>
-                }
+                </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                </div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="o.pendingEstado ?? o.estado"
+                    (ngModelChange)="o.pendingEstado = $event"
+                  >
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
               </div>
-              <div class="column">
-                <h3>Done</h3>
-                @if (orderDoneList.length === 0) {
-                  <div class="small-muted">No hay pedidos finalizados.</div>
-                }
-                @for (o of orderDoneList; track o.id ?? o.pedido_id ?? o) {
-                  <div class="project-card">
-                    <div class="project-row">
-                      <div>
-                        <h3>{{ o.titulo || o.title || ('Pedido #' + (o.id || o.pedido_id)) }}</h3>
-                        <div class="project-meta small-muted">Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}</div>
-                        <div class="project-meta small-muted">Total: {{ o.total || o.totalPrice || '-' }}</div>
-                      </div>
-                      <div class="project-meta">Estado: <strong>{{ o.estado || o.status || 'done' }}</strong></div>
-                    </div>
-                    <div style="margin-top:6px; text-align:right;"><button class="btn btn-ghost" (click)="openDetails(o)">Ver</button></div>
-                    <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
-                    <div class="progress-controls">
-                      <label class="small-muted">Estado:</label>
-                      <select [ngModel]="o.pendingEstado ?? o.estado" (ngModelChange)="o.pendingEstado = $event">
-                        <option value="pendiente">To-Do</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="done">Done</option>
-                      </select>
-                      <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
-                    </div>
-                  </div>
-                }
-              </div>
+              }
             </div>
+            <div class="column">
+              <h3>In Progress</h3>
+              @if (orderInProgressList.length === 0) {
+              <div class="small-muted">No hay pedidos en progreso.</div>
+              } @for (o of orderInProgressList; track o.id ?? o.pedido_id ?? o) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <div class="project-meta small-muted">
+                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
+                    </div>
+                    <div class="project-meta small-muted">
+                      Total: {{ o.total || o.totalPrice || '-' }}
+                    </div>
+                  </div>
+                  <div class="project-meta">
+                    Estado: <strong>{{ o.estado || o.status || 'in progress' }}</strong>
+                  </div>
+                </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                </div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="o.pendingEstado ?? o.estado"
+                    (ngModelChange)="o.pendingEstado = $event"
+                  >
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
+              </div>
+              }
+            </div>
+            <div class="column">
+              <h3>Done</h3>
+              @if (orderDoneList.length === 0) {
+              <div class="small-muted">No hay pedidos finalizados.</div>
+              } @for (o of orderDoneList; track o.id ?? o.pedido_id ?? o) {
+              <div class="project-card">
+                <div class="project-row">
+                  <div>
+                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <div class="project-meta small-muted">
+                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
+                    </div>
+                    <div class="project-meta small-muted">
+                      Total: {{ o.total || o.totalPrice || '-' }}
+                    </div>
+                  </div>
+                  <div class="project-meta">
+                    Estado: <strong>{{ o.estado || o.status || 'done' }}</strong>
+                  </div>
+                </div>
+                <div style="margin-top: 6px; text-align: right">
+                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                </div>
+                <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
+                <div class="progress-controls">
+                  <label class="small-muted">Estado:</label>
+                  <select
+                    [ngModel]="o.pendingEstado ?? o.estado"
+                    (ngModelChange)="o.pendingEstado = $event"
+                  >
+                    <option value="pendiente">To-Do</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="done">Done</option>
+                  </select>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
           }
         </div>
       </mat-tab>
@@ -414,124 +596,135 @@
                 placeholder="Buscar por nombre, email o rol"
                 [(ngModel)]="managedUsersSearch"
               />
-              <button class="btn btn-ghost" type="button" (click)="refreshManagedUsers()">Refrescar</button>
-              <button class="btn btn-primary" type="button" (click)="startCreateUser()">Nuevo</button>
+              <button class="btn btn-ghost" type="button" (click)="refreshManagedUsers()">
+                Refrescar
+              </button>
+              <button class="btn btn-primary" type="button" (click)="startCreateUser()">
+                Nuevo
+              </button>
             </div>
           </div>
 
           @if (managedUsersLoading) {
-            <div class="loading-state">Cargando usuarios...</div>
-          }
-          @if (managedUsersError) {
-            <div class="error-state">{{ managedUsersError }}</div>
-          }
-
-          @if (!managedUsersLoading) {
-            <div class="clients-grid">
-              <div class="clients-card list-card">
-                <div class="list-header">
-                  <div>
-                    <h3>Listado de usuarios</h3>
-                    <p class="small-muted">
-                      {{ filteredManagedUsers.length }} resultado(s)
-                    </p>
-                  </div>
-                </div>
-                <div class="lista-wrapper">
-                  <table class="client-table">
-                    <thead>
-                      <tr>
-                        <th>Nombre</th>
-                        <th>Rol</th>
-                        <th>Email</th>
-                        <th>Teléfono</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @if (filteredManagedUsers.length === 0) {
-                        <tr>
-                          <td colspan="5" class="empty-row">No hay usuarios con ese filtro.</td>
-                        </tr>
-                      }
-                      @for (user of filteredManagedUsers; track user.id) {
-                        <tr>
-                          <td>
-                            <div class="user-name">
-                              <strong>{{ user.nombre }}</strong>
-                              @if (user.fecha_registro) {
-                                <span class="small-muted">
-                                  Alta: {{ user.fecha_registro | date: 'shortDate' }}
-                                </span>
-                              }
-                            </div>
-                          </td>
-                          <td>
-                            <span
-                              class="role-pill"
-                              [ngClass]="{ 'role-architect': user.rol === 'arquitecto' }"
-                            >
-                              {{ user.rol | titlecase }}
-                            </span>
-                          </td>
-                          <td>{{ user.email }}</td>
-                          <td>{{ user.telefono || '-' }}</td>
-                          <td class="user-actions">
-                            <button type="button" class="btn btn-ghost" (click)="openEditUserModal(user)">
-                              Modificar
-                            </button>
-                            <button
-                              type="button"
-                              class="btn btn-reject"
-                              (click)="confirmDeleteManagedUser(user)"
-                            >
-                              Excluir
-                            </button>
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
+          <div class="loading-state">Cargando usuarios...</div>
+          } @if (managedUsersError) {
+          <div class="error-state">{{ managedUsersError }}</div>
+          } @if (!managedUsersLoading) {
+          <div class="clients-grid">
+            <div class="clients-card list-card">
+              <div class="list-header">
+                <div>
+                  <h3>Listado de usuarios</h3>
+                  <p class="small-muted">{{ filteredManagedUsers.length }} resultado(s)</p>
                 </div>
               </div>
-
-              <div class="clients-card form-card">
-                <h3>{{ editingUserId ? 'Modificar usuario' : 'Añadir usuario' }}</h3>
-                <form class="user-form" (ngSubmit)="submitUserForm()">
-                  <label>
-                    Nombre
-                    <input type="text" name="userName" [(ngModel)]="createUserForm.nombre" required />
-                  </label>
-                  <label>
-                    Email
-                    <input type="email" name="userEmail" [(ngModel)]="createUserForm.email" required />
-                  </label>
-                  <label>
-                    Teléfono
-                    <input type="text" name="userPhone" [(ngModel)]="createUserForm.telefono" />
-                  </label>
-                  <label>
-                    Rol
-                    <select name="userRole" [(ngModel)]="createUserForm.rol">
-                      <option value="cliente">Cliente</option>
-                      <option value="arquitecto">Arquitecto</option>
-                    </select>
-                  </label>
-                  <label>
-                    Contraseña
-                    <input type="password" name="userPassword" [(ngModel)]="createUserForm.password" required minlength="4" />
-                    <small class="small-muted">
-                      Mínimo 4 caracteres.
-                    </small>
-                  </label>
-                  <div class="form-actions">
-                    <button class="btn btn-primary" type="submit" [disabled]="savingUser">
-                      {{ savingUser ? 'Guardando...' : 'Añadir usuario' }}
-                    </button>
-                  </div>
-                </form>
+              <div class="lista-wrapper">
+                <table class="client-table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Rol</th>
+                      <th>Email</th>
+                      <th>Teléfono</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (filteredManagedUsers.length === 0) {
+                    <tr>
+                      <td colspan="5" class="empty-row">No hay usuarios con ese filtro.</td>
+                    </tr>
+                    } @for (user of filteredManagedUsers; track user.id) {
+                    <tr>
+                      <td>
+                        <div class="user-name">
+                          <strong>{{ user.nombre }}</strong>
+                          @if (user.fecha_registro) {
+                          <span class="small-muted">
+                            Alta: {{ user.fecha_registro | date : 'shortDate' }}
+                          </span>
+                          }
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          class="role-pill"
+                          [ngClass]="{ 'role-architect': user.rol === 'arquitecto' }"
+                        >
+                          {{ user.rol | titlecase }}
+                        </span>
+                      </td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.telefono || '-' }}</td>
+                      <td class="user-actions">
+                        <button
+                          type="button"
+                          class="btn btn-ghost"
+                          (click)="openEditUserModal(user)"
+                        >
+                          Modificar
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-reject"
+                          (click)="confirmDeleteManagedUser(user)"
+                        >
+                          Excluir
+                        </button>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
             </div>
+
+            <div class="clients-card form-card">
+              <h3>{{ editingUserId ? 'Modificar usuario' : 'Añadir usuario' }}</h3>
+              <form class="user-form" (ngSubmit)="submitUserForm()">
+                <label>
+                  Nombre
+                  <input type="text" name="userName" [(ngModel)]="createUserForm.nombre" required />
+                </label>
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    name="userEmail"
+                    [(ngModel)]="createUserForm.email"
+                    required
+                  />
+                </label>
+                <label>
+                  Teléfono
+                  <input type="text" name="userPhone" [(ngModel)]="createUserForm.telefono" />
+                </label>
+                <label>
+                  Rol
+                  <select name="userRole" [(ngModel)]="createUserForm.rol">
+                    <option value="cliente">Cliente</option>
+                    <option value="arquitecto">Arquitecto</option>
+                  </select>
+                </label>
+                <label>
+                  Contraseña
+                  <input
+                    type="password"
+                    name="userPassword"
+                    [(ngModel)]="createUserForm.password"
+                    required
+                    minlength="4"
+                  />
+                  <small class="small-muted"> Mínimo 4 caracteres. </small>
+                </label>
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit" [disabled]="savingUser">
+                    {{ savingUser ? 'Guardando...' : 'Añadir usuario' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
           }
         </div>
         @if (showUserModal) {
@@ -539,7 +732,12 @@
           <div class="user-modal" (click)="$event.stopPropagation()">
             <div class="modal-header">
               <h3>Modificar usuario</h3>
-              <button type="button" class="close-btn" (click)="closeUserModal()" aria-label="Cerrar">
+              <button
+                type="button"
+                class="close-btn"
+                (click)="closeUserModal()"
+                aria-label="Cerrar"
+              >
                 &times;
               </button>
             </div>
@@ -565,11 +763,18 @@
               </label>
               <label>
                 Contraseña (opcional)
-                <input type="password" name="editPassword" [(ngModel)]="editUserForm.password" minlength="4" />
+                <input
+                  type="password"
+                  name="editPassword"
+                  [(ngModel)]="editUserForm.password"
+                  minlength="4"
+                />
                 <small class="small-muted">Déjala vacía para mantener la actual.</small>
               </label>
               <div class="form-actions">
-                <button type="button" class="btn btn-ghost" (click)="closeUserModal()">Cancelar</button>
+                <button type="button" class="btn btn-ghost" (click)="closeUserModal()">
+                  Cancelar
+                </button>
                 <button type="submit" class="btn btn-primary" [disabled]="savingUser">
                   {{ savingUser ? 'Guardando...' : 'Guardar cambios' }}
                 </button>
@@ -583,9 +788,8 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <span class="tab-label-with-badge">
-            Messages
-            @if (unreadMessageCount > 0) {
-              <span class="messages-badge">{{ unreadMessageCount }}</span>
+            Messages @if (unreadMessageCount > 0) {
+            <span class="messages-badge">{{ unreadMessageCount }}</span>
             }
           </span>
         </ng-template>
@@ -593,81 +797,86 @@
           <div class="messages-heading">
             <h2>Client Messages</h2>
             @if (unreadMessageCount > 0) {
-              <div class="messages-badge">
-                {{ unreadMessageCount }} new
-              </div>
+            <div class="messages-badge">{{ unreadMessageCount }} new</div>
             }
           </div>
           @if (messagesLoading) {
-            <div class="loading-state">Loading messages...</div>
-          }
-          @if (messagesError) {
-            <div class="error-state">{{ messagesError }}</div>
-          }
-          @if (!messagesLoading && !messagesError) {
-            <div class="messages-list">
-              @for (msg of contactMessages; track msg.id ?? msg.email ?? msg) {
-                <article class="message-card">
-                  <div class="message-header">
-                    <div>
-                      <h3>{{ msg.name }}</h3>
-                      <p class="message-meta">
-                        <span>{{ msg.email }}</span>
-                        @if (msg.phone) {
-                          <span>| {{ msg.phone }}</span>
-                        }
-                      </p>
-                    </div>
-                    <div class="message-status-block">
-                  <span class="status-pill" [ngClass]="{
-                    'status-new': msg.status === 'new',
-                    'status-read': msg.status === 'read',
-                    'status-responded': msg.status === 'responded'
-                  }">
-                        {{ formatMessageStatus(msg.status) }}
-                      </span>
-                      @if (isMessageUnread(msg)) {
-                        <span class="unread-indicator">Nuevo</span>
-                      }
-                    </div>
-                  </div>
-                  @if (msg.subject) {
-                    <p class="message-subject">{{ msg.subject }}</p>
+          <div class="loading-state">Loading messages...</div>
+          } @if (messagesError) {
+          <div class="error-state">{{ messagesError }}</div>
+          } @if (!messagesLoading && !messagesError) {
+          <div class="messages-list">
+            @for (msg of contactMessages; track msg.id ?? msg.email ?? msg) {
+            <article class="message-card">
+              <div class="message-header">
+                <div>
+                  <h3>{{ msg.name }}</h3>
+                  <p class="message-meta">
+                    <span>{{ msg.email }}</span>
+                    @if (msg.phone) {
+                    <span>| {{ msg.phone }}</span>
+                    }
+                  </p>
+                </div>
+                <div class="message-status-block">
+                  <span
+                    class="status-pill"
+                    [ngClass]="{
+                      'status-new': msg.status === 'new',
+                      'status-read': msg.status === 'read',
+                      'status-responded': msg.status === 'responded'
+                    }"
+                  >
+                    {{ formatMessageStatus(msg.status) }}
+                  </span>
+                  @if (isMessageUnread(msg)) {
+                  <span class="unread-indicator">Nuevo</span>
                   }
-                  <p class="message-body">{{ msg.message }}</p>
-                  <div class="message-status-actions">
-                    <button type="button"
-                      class="btn btn-ghost"
-                      (click)="markMessageStatus(msg, 'read')"
-                      [disabled]="!isMessageUnread(msg)">
-                      Marcar como leÃ­do
-                    </button>
-                    <button type="button"
-                      class="btn btn-ghost"
-                      (click)="markMessageStatus(msg, 'new')"
-                      [disabled]="isMessageUnread(msg)">
-                      Marcar como no leÃ­do
-                    </button>
-                  </div>
-                  @if (msg.response) {
-                    <div class="response-block">
-                      <strong>Response:</strong>
-                      <p>{{ msg.response }}</p>
-                      @if (msg.response_created_at) {
-                        <small>Sent: {{ msg.response_created_at | date:'short' }}</small>
-                      }
-                    </div>
-                  }
-                  <div class="message-actions">
-                    <textarea [(ngModel)]="msg.pendingResponse" placeholder="Write a response..."></textarea>
-                    <button (click)="sendResponse(msg)">Send Reply</button>
-                  </div>
-                </article>
+                </div>
+              </div>
+              @if (msg.subject) {
+              <p class="message-subject">{{ msg.subject }}</p>
               }
-              @if (contactMessages.length === 0) {
-                <p class="empty-state">No messages yet.</p>
+              <p class="message-body">{{ msg.message }}</p>
+              <div class="message-status-actions">
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  (click)="markMessageStatus(msg, 'read')"
+                  [disabled]="!isMessageUnread(msg)"
+                >
+                  Marcar como leÃ­do
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  (click)="markMessageStatus(msg, 'new')"
+                  [disabled]="isMessageUnread(msg)"
+                >
+                  Marcar como no leÃ­do
+                </button>
+              </div>
+              @if (msg.response) {
+              <div class="response-block">
+                <strong>Response:</strong>
+                <p>{{ msg.response }}</p>
+                @if (msg.response_created_at) {
+                <small>Sent: {{ msg.response_created_at | date : 'short' }}</small>
+                }
+              </div>
               }
-            </div>
+              <div class="message-actions">
+                <textarea
+                  [(ngModel)]="msg.pendingResponse"
+                  placeholder="Write a response..."
+                ></textarea>
+                <button (click)="sendResponse(msg)">Send Reply</button>
+              </div>
+            </article>
+            } @if (contactMessages.length === 0) {
+            <p class="empty-state">No messages yet.</p>
+            }
+          </div>
           }
         </div>
       </mat-tab>
@@ -675,48 +884,40 @@
   </div>
 
   @if (showRejectionModal) {
-    <app-rejection-modal
-      [isOpen]="showRejectionModal"
-      [(motivo)]="rejectionMotivo"
-      (confirm)="sendReject()"
-      (cancel)="closeModal()">
-    </app-rejection-modal>
+  <app-rejection-modal
+    [isOpen]="showRejectionModal"
+    [(motivo)]="rejectionMotivo"
+    (confirm)="sendReject()"
+    (cancel)="closeModal()"
+  >
+  </app-rejection-modal>
+  } @if (showConfirmModal) {
+  <app-confirmation-modal
+    [isOpen]="showConfirmModal"
+    [message]="confirmMessage"
+    (confirm)="onConfirmModalConfirm()"
+    (cancel)="onConfirmModalCancel()"
+  >
+  </app-confirmation-modal>
+  } @if (showPriceModal) {
+  <app-price-modal
+    [isOpen]="showPriceModal"
+    [presupuesto]="priceModalPresupuesto"
+    (confirm)="onPriceModalConfirm($event)"
+    (cancel)="onPriceModalCancel()"
+  >
+  </app-price-modal>
+  } @if (showDetailModal) {
+  <app-furniture-detail-modal
+    [isOpen]="showDetailModal"
+    [data]="detailModalData"
+    (cancel)="closeDetails()"
+  >
+  </app-furniture-detail-modal>
+  } @if (toastVisible) {
+  <app-toast-notification [message]="toastMessage" [type]="toastType" [duration]="toastDuration">
+  </app-toast-notification>
   }
-
-  @if (showConfirmModal) {
-    <app-confirmation-modal
-      [isOpen]="showConfirmModal"
-      [message]="confirmMessage"
-      (confirm)="onConfirmModalConfirm()"
-      (cancel)="onConfirmModalCancel()">
-    </app-confirmation-modal>
-  }
-
-  @if (showPriceModal) {
-    <app-price-modal
-      [isOpen]="showPriceModal"
-      [presupuesto]="priceModalPresupuesto"
-      (confirm)="onPriceModalConfirm($event)"
-      (cancel)="onPriceModalCancel()">
-    </app-price-modal>
-  }
-
-  @if (showDetailModal) {
-    <app-furniture-detail-modal
-      [isOpen]="showDetailModal"
-      [data]="detailModalData"
-      (cancel)="closeDetails()">
-    </app-furniture-detail-modal>
-  }
-
-  @if (toastVisible) {
-    <app-toast-notification
-      [message]="toastMessage"
-      [type]="toastType"
-      [duration]="toastDuration">
-    </app-toast-notification>
-  }
-
 
   <app-footer></app-footer>
 </main>

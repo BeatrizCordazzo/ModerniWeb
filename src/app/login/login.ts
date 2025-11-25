@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { Datos } from '../datos';
+import { PushNotificationService } from '../shared/push-notification/push-notification.service';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +29,13 @@ export class Login implements OnInit {
   hidePassword = true;
   returnUrl: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router, private datosService: Datos, private route: ActivatedRoute) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private datosService: Datos,
+    private route: ActivatedRoute,
+    private pushNotifications: PushNotificationService
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
@@ -43,6 +50,7 @@ export class Login implements OnInit {
     this.datosService.getLoggedUser().subscribe({
       next: (user: any) => {
         if (user && user.email) {
+          this.registerPushNotifications(user);
           const dest = this.returnUrl || '/profile';
           this.router.navigate([dest]);
         }
@@ -70,18 +78,21 @@ export class Login implements OnInit {
               } catch (e) {
                 console.warn('No se pudo guardar usuario en localStorage:', e);
               }
+              this.registerPushNotifications((response as any).user);
             }
 
             // Try to validate server-side session; if it fails, fallback to localStorage data
             this.datosService.getLoggedUser().subscribe({
               next: (user: any) => {
                 if (user && user.email) {
+                  this.registerPushNotifications(user);
                   const dest = this.returnUrl || '/profile';
                   this.router.navigate([dest]);
                 } else {
                   // Fallback to localStorage
                   const stored = localStorage.getItem('loggedUser');
                   if (stored) {
+                    this.registerPushNotifications(JSON.parse(stored));
                     const dest = this.returnUrl || '/profile';
                     this.router.navigate([dest]);
                   } else {
@@ -94,6 +105,11 @@ export class Login implements OnInit {
                 // On error, try localStorage fallback
                 const stored = localStorage.getItem('loggedUser');
                 if (stored) {
+                  try {
+                    this.registerPushNotifications(JSON.parse(stored));
+                  } catch (e) {
+                    console.warn('No se pudo parsear el usuario almacenado para FCM:', e);
+                  }
                   const dest = this.returnUrl || '/profile';
                   this.router.navigate([dest]);
                 } else {
@@ -119,5 +135,14 @@ export class Login implements OnInit {
 
   togglePasswordVisibility() {
     this.hidePassword = !this.hidePassword;
+  }
+
+  private registerPushNotifications(user: any) {
+    if (!user || typeof user.id !== 'number') {
+      return;
+    }
+    this.pushNotifications.enablePushForUser(user.id).catch((error) => {
+      console.warn('No se pudo activar las notificaciones push para el usuario actual:', error);
+    });
   }
 }

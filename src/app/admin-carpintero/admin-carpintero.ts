@@ -1,4 +1,5 @@
 ﻿import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Datos } from '../datos';
 import { Nav } from '../nav/nav';
@@ -11,7 +12,13 @@ import { ConfirmationModal } from '../shared/confirmation-modal/confirmation-mod
 import { PriceModal } from '../shared/price-modal/price-modal.component';
 import { FurnitureDetailModal } from '../shared/furniture-detail-modal/furniture-detail-modal';
 import { ToastNotification } from '../shared/toast-notification/toast-notification';
-import { ArchitectProject, ContactMessage, ManagedUser, ManagedUserPayload } from '../datos';
+import {
+  ArchitectProject,
+  ContactMessage,
+  ManagedUser,
+  ManagedUserPayload,
+  SketchupProject,
+} from '../datos';
 
 type ManagedUserRole = 'cliente' | 'arquitecto';
 interface UserFormModel {
@@ -25,9 +32,20 @@ interface UserFormModel {
 @Component({
   selector: 'app-admin-carpintero',
   standalone: true,
-  imports: [Nav, Footer, CommonModule, FormsModule, RejectionModal, ConfirmationModal, ToastNotification, MatTabsModule, PriceModal, FurnitureDetailModal],
+  imports: [
+    Nav,
+    Footer,
+    CommonModule,
+    FormsModule,
+    RejectionModal,
+    ConfirmationModal,
+    ToastNotification,
+    MatTabsModule,
+    PriceModal,
+    FurnitureDetailModal,
+  ],
   templateUrl: './admin-carpintero.html',
-  styleUrls: ['./admin-carpintero.scss']
+  styleUrls: ['./admin-carpintero.scss'],
 })
 export class AdminCarpintero implements OnInit {
   pendingPresupuestos: any[] = [];
@@ -92,8 +110,21 @@ export class AdminCarpintero implements OnInit {
   architectDecisionComments: Record<number, string> = {};
   architectDecisionSaving: Record<number, boolean> = {};
 
+  // SketchUp models
+  sketchupProjects: SketchupProject[] = [];
+  sketchupLoading = false;
+  sketchupError = '';
+  sketchupFile: File | null = null;
+  sketchupTitle = '';
+  sketchupNotes = '';
+  sketchupEmbedCode = '';
+  sketchupUploading = false;
+  sketchupViewerUrl: SafeResourceUrl | null = null;
+  sketchupSelectedName: string | null = null;
+  sketchupViewerProjectId: number | null = null;
+  sketchupDeleting: Record<number, boolean> = {};
 
-  constructor(private datos: Datos, private router: Router) {}
+  constructor(private datos: Datos, private router: Router, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     // Ensure only admin can access this page
@@ -109,6 +140,7 @@ export class AdminCarpintero implements OnInit {
         this.loadManagedUsers();
         this.loadArchitectProjects('pending');
         this.loadArchitectProjects('accepted');
+        this.loadSketchupProjects();
       },
       error: () => {
         // fallback: check localStorage
@@ -126,11 +158,12 @@ export class AdminCarpintero implements OnInit {
             this.loadManagedUsers();
             this.loadArchitectProjects('pending');
             this.loadArchitectProjects('accepted');
+            this.loadSketchupProjects();
             return;
           }
         } catch (e) {}
         this.router.navigate(['/error']);
-      }
+      },
     });
   }
 
@@ -139,13 +172,13 @@ export class AdminCarpintero implements OnInit {
       next: (res: any) => {
         this.pendingPresupuestos = res.presupuestos || [];
       },
-      error: (err) => console.error('Error loading presupuestos', err)
+      error: (err) => console.error('Error loading presupuestos', err),
     });
   }
 
   accept(presupuestoId: number): void {
     // Open price modal so carpintero can input final price before accepting
-    const p = this.pendingPresupuestos.find(pp => pp.presupuesto_id === presupuestoId) || null;
+    const p = this.pendingPresupuestos.find((pp) => pp.presupuesto_id === presupuestoId) || null;
     this.priceModalPresupuesto = p;
     this.showPriceModal = true;
   }
@@ -176,7 +209,7 @@ export class AdminCarpintero implements OnInit {
       },
       error: (err) => {
         this.showToast('Error rechazando presupuesto', 'error');
-      }
+      },
     });
   }
 
@@ -191,7 +224,7 @@ export class AdminCarpintero implements OnInit {
       next: (res: any) => {
         this.todoProjects = res.projects || [];
       },
-      error: (err) => console.error('Error loading todo list', err)
+      error: (err) => console.error('Error loading todo list', err),
     });
   }
 
@@ -203,7 +236,7 @@ export class AdminCarpintero implements OnInit {
         // accepted projects are those that were assigned to carpintero (carpintero_estado not null)
         this.acceptedProjects = projects.filter((p: any) => p.carpintero_estado !== null);
       },
-      error: (err) => console.error('Error loading accepted projects', err)
+      error: (err) => console.error('Error loading accepted projects', err),
     });
   }
 
@@ -216,12 +249,16 @@ export class AdminCarpintero implements OnInit {
         this.orders = raw.map((o: any) => {
           let items = o.items || [];
           if (typeof items === 'string') {
-            try { items = JSON.parse(items); } catch (e) { items = []; }
+            try {
+              items = JSON.parse(items);
+            } catch (e) {
+              items = [];
+            }
           }
           return { ...o, items };
         });
       },
-      error: (err) => console.error('Error loading orders', err)
+      error: (err) => console.error('Error loading orders', err),
     });
   }
 
@@ -237,7 +274,7 @@ export class AdminCarpintero implements OnInit {
         console.error('Error loading managed users', err);
         this.managedUsersError = 'No se pudieron cargar los usuarios.';
         this.managedUsersLoading = false;
-      }
+      },
     });
   }
 
@@ -269,7 +306,7 @@ export class AdminCarpintero implements OnInit {
           this.architectAcceptedError = 'No se pudieron cargar los aceptados.';
           this.architectAcceptedLoading = false;
         }
-      }
+      },
     });
   }
 
@@ -294,7 +331,7 @@ export class AdminCarpintero implements OnInit {
         console.error('Error updating architect project', err);
         this.showToast('No se pudo actualizar el proyecto.', 'error');
         delete this.architectDecisionSaving[project.id];
-      }
+      },
     });
   }
 
@@ -306,8 +343,161 @@ export class AdminCarpintero implements OnInit {
       return project.file_url;
     }
     const base = this.datos.url.endsWith('/') ? this.datos.url : this.datos.url + '/';
-    const relative = project.file_url.startsWith('/') ? project.file_url.substring(1) : project.file_url;
+    const relative = project.file_url.startsWith('/')
+      ? project.file_url.substring(1)
+      : project.file_url;
     return base + relative;
+  }
+
+  loadSketchupProjects(): void {
+    this.sketchupLoading = true;
+    this.sketchupError = '';
+    this.datos.getSketchupProjects().subscribe({
+      next: (projects) => {
+        this.sketchupProjects = projects ?? [];
+        this.sketchupLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading SketchUp projects', err);
+        this.sketchupError = 'No se pudieron cargar los modelos.';
+        this.sketchupLoading = false;
+      },
+    });
+  }
+
+  onSketchupFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files && input.files.length ? input.files[0] : null;
+    if (!file) {
+      this.sketchupFile = null;
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith('.skp')) {
+      this.sketchupError = 'Solo se permiten archivos .skp.';
+      this.sketchupFile = null;
+      return;
+    }
+    this.sketchupError = '';
+    this.sketchupFile = file;
+  }
+
+  uploadSketchupModel(): void {
+    if (!this.sketchupFile) {
+      this.sketchupError = 'Selecciona un archivo .skp para subir.';
+      return;
+    }
+    this.sketchupUploading = true;
+    this.sketchupError = '';
+    const embedUrl = this.sketchupEmbedCode?.trim();
+    this.datos
+      .uploadSketchupProject({
+        file: this.sketchupFile,
+        title: this.sketchupTitle,
+        notes: this.sketchupNotes,
+        embedUrl: embedUrl || undefined,
+      })
+      .subscribe({
+        next: (project) => {
+          if (project && project.id) {
+            this.sketchupProjects = [project, ...this.sketchupProjects];
+            this.openSketchupViewer(project);
+            this.sketchupTitle = '';
+            this.sketchupNotes = '';
+            this.sketchupEmbedCode = '';
+            this.sketchupFile = null;
+            this.showToast('Modelo SketchUp subido', 'success');
+          } else {
+            this.sketchupError = 'No se pudo registrar el modelo.';
+          }
+          this.sketchupUploading = false;
+        },
+        error: (err) => {
+          console.error('Error uploading SketchUp model', err);
+          const msg = err?.error?.error || 'No se pudo subir el modelo.';
+          this.sketchupError = msg;
+          this.sketchupUploading = false;
+        },
+      });
+  }
+
+  getSketchupFileUrl(project: SketchupProject): string {
+    if (!project?.file_url) {
+      return '';
+    }
+    if (project.file_url.startsWith('http')) {
+      return project.file_url;
+    }
+    const base = this.datos.url.endsWith('/') ? this.datos.url : this.datos.url + '/';
+    const relative = project.file_url.startsWith('/')
+      ? project.file_url.substring(1)
+      : project.file_url;
+    return base + relative;
+  }
+
+  openSketchupViewer(project: SketchupProject): void {
+    const embedUrl = this.extractEmbedUrl(project?.embed_url);
+    if (!embedUrl) {
+      this.sketchupViewerUrl = null;
+      this.sketchupSelectedName = null;
+      this.sketchupViewerProjectId = null;
+      this.sketchupError = 'Agrega el iframe de 3D Warehouse para este modelo.';
+      return;
+    }
+    this.sketchupError = '';
+    this.sketchupViewerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    this.sketchupSelectedName =
+      project.title || project.file_original_name || `Modelo #${project.id}`;
+    this.sketchupViewerProjectId = project?.id ?? null;
+  }
+
+  confirmDeleteSketchup(project: SketchupProject): void {
+    if (!project || !project.id) return;
+    const name = project.title || project.file_original_name || `Modelo #${project.id}`;
+    this.confirmMessage = `¿Deseas excluir "${name}"?`;
+    this.confirmAction = 'deleteSketchupProject';
+    this.confirmTargetId = project.id;
+    this.showConfirmModal = true;
+  }
+
+  deleteSketchupProject(projectId: number): void {
+    if (!projectId) return;
+    this.sketchupDeleting[projectId] = true;
+    this.datos.deleteSketchupProject(projectId).subscribe({
+      next: () => {
+        delete this.sketchupDeleting[projectId];
+        this.sketchupProjects = this.sketchupProjects.filter((proj) => proj.id !== projectId);
+        if (this.sketchupViewerProjectId === projectId) {
+          this.sketchupViewerProjectId = null;
+          this.sketchupViewerUrl = null;
+          this.sketchupSelectedName = null;
+        }
+        this.showToast('Modelo excluido', 'success');
+      },
+      error: (err) => {
+        console.error('Error deleting SketchUp project', err);
+        delete this.sketchupDeleting[projectId];
+        const msg = err?.error?.error || 'No se pudo excluir el modelo.';
+        this.showToast(msg, 'error');
+      },
+    });
+  }
+
+  private extractEmbedUrl(raw?: string | null): string | null {
+    if (!raw) {
+      return null;
+    }
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      return null;
+    }
+    if (trimmed.toLowerCase().includes('<iframe')) {
+      const match = trimmed.match(/src=["']([^"']+)["']/i);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+      return null;
+    }
+    return trimmed;
   }
 
   refreshManagedUsers(): void {
@@ -344,7 +534,7 @@ export class AdminCarpintero implements OnInit {
       email: user.email || '',
       telefono: user.telefono || '',
       rol: (user.rol as ManagedUserRole) || 'cliente',
-      password: ''
+      password: '',
     };
     this.showUserModal = true;
   }
@@ -377,7 +567,7 @@ export class AdminCarpintero implements OnInit {
       email: form.email.trim(),
       rol: form.rol,
       telefono: form.telefono.trim() ? form.telefono.trim() : null,
-      password: passwordValue
+      password: passwordValue,
     };
 
     this.savingUser = true;
@@ -393,7 +583,7 @@ export class AdminCarpintero implements OnInit {
         const message = err?.error?.error || 'No se pudo crear el usuario';
         this.showToast(message, 'error');
         this.savingUser = false;
-      }
+      },
     });
   }
 
@@ -417,7 +607,7 @@ export class AdminCarpintero implements OnInit {
       nombre: form.nombre.trim(),
       email: form.email.trim(),
       telefono: form.telefono.trim() ? form.telefono.trim() : null,
-      rol: form.rol
+      rol: form.rol,
     };
     if (passwordValue) {
       payload.password = passwordValue;
@@ -436,7 +626,7 @@ export class AdminCarpintero implements OnInit {
         const message = err?.error?.error || 'No se pudo actualizar el usuario';
         this.showToast(message, 'error');
         this.savingUser = false;
-      }
+      },
     });
   }
 
@@ -461,7 +651,7 @@ export class AdminCarpintero implements OnInit {
       error: (err) => {
         console.error('Error deleting user', err);
         this.showToast('No se pudo excluir el usuario', 'error');
-      }
+      },
     });
   }
 
@@ -471,33 +661,38 @@ export class AdminCarpintero implements OnInit {
       email: '',
       telefono: '',
       rol: 'cliente',
-      password: ''
+      password: '',
     };
   }
 
   // Getters to split orders into columns similar to projects
   get orderTodoList(): any[] {
-    return this.orders.filter(o => {
+    return this.orders.filter((o) => {
       const s = (o.estado || o.status || '').toString().toLowerCase();
       return s === 'pendiente' || s === 'to-do' || s === 'todo' || s === '';
     });
   }
 
   get orderInProgressList(): any[] {
-    return this.orders.filter(o => {
+    return this.orders.filter((o) => {
       const s = (o.estado || o.status || '').toString().toLowerCase();
-      return s.includes('in progress') || s === 'inprogress' || s.includes('progreso') || s.includes('proceso');
+      return (
+        s.includes('in progress') ||
+        s === 'inprogress' ||
+        s.includes('progreso') ||
+        s.includes('proceso')
+      );
     });
   }
 
   get orderDoneList(): any[] {
-    return this.orders.filter(o => {
+    return this.orders.filter((o) => {
       const s = (o.estado || o.status || '').toString().toLowerCase();
       return s === 'done' || s === 'finalizado' || s === 'done' || s.includes('done');
     });
   }
 
-  // Called when admin switches tabs (index 0 = pendientes, 1 = todo, 2 = pedidos)
+  // Called when admin switches tabs (0: pendientes, 1: to-do, 2: architect pending, 3: architect accepted, 4: sketchup, 5: pedidos, 6: clientes, 7: mensajes)
   onTabChange(index: number): void {
     switch (index) {
       case 0:
@@ -513,12 +708,15 @@ export class AdminCarpintero implements OnInit {
         this.loadArchitectProjects('accepted');
         break;
       case 4:
-        this.loadOrders();
+        this.loadSketchupProjects();
         break;
       case 5:
-        this.loadManagedUsers();
+        this.loadOrders();
         break;
       case 6:
+        this.loadManagedUsers();
+        break;
+      case 7:
         this.loadMessages();
         break;
       default:
@@ -528,15 +726,25 @@ export class AdminCarpintero implements OnInit {
 
   // Grouped getters for To-Do columns
   get todoProjectsList(): any[] {
-    return this.acceptedProjects.filter(p => (p.carpintero_estado || '').toLowerCase() === 'to-do' || (p.carpintero_estado || '').toLowerCase() === 'todo');
+    return this.acceptedProjects.filter(
+      (p) =>
+        (p.carpintero_estado || '').toLowerCase() === 'to-do' ||
+        (p.carpintero_estado || '').toLowerCase() === 'todo'
+    );
   }
 
   get inProgressProjectsList(): any[] {
-    return this.acceptedProjects.filter(p => (p.carpintero_estado || '').toLowerCase() === 'in progress' || (p.carpintero_estado || '').toLowerCase() === 'inprogress');
+    return this.acceptedProjects.filter(
+      (p) =>
+        (p.carpintero_estado || '').toLowerCase() === 'in progress' ||
+        (p.carpintero_estado || '').toLowerCase() === 'inprogress'
+    );
   }
 
   get doneProjectsList(): any[] {
-    return this.acceptedProjects.filter(p => (p.carpintero_estado || '').toLowerCase() === 'done');
+    return this.acceptedProjects.filter(
+      (p) => (p.carpintero_estado || '').toLowerCase() === 'done'
+    );
   }
 
   // Save a single project's estado
@@ -557,7 +765,7 @@ export class AdminCarpintero implements OnInit {
         // refresh lists to move project between columns
         this.loadAcceptedProjects();
       },
-      error: () => this.showToast('Error guardando estado', 'error')
+      error: () => this.showToast('Error guardando estado', 'error'),
     });
   }
 
@@ -565,7 +773,9 @@ export class AdminCarpintero implements OnInit {
   saveOrderStatus(order: any): void {
     if (!order || !order.id) return;
     const newStatus = order.pendingEstado ?? order.estado;
-    if ((order.estado || '').toString().toLowerCase() === (newStatus || '').toString().toLowerCase()) {
+    if (
+      (order.estado || '').toString().toLowerCase() === (newStatus || '').toString().toLowerCase()
+    ) {
       delete order.pendingEstado;
       this.showToast('No hay cambios para guardar', 'info');
       return;
@@ -583,7 +793,7 @@ export class AdminCarpintero implements OnInit {
       error: (err) => {
         console.error('Error saving order status', err);
         this.showToast('Error guardando estado del pedido', 'error');
-      }
+      },
     });
   }
 
@@ -622,7 +832,7 @@ export class AdminCarpintero implements OnInit {
 
   // Save all accepted projects at once
   saveAllAccepted(): void {
-    const saves = this.acceptedProjects.map(p => {
+    const saves = this.acceptedProjects.map((p) => {
       return new Promise<void>((resolve) => {
         const newStatus = p.pendingEstado ?? p.carpintero_estado;
         if ((p.carpintero_estado || '').toLowerCase() === (newStatus || '').toLowerCase()) {
@@ -637,17 +847,22 @@ export class AdminCarpintero implements OnInit {
             delete p.pendingEstado;
             resolve();
           },
-          error: () => { resolve(); }
+          error: () => {
+            resolve();
+          },
         });
       });
     });
-    Promise.all(saves).then(() => { this.loadAcceptedProjects(); this.showToast('Todos los cambios guardados', 'success'); });
+    Promise.all(saves).then(() => {
+      this.loadAcceptedProjects();
+      this.showToast('Todos los cambios guardados', 'success');
+    });
   }
 
   updateProgress(proyectoId: number, estado: string): void {
     this.datos.updateProjectProgress(proyectoId, estado).subscribe({
       next: () => this.loadTodoList(),
-      error: (err) => this.showToast('Error actualizando progreso', 'error')
+      error: (err) => this.showToast('Error actualizando progreso', 'error'),
     });
   }
 
@@ -665,24 +880,26 @@ export class AdminCarpintero implements OnInit {
           this.loadPending();
           this.showToast('Presupuesto aceptado', 'success');
         },
-        error: () => this.showToast('Error aceptando presupuesto', 'error')
+        error: () => this.showToast('Error aceptando presupuesto', 'error'),
       });
-    } else if (action === 'saveProject' && target) {
-      const proj = this.acceptedProjects.find((p: any) => p.proyecto_id === target);
-      if (proj) {
-        this.saveProject(proj);
-      } else {
+      } else if (action === 'saveProject' && target) {
+        const proj = this.acceptedProjects.find((p: any) => p.proyecto_id === target);
+        if (proj) {
+          this.saveProject(proj);
+        } else {
         this.datos.updateProjectProgress(target, 'to-do').subscribe({
           next: () => this.showToast('Estado actualizado', 'success'),
-          error: () => this.showToast('Error guardando estado', 'error')
+          error: () => this.showToast('Error guardando estado', 'error'),
         });
       }
-    } else if (action === 'saveAllAccepted') {
-      this.saveAllAccepted();
-    } else if (action === 'deleteManagedUser' && target) {
-      this.deleteManagedUser(target);
+      } else if (action === 'saveAllAccepted') {
+        this.saveAllAccepted();
+      } else if (action === 'deleteManagedUser' && target) {
+        this.deleteManagedUser(target);
+      } else if (action === 'deleteSketchupProject' && target) {
+        this.deleteSketchupProject(target);
+      }
     }
-  }
 
   loadMessages(): void {
     this.messagesLoading = true;
@@ -690,7 +907,7 @@ export class AdminCarpintero implements OnInit {
     this.datos.getAdminMessages().subscribe({
       next: (res) => {
         if (res && res.success && Array.isArray(res.messages)) {
-          this.contactMessages = res.messages.map(msg => ({ ...msg, pendingResponse: '' }));
+          this.contactMessages = res.messages.map((msg) => ({ ...msg, pendingResponse: '' }));
           if (typeof res.unread_count === 'number') {
             this.unreadMessageCount = res.unread_count;
           } else {
@@ -706,7 +923,7 @@ export class AdminCarpintero implements OnInit {
         console.error('Error loading messages', err);
         this.messagesLoading = false;
         this.messagesError = 'Unable to load messages.';
-      }
+      },
     });
   }
 
@@ -717,7 +934,10 @@ export class AdminCarpintero implements OnInit {
     }, 0);
   }
 
-  markMessageStatus(msg: ContactMessage & { pendingResponse?: string }, state: 'new' | 'read'): void {
+  markMessageStatus(
+    msg: ContactMessage & { pendingResponse?: string },
+    state: 'new' | 'read'
+  ): void {
     if (!msg || !msg.id) return;
     const isCurrentlyUnread = Number(msg.admin_unread ?? 0) === 1;
     if ((state === 'read' && !isCurrentlyUnread) || (state === 'new' && isCurrentlyUnread)) {
@@ -740,7 +960,7 @@ export class AdminCarpintero implements OnInit {
       error: (err) => {
         console.error('Error updating message status', err);
         this.showToast('No se pudo actualizar el estado del mensaje', 'error');
-      }
+      },
     });
   }
 
@@ -769,7 +989,7 @@ export class AdminCarpintero implements OnInit {
       error: (err) => {
         console.error('Error sending response', err);
         this.showToast('No se pudo enviar la respuesta', 'error');
-      }
+      },
     });
   }
 
@@ -790,7 +1010,7 @@ export class AdminCarpintero implements OnInit {
         this.loadPending();
         this.showToast('Presupuesto aceptado y precio enviado al cliente', 'success');
       },
-      error: () => this.showToast('Error aceptando presupuesto', 'error')
+      error: () => this.showToast('Error aceptando presupuesto', 'error'),
     });
   }
 
@@ -815,7 +1035,11 @@ export class AdminCarpintero implements OnInit {
       // also attach project description if available
       if (!ap.proyecto && data.proyecto_nombre) ap.proyecto = data.proyecto_nombre;
       this.detailModalData = ap;
-    } else if (data.presupuestos && Array.isArray(data.presupuestos) && data.presupuestos.length === 1) {
+    } else if (
+      data.presupuestos &&
+      Array.isArray(data.presupuestos) &&
+      data.presupuestos.length === 1
+    ) {
       // sometimes a single-presupuesto object is wrapped as project; prefer that presupuesto
       this.detailModalData = data.presupuestos[0];
     } else {
@@ -833,13 +1057,18 @@ export class AdminCarpintero implements OnInit {
   // Note: status selection updates locally; confirmation happens on 'Guardar' to persist changes.
 
   // Toast helper
-  showToast(message: string, type: 'success' | 'error' | 'info' | 'warning' = 'success', duration = 3000): void {
+  showToast(
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'success',
+    duration = 3000
+  ): void {
     this.toastMessage = message;
     this.toastType = type;
     this.toastDuration = duration;
     this.toastVisible = true;
     // Auto hide after duration + small buffer
-    setTimeout(() => { this.toastVisible = false; }, duration + 400);
+    setTimeout(() => {
+      this.toastVisible = false;
+    }, duration + 400);
   }
-
 }
