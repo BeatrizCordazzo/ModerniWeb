@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use 'styles/theme' as theme;
+@import 'leaflet/dist/leaflet.css';
 
 // Angular Material base theme ------------------------------------------------
 html {

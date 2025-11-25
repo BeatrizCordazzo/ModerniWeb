@@ -195,19 +195,6 @@ export class Datos {
     return this.http.post(this.url + 'logout.php', {}, { withCredentials: true });
   }
 
-  savePushToken(payload: { token: string; userId?: number; platform?: string }): Observable<any> {
-    const body: any = {
-      token: payload.token,
-      platform: payload.platform ?? 'web'
-    };
-
-    if (payload.userId) {
-      body.userId = payload.userId;
-    }
-
-    return this.http.post(this.url + 'save_fcm_token.php', body, { withCredentials: true });
-  }
-
   // Get all products or filter by category
   getProducts(category?: string): Observable<Product[]> {
     let endpoint = this.url + 'get_products.php';
