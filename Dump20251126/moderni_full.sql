@@ -1,7 +1,5 @@
-﻿CREATE DATABASE IF NOT EXISTS moderni1 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE moderni1;
-
--- >>>>> BEGIN moderni_architect_projects.sql <<<<<
+﻿CREATE DATABASE IF NOT EXISTS moderni CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE moderni;
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -52,7 +50,7 @@ CREATE TABLE `architect_projects` (
 
 LOCK TABLES `architect_projects` WRITE;
 /*!40000 ALTER TABLE `architect_projects` DISABLE KEYS */;
-INSERT INTO `architect_projects` VALUES (1,4,'Kitchen remodel','Iâ€™m sharing the scope of work and details for the upcoming kitchen remodel at [Clientâ€™s Name / Project Address]. Please review the following carpentry requirements and let me know if you need additional drawings or clarification before we finalize the schedule.\r\n\r\nProject Overview\r\n\r\nThe design focuses on a modern, functional kitchen with clean lines, high-quality finishes, and efficient use of space. The cabinetry will be custom-built to match the architectural plans (see drawings A-201 to A-205).\r\n\r\nScope of Work\r\n\r\nCustom Cabinetry\r\n\r\nFabricate and install full-height kitchen cabinets per dimensions in drawing A-202.\r\n\r\nMaterial: Â¾â€ birch plywood carcass with solid maple face frames.\r\n\r\nFinish: Painted (color TBD â€“ likely satin white).\r\n\r\nHardware: Soft-close hinges and full-extension drawer slides (Blum or equivalent).\r\n\r\nIsland Construction\r\n\r\nDimensions: 96â€ x 42â€ x 36â€ high.\r\n\r\nInclude provisions for electrical outlets on both sides.\r\n\r\nPaneling to match base cabinets, with solid oak end panels and decorative trim per detail D-301.\r\n\r\nTrim and Finishes\r\n\r\nInstall crown molding to match cabinet finish.\r\n\r\nBaseboards and light valance under upper cabinets.\r\n\r\nAdjustments for integrated LED lighting strip (supplied by electrician).\r\n\r\nCountertop Support\r\n\r\nProvide structural support framing for quartz countertop (2 cm thickness) as shown in section S-102.','uploads/architect_projects/architect_4_1763050924_134b8c68.docx','Resumen.docx','accepted','That\'s perfect i\'ll start on that and text you my progress.','2025-11-13 17:25:12','2025-11-13 16:22:04','2025-11-13 16:25:12');
+INSERT INTO `architect_projects` VALUES (1,4,'Kitchen remodel','I’m sharing the scope of work and details for the upcoming kitchen remodel at [Client’s Name / Project Address]. Please review the following carpentry requirements and let me know if you need additional drawings or clarification before we finalize the schedule.\r\n\r\nProject Overview\r\n\r\nThe design focuses on a modern, functional kitchen with clean lines, high-quality finishes, and efficient use of space. The cabinetry will be custom-built to match the architectural plans (see drawings A-201 to A-205).\r\n\r\nScope of Work\r\n\r\nCustom Cabinetry\r\n\r\nFabricate and install full-height kitchen cabinets per dimensions in drawing A-202.\r\n\r\nMaterial: ¾” birch plywood carcass with solid maple face frames.\r\n\r\nFinish: Painted (color TBD – likely satin white).\r\n\r\nHardware: Soft-close hinges and full-extension drawer slides (Blum or equivalent).\r\n\r\nIsland Construction\r\n\r\nDimensions: 96” x 42” x 36” high.\r\n\r\nInclude provisions for electrical outlets on both sides.\r\n\r\nPaneling to match base cabinets, with solid oak end panels and decorative trim per detail D-301.\r\n\r\nTrim and Finishes\r\n\r\nInstall crown molding to match cabinet finish.\r\n\r\nBaseboards and light valance under upper cabinets.\r\n\r\nAdjustments for integrated LED lighting strip (supplied by electrician).\r\n\r\nCountertop Support\r\n\r\nProvide structural support framing for quartz countertop (2 cm thickness) as shown in section S-102.','uploads/architect_projects/architect_4_1763050924_134b8c68.docx','Resumen.docx','accepted','That\'s perfect i\'ll start on that and text you my progress.','2025-11-13 17:25:12','2025-11-13 16:22:04','2025-11-13 16:25:12');
 /*!40000 ALTER TABLE `architect_projects` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -66,10 +64,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:40
-
--- <<<<< END moderni_architect_projects.sql >>>>>
-
--- >>>>> BEGIN moderni_archivos_proyecto.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -127,10 +121,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:44
 
--- <<<<< END moderni_archivos_proyecto.sql >>>>>
-
--- >>>>> BEGIN moderni_categorias.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -185,67 +175,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:42
-
--- <<<<< END moderni_categorias.sql >>>>>
-
--- >>>>> BEGIN moderni_colores.sql <<<<<
-
--- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
---
--- Host: localhost    Database: moderni
--- ------------------------------------------------------
--- Server version	8.0.19
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `colores`
---
-
-DROP TABLE IF EXISTS `colores`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `colores` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  `codigo_hex` varchar(7) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `colores`
---
-
-LOCK TABLES `colores` WRITE;
-/*!40000 ALTER TABLE `colores` DISABLE KEYS */;
-INSERT INTO `colores` VALUES (1,'Beige','#F5F5DC'),(2,'Gray','#808080'),(3,'Navy','#000080'),(4,'Oak','#C19A6B'),(5,'Walnut','#5C4033'),(6,'Black Metal','#1C1C1C'),(7,'White Metal','#F8F8F8'),(8,'White','#FFFFFF'),(9,'Black','#000000'),(10,'Red','#DC143C'),(11,'Emerald Green','#50C878'),(12,'Navy Blue','#000080'),(13,'Burgundy','#800020'),(14,'Gray Fabric','#A9A9A9'),(15,'Beige Fabric','#F5F5DC'),(16,'Bamboo','#D2B48C'),(17,'Brass','#B5A642'),(18,'White Oak','#F0E6D2'),(19,'Dark Oak','#6F4E37'),(20,'Natural Wood','#DEB887'),(21,'Natural Oak','#D2B48C'),(22,'Dark Walnut','#5C4033'),(23,'Light Gray','#D3D3D3'),(24,'Charcoal','#36454F'),(25,'Espresso','#3D2817'),(26,'Ivory','#FFFFF0'),(27,'Cream','#FFFDD0'),(28,'Sage Green','#9DC183'),(29,'Dusty Blue','#6B8E9F'),(30,'Taupe','#483C32');
-/*!40000 ALTER TABLE `colores` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2025-11-26 11:49:43
-
--- <<<<< END moderni_colores.sql >>>>>
-
--- >>>>> BEGIN moderni_colores_mueble.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -304,9 +233,58 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:44
 
--- <<<<< END moderni_colores_mueble.sql >>>>>
+-- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
+--
+-- Host: localhost    Database: moderni
+-- ------------------------------------------------------
+-- Server version	8.0.19
 
--- >>>>> BEGIN moderni_contact_messages.sql <<<<<
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `colores`
+--
+
+DROP TABLE IF EXISTS `colores`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `colores` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `codigo_hex` varchar(7) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `colores`
+--
+
+LOCK TABLES `colores` WRITE;
+/*!40000 ALTER TABLE `colores` DISABLE KEYS */;
+INSERT INTO `colores` VALUES (1,'Beige','#F5F5DC'),(2,'Gray','#808080'),(3,'Navy','#000080'),(4,'Oak','#C19A6B'),(5,'Walnut','#5C4033'),(6,'Black Metal','#1C1C1C'),(7,'White Metal','#F8F8F8'),(8,'White','#FFFFFF'),(9,'Black','#000000'),(10,'Red','#DC143C'),(11,'Emerald Green','#50C878'),(12,'Navy Blue','#000080'),(13,'Burgundy','#800020'),(14,'Gray Fabric','#A9A9A9'),(15,'Beige Fabric','#F5F5DC'),(16,'Bamboo','#D2B48C'),(17,'Brass','#B5A642'),(18,'White Oak','#F0E6D2'),(19,'Dark Oak','#6F4E37'),(20,'Natural Wood','#DEB887'),(21,'Natural Oak','#D2B48C'),(22,'Dark Walnut','#5C4033'),(23,'Light Gray','#D3D3D3'),(24,'Charcoal','#36454F'),(25,'Espresso','#3D2817'),(26,'Ivory','#FFFFF0'),(27,'Cream','#FFFDD0'),(28,'Sage Green','#9DC183'),(29,'Dusty Blue','#6B8E9F'),(30,'Taupe','#483C32');
+/*!40000 ALTER TABLE `colores` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-11-26 11:49:43
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -377,10 +355,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:41
 
--- <<<<< END moderni_contact_messages.sql >>>>>
-
--- >>>>> BEGIN moderni_custom_furniture_options.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -446,10 +420,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:42
 
--- <<<<< END moderni_custom_furniture_options.sql >>>>>
-
--- >>>>> BEGIN moderni_detalle_presupuesto.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -505,10 +475,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:43
-
--- <<<<< END moderni_detalle_presupuesto.sql >>>>>
-
--- >>>>> BEGIN moderni_muebles.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -580,10 +546,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:41
 
--- <<<<< END moderni_muebles.sql >>>>>
-
--- >>>>> BEGIN moderni_order_reviews.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -630,7 +592,7 @@ CREATE TABLE `order_reviews` (
 
 LOCK TABLES `order_reviews` WRITE;
 /*!40000 ALTER TABLE `order_reviews` DISABLE KEYS */;
-INSERT INTO `order_reviews` VALUES (1,1,5,'pedido',5,'Iâ€™m absolutely thrilled with the classic bedroom the team created for me! The craftsmanship is outstanding â€” every detail, from the wardrobe to the bed frame, shows real skill and care. They perfectly captured the timeless look I wanted. Professional, reliable, and truly talented â€” highly recommended!','2025-11-07 12:24:05',NULL);
+INSERT INTO `order_reviews` VALUES (1,1,5,'pedido',5,'I’m absolutely thrilled with the classic bedroom the team created for me! The craftsmanship is outstanding — every detail, from the wardrobe to the bed frame, shows real skill and care. They perfectly captured the timeless look I wanted. Professional, reliable, and truly talented — highly recommended!','2025-11-07 12:24:05',NULL);
 /*!40000 ALTER TABLE `order_reviews` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -644,10 +606,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:43
-
--- <<<<< END moderni_order_reviews.sql >>>>>
-
--- >>>>> BEGIN moderni_pedido_items.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -709,10 +667,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:42
-
--- <<<<< END moderni_pedido_items.sql >>>>>
-
--- >>>>> BEGIN moderni_pedidos.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -779,10 +733,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:43
 
--- <<<<< END moderni_pedidos.sql >>>>>
-
--- >>>>> BEGIN moderni_presupuestos.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -848,77 +798,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:42
 
--- <<<<< END moderni_presupuestos.sql >>>>>
-
--- >>>>> BEGIN moderni_proyectos.sql <<<<<
-
--- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
---
--- Host: localhost    Database: moderni
--- ------------------------------------------------------
--- Server version	8.0.19
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `proyectos`
---
-
-DROP TABLE IF EXISTS `proyectos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `proyectos` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `cliente_id` int NOT NULL,
-  `arquitecto_id` int DEFAULT NULL,
-  `nombre` varchar(150) NOT NULL,
-  `descripcion` text,
-  `estado` enum('pendiente','en_diseÃ±o','en_fabricacion','entregado') DEFAULT 'pendiente',
-  `fecha_inicio` date DEFAULT NULL,
-  `fecha_entrega` date DEFAULT NULL,
-  `carpintero_estado` enum('to-do','in progress','done') DEFAULT 'to-do',
-  PRIMARY KEY (`id`),
-  KEY `cliente_id` (`cliente_id`),
-  KEY `arquitecto_id` (`arquitecto_id`),
-  CONSTRAINT `proyectos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `usuarios` (`id`),
-  CONSTRAINT `proyectos_ibfk_2` FOREIGN KEY (`arquitecto_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `proyectos`
---
-
-LOCK TABLES `proyectos` WRITE;
-/*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
-INSERT INTO `proyectos` VALUES (1,5,4,'Proyecto Cocina Cliente1','RenovaciÃ³n completa de cocina.','pendiente','2025-10-01','2025-11-15','done'),(2,6,4,'Proyecto BaÃ±o Cliente2','RediseÃ±o del baÃ±o principal.','pendiente','2025-10-10','2025-11-05','in progress'),(3,7,4,'Proyecto Living Cliente3','Reforma del living con nueva carpinterÃ­a.','pendiente','2025-10-05','2025-11-20','to-do'),(5,9,4,'Proyecto Cocina Cliente5','ActualizaciÃ³n de mobiliario y encimera.','pendiente','2025-10-08','2025-12-01','done'),(6,10,4,'Proyecto BaÃ±o Cliente6','Nueva distribuciÃ³n y carpinterÃ­a a medida.','pendiente','2025-10-09','2025-11-18','to-do'),(7,11,4,'Proyecto Oficina Cliente7','Mobiliario a medida para oficina en casa.','pendiente','2025-10-11','2025-11-30','to-do'),(8,12,4,'Proyecto Terraza Cliente8','Deck y cerramiento de carpinterÃ­a.','pendiente','2025-10-12','2025-11-25','to-do'),(9,13,4,'Proyecto Hall Cliente9','Mobiliario y revestimientos de madera.','pendiente','2025-10-13','2025-11-10','in progress'),(13,1,4,'Pedido desde carrito - 2025-10-29T15:46:38.471Z','Pedido generado desde el carrito de compras','pendiente','2025-10-29',NULL,'to-do'),(14,1,4,'Pedido personalizado 2025-11-03 15:41:56','{\"width\":100,\"height\":200,\"depth\":40}','pendiente','2025-11-03',NULL,'in progress'),(15,1,4,'Pedido personalizado 2025-11-03 21:58:34','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-03',NULL,'to-do'),(16,1,4,'Pedido personalizado 2025-11-04 09:47:35','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-04',NULL,'to-do'),(17,1,4,'Pedido desde carrito - 2025-11-04T08:48:03.919Z','Pedido generado desde el carrito de compras','pendiente','2025-11-04',NULL,'to-do'),(18,1,4,'Pedido personalizado 2025-11-04 11:25:55','{\"width\":300,\"height\":200,\"depth\":300}','pendiente','2025-11-04',NULL,'to-do'),(19,1,4,'Pedido personalizado - Bed Frame, Nightstand, Dresser','{\"width\":200,\"height\":200,\"depth\":200}','pendiente','2025-11-04',NULL,'to-do'),(20,1,4,'Pedido personalizado - Bathroom Vanity, Bathroom Mirror, Shower Enclosure','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-04',NULL,'to-do'),(21,2,4,'Pedido personalizado - Base Cabinet, Upper Cabinet, Countertop','{\"width\":100,\"height\":203,\"depth\":42}','pendiente','2025-11-04',NULL,'to-do'),(22,2,4,'Pedido personalizado - Coffee Table, Sofa, TV Entertainment Unit','{\"width\":303,\"height\":202,\"depth\":304}','pendiente','2025-11-04',NULL,'to-do'),(23,1,4,'Pedido personalizado - Sofa, Coffee Table, TV Entertainment Unit','{\"width\":302,\"height\":205,\"depth\":303}','pendiente','2025-11-06',NULL,'in progress');
-/*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2025-11-26 11:49:42
-
--- <<<<< END moderni_proyectos.sql >>>>>
-
--- >>>>> BEGIN moderni_proyectos_showcase.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -972,7 +851,7 @@ CREATE TABLE `proyectos_showcase` (
 
 LOCK TABLES `proyectos_showcase` WRITE;
 /*!40000 ALTER TABLE `proyectos_showcase` DISABLE KEYS */;
-INSERT INTO `proyectos_showcase` VALUES (1,'Modern Kitchen Renovation','Complete kitchen transformation with custom cabinets, quartz countertops, and integrated appliances. The design emphasizes clean lines and functionality while maximizing storage space.','kitchen','RodrÃ­guez Family','Madrid','2024-09-15',45,18500.00,'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','Contemporary',25.50,'High-gloss white lacquer cabinets|Quartz countertops|Stainless steel appliances|LED under-cabinet lighting|Soft-close hardware',1,'2025-10-22 20:07:38'),(2,'Rustic Farmhouse Kitchen','Charming rustic kitchen featuring reclaimed wood elements, open shelving, and a farmhouse sink. Traditional design meets modern functionality.','kitchen','GarcÃ­a Residence','Barcelona','2024-08-22',38,15200.00,'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','Rustic Farmhouse',22.00,'Reclaimed oak cabinets|Butcher block countertops|Ceramic farmhouse sink|Open wood shelving|Vintage brass fixtures',0,'2025-10-22 20:07:38'),(3,'Industrial Loft Kitchen','Bold industrial design with exposed brick, metal accents, and concrete countertops. Perfect for modern urban living.','kitchen','LÃ³pez Studio','Valencia','2024-07-10',42,16800.00,'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','Industrial',28.00,'Metal-framed cabinets|Polished concrete countertops|Exposed brick backsplash|Industrial pendant lights|Black steel fixtures',1,'2025-10-22 20:07:38'),(4,'Luxury Spa Bathroom','Resort-style spa bathroom with freestanding soaking tub, walk-in rain shower, and premium natural stone finishes. A personal sanctuary for relaxation.','bathroom','MartÃ­nez Estate','Marbella','2024-09-01',30,22000.00,'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','Luxury Spa',18.50,'Travertine stone tiles|Freestanding bathtub|Frameless glass shower|Double vanity|Heated floors|Ambient LED lighting',1,'2025-10-22 20:07:38'),(5,'Modern Minimalist Bathroom','Sleek contemporary bathroom with floating vanity, frameless fixtures, and monochromatic color scheme. Clean lines and sophisticated simplicity.','bathroom','FernÃ¡ndez Apartment','Madrid','2024-08-15',25,12500.00,'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Contemporary',12.00,'White porcelain tiles|Floating vanity|Wall-mounted toilet|Frameless mirror|Matte black fixtures|LED backlit mirror',0,'2025-10-22 20:07:38'),(6,'Classic Traditional Bathroom','Elegant traditional bathroom with marble countertops, ornate fixtures, and timeless design elements. Sophisticated and functional.','bathroom','SÃ¡nchez Villa','Sevilla','2024-07-20',28,14800.00,'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Traditional',15.00,'Carrara marble countertop|Classic wood vanity|Chrome fixtures|Framed mirror|Subway tile|Elegant hardware',0,'2025-10-22 20:07:38'),(7,'Master Bedroom Suite','Luxurious master bedroom with custom built-in wardrobes, upholstered headboard, and integrated lighting. Creating the perfect retreat.','bedroom','Torres Penthouse','Barcelona','2024-09-10',35,16500.00,'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','Contemporary Luxury',30.00,'Built-in wardrobes|Upholstered bed frame|Premium wood flooring|Integrated LED lighting|Custom nightstands|Soft-close drawers',1,'2025-10-22 20:07:38'),(8,'Scandinavian Bedroom','Light and airy Nordic-inspired bedroom with light wood furniture, minimalist design, and functional storage solutions.','bedroom','Andersen Home','Madrid','2024-08-05',28,11200.00,'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','Scandinavian',22.00,'Light oak furniture|Minimalist bed frame|Open wardrobe system|Natural fiber textiles|Simple hardware|White wall finishes',0,'2025-10-22 20:07:38'),(9,'Modern Platform Bedroom','Contemporary bedroom with platform bed, floating nightstands, and sleek storage solutions. Sophisticated minimalism.','bedroom','Silva Residence','Valencia','2024-07-28',32,13800.00,'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','Modern',25.00,'Platform bed with storage|Floating nightstands|Built-in closet system|LED accent lighting|High-gloss finishes|Modern hardware',0,'2025-10-22 20:07:38'),(10,'Contemporary Living Space','Open-concept living room with custom entertainment unit, built-in shelving, and modern furniture. Perfect for entertaining.','livingroom','Morales Family','Madrid','2024-09-18',40,19500.00,'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Contemporary',35.00,'Custom entertainment unit|Built-in shelving|Premium upholstery|Wood flooring|Recessed lighting|Modern coffee table',1,'2025-10-22 20:07:38'),(11,'Cozy Traditional Living Room','Warm and inviting traditional living room with custom built-ins, classic furniture, and rich wood finishes.','livingroom','Delgado Home','Barcelona','2024-08-12',36,17200.00,'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Traditional',32.00,'Built-in bookshelves|Classic wood furniture|Area rug|Traditional hardware|Crown molding|Table lamps',0,'2025-10-22 20:07:38'),(12,'Industrial Living Loft','Urban industrial living space with exposed elements, metal accents, and custom furniture pieces. Modern city living.','livingroom','Costa Loft','Valencia','2024-07-15',38,18600.00,'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Industrial',40.00,'Metal shelving units|Exposed brick|Leather furniture|Concrete accents|Industrial lighting|Reclaimed wood',1,'2025-10-22 20:07:38'),(13,'Custom Home Office','Bespoke home office with built-in desk, custom shelving, and ergonomic storage solutions. Productivity meets style.','others','RamÃ­rez Studio','Madrid','2024-09-05',25,8500.00,'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','Modern',15.00,'Built-in desk system|Custom shelving|Cable management|Ergonomic storage|LED task lighting|Premium wood finish',0,'2025-10-22 20:07:38'),(14,'Dining Room Furniture Set','Complete custom dining room set with extendable table, matching chairs, and sideboard. Perfect for family gatherings.','others','Navarro Family','Barcelona','2024-08-20',30,12000.00,'https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1565794529569-e6e6c4c7b77b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','Contemporary',20.00,'Extendable dining table|Upholstered dining chairs|Matching sideboard|Premium wood|Custom finish|Soft-close drawers',0,'2025-10-22 20:07:38'),(15,'Entry Hall Solution','Custom entryway furniture including coat storage, shoe cabinet, and decorative mirror. First impressions matter.','others','JimÃ©nez Home','Sevilla','2024-07-25',20,5800.00,'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=400&h=400&fit=crop','Modern',8.00,'Built-in coat storage|Shoe cabinet|Wall mirror|Bench seating|Hooks and organizers|Durable finishes',0,'2025-10-22 20:07:38');
+INSERT INTO `proyectos_showcase` VALUES (1,'Modern Kitchen Renovation','Complete kitchen transformation with custom cabinets, quartz countertops, and integrated appliances. The design emphasizes clean lines and functionality while maximizing storage space.','kitchen','Rodríguez Family','Madrid','2024-09-15',45,18500.00,'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','Contemporary',25.50,'High-gloss white lacquer cabinets|Quartz countertops|Stainless steel appliances|LED under-cabinet lighting|Soft-close hardware',1,'2025-10-22 20:07:38'),(2,'Rustic Farmhouse Kitchen','Charming rustic kitchen featuring reclaimed wood elements, open shelving, and a farmhouse sink. Traditional design meets modern functionality.','kitchen','García Residence','Barcelona','2024-08-22',38,15200.00,'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','Rustic Farmhouse',22.00,'Reclaimed oak cabinets|Butcher block countertops|Ceramic farmhouse sink|Open wood shelving|Vintage brass fixtures',0,'2025-10-22 20:07:38'),(3,'Industrial Loft Kitchen','Bold industrial design with exposed brick, metal accents, and concrete countertops. Perfect for modern urban living.','kitchen','López Studio','Valencia','2024-07-10',42,16800.00,'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','Industrial',28.00,'Metal-framed cabinets|Polished concrete countertops|Exposed brick backsplash|Industrial pendant lights|Black steel fixtures',1,'2025-10-22 20:07:38'),(4,'Luxury Spa Bathroom','Resort-style spa bathroom with freestanding soaking tub, walk-in rain shower, and premium natural stone finishes. A personal sanctuary for relaxation.','bathroom','Martínez Estate','Marbella','2024-09-01',30,22000.00,'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','Luxury Spa',18.50,'Travertine stone tiles|Freestanding bathtub|Frameless glass shower|Double vanity|Heated floors|Ambient LED lighting',1,'2025-10-22 20:07:38'),(5,'Modern Minimalist Bathroom','Sleek contemporary bathroom with floating vanity, frameless fixtures, and monochromatic color scheme. Clean lines and sophisticated simplicity.','bathroom','Fernández Apartment','Madrid','2024-08-15',25,12500.00,'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Contemporary',12.00,'White porcelain tiles|Floating vanity|Wall-mounted toilet|Frameless mirror|Matte black fixtures|LED backlit mirror',0,'2025-10-22 20:07:38'),(6,'Classic Traditional Bathroom','Elegant traditional bathroom with marble countertops, ornate fixtures, and timeless design elements. Sophisticated and functional.','bathroom','Sánchez Villa','Sevilla','2024-07-20',28,14800.00,'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Traditional',15.00,'Carrara marble countertop|Classic wood vanity|Chrome fixtures|Framed mirror|Subway tile|Elegant hardware',0,'2025-10-22 20:07:38'),(7,'Master Bedroom Suite','Luxurious master bedroom with custom built-in wardrobes, upholstered headboard, and integrated lighting. Creating the perfect retreat.','bedroom','Torres Penthouse','Barcelona','2024-09-10',35,16500.00,'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','Contemporary Luxury',30.00,'Built-in wardrobes|Upholstered bed frame|Premium wood flooring|Integrated LED lighting|Custom nightstands|Soft-close drawers',1,'2025-10-22 20:07:38'),(8,'Scandinavian Bedroom','Light and airy Nordic-inspired bedroom with light wood furniture, minimalist design, and functional storage solutions.','bedroom','Andersen Home','Madrid','2024-08-05',28,11200.00,'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','Scandinavian',22.00,'Light oak furniture|Minimalist bed frame|Open wardrobe system|Natural fiber textiles|Simple hardware|White wall finishes',0,'2025-10-22 20:07:38'),(9,'Modern Platform Bedroom','Contemporary bedroom with platform bed, floating nightstands, and sleek storage solutions. Sophisticated minimalism.','bedroom','Silva Residence','Valencia','2024-07-28',32,13800.00,'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','Modern',25.00,'Platform bed with storage|Floating nightstands|Built-in closet system|LED accent lighting|High-gloss finishes|Modern hardware',0,'2025-10-22 20:07:38'),(10,'Contemporary Living Space','Open-concept living room with custom entertainment unit, built-in shelving, and modern furniture. Perfect for entertaining.','livingroom','Morales Family','Madrid','2024-09-18',40,19500.00,'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Contemporary',35.00,'Custom entertainment unit|Built-in shelving|Premium upholstery|Wood flooring|Recessed lighting|Modern coffee table',1,'2025-10-22 20:07:38'),(11,'Cozy Traditional Living Room','Warm and inviting traditional living room with custom built-ins, classic furniture, and rich wood finishes.','livingroom','Delgado Home','Barcelona','2024-08-12',36,17200.00,'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Traditional',32.00,'Built-in bookshelves|Classic wood furniture|Area rug|Traditional hardware|Crown molding|Table lamps',0,'2025-10-22 20:07:38'),(12,'Industrial Living Loft','Urban industrial living space with exposed elements, metal accents, and custom furniture pieces. Modern city living.','livingroom','Costa Loft','Valencia','2024-07-15',38,18600.00,'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Industrial',40.00,'Metal shelving units|Exposed brick|Leather furniture|Concrete accents|Industrial lighting|Reclaimed wood',1,'2025-10-22 20:07:38'),(13,'Custom Home Office','Bespoke home office with built-in desk, custom shelving, and ergonomic storage solutions. Productivity meets style.','others','Ramírez Studio','Madrid','2024-09-05',25,8500.00,'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','Modern',15.00,'Built-in desk system|Custom shelving|Cable management|Ergonomic storage|LED task lighting|Premium wood finish',0,'2025-10-22 20:07:38'),(14,'Dining Room Furniture Set','Complete custom dining room set with extendable table, matching chairs, and sideboard. Perfect for family gatherings.','others','Navarro Family','Barcelona','2024-08-20',30,12000.00,'https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1565794529569-e6e6c4c7b77b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','Contemporary',20.00,'Extendable dining table|Upholstered dining chairs|Matching sideboard|Premium wood|Custom finish|Soft-close drawers',0,'2025-10-22 20:07:38'),(15,'Entry Hall Solution','Custom entryway furniture including coat storage, shoe cabinet, and decorative mirror. First impressions matter.','others','Jiménez Home','Sevilla','2024-07-25',20,5800.00,'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=400&h=400&fit=crop','Modern',8.00,'Built-in coat storage|Shoe cabinet|Wall mirror|Bench seating|Hooks and organizers|Durable finishes',0,'2025-10-22 20:07:38');
 /*!40000 ALTER TABLE `proyectos_showcase` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -986,10 +865,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:41
-
--- <<<<< END moderni_proyectos_showcase.sql >>>>>
-
--- >>>>> BEGIN moderni_reseñas.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -1009,13 +884,76 @@ UNLOCK TABLES;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `reseÃ±as`
+-- Table structure for table `proyectos`
 --
 
-DROP TABLE IF EXISTS `reseÃ±as`;
+DROP TABLE IF EXISTS `proyectos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `reseÃ±as` (
+CREATE TABLE `proyectos` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `cliente_id` int NOT NULL,
+  `arquitecto_id` int DEFAULT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text,
+  `estado` enum('pendiente','en_diseño','en_fabricacion','entregado') DEFAULT 'pendiente',
+  `fecha_inicio` date DEFAULT NULL,
+  `fecha_entrega` date DEFAULT NULL,
+  `carpintero_estado` enum('to-do','in progress','done') DEFAULT 'to-do',
+  PRIMARY KEY (`id`),
+  KEY `cliente_id` (`cliente_id`),
+  KEY `arquitecto_id` (`arquitecto_id`),
+  CONSTRAINT `proyectos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `usuarios` (`id`),
+  CONSTRAINT `proyectos_ibfk_2` FOREIGN KEY (`arquitecto_id`) REFERENCES `usuarios` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `proyectos`
+--
+
+LOCK TABLES `proyectos` WRITE;
+/*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
+INSERT INTO `proyectos` VALUES (1,5,4,'Proyecto Cocina Cliente1','Renovación completa de cocina.','pendiente','2025-10-01','2025-11-15','done'),(2,6,4,'Proyecto Baño Cliente2','Rediseño del baño principal.','pendiente','2025-10-10','2025-11-05','in progress'),(3,7,4,'Proyecto Living Cliente3','Reforma del living con nueva carpintería.','pendiente','2025-10-05','2025-11-20','to-do'),(5,9,4,'Proyecto Cocina Cliente5','Actualización de mobiliario y encimera.','pendiente','2025-10-08','2025-12-01','done'),(6,10,4,'Proyecto Baño Cliente6','Nueva distribución y carpintería a medida.','pendiente','2025-10-09','2025-11-18','to-do'),(7,11,4,'Proyecto Oficina Cliente7','Mobiliario a medida para oficina en casa.','pendiente','2025-10-11','2025-11-30','to-do'),(8,12,4,'Proyecto Terraza Cliente8','Deck y cerramiento de carpintería.','pendiente','2025-10-12','2025-11-25','to-do'),(9,13,4,'Proyecto Hall Cliente9','Mobiliario y revestimientos de madera.','pendiente','2025-10-13','2025-11-10','in progress'),(13,1,4,'Pedido desde carrito - 2025-10-29T15:46:38.471Z','Pedido generado desde el carrito de compras','pendiente','2025-10-29',NULL,'to-do'),(14,1,4,'Pedido personalizado 2025-11-03 15:41:56','{\"width\":100,\"height\":200,\"depth\":40}','pendiente','2025-11-03',NULL,'in progress'),(15,1,4,'Pedido personalizado 2025-11-03 21:58:34','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-03',NULL,'to-do'),(16,1,4,'Pedido personalizado 2025-11-04 09:47:35','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-04',NULL,'to-do'),(17,1,4,'Pedido desde carrito - 2025-11-04T08:48:03.919Z','Pedido generado desde el carrito de compras','pendiente','2025-11-04',NULL,'to-do'),(18,1,4,'Pedido personalizado 2025-11-04 11:25:55','{\"width\":300,\"height\":200,\"depth\":300}','pendiente','2025-11-04',NULL,'to-do'),(19,1,4,'Pedido personalizado - Bed Frame, Nightstand, Dresser','{\"width\":200,\"height\":200,\"depth\":200}','pendiente','2025-11-04',NULL,'to-do'),(20,1,4,'Pedido personalizado - Bathroom Vanity, Bathroom Mirror, Shower Enclosure','{\"width\":100,\"height\":200,\"depth\":150}','pendiente','2025-11-04',NULL,'to-do'),(21,2,4,'Pedido personalizado - Base Cabinet, Upper Cabinet, Countertop','{\"width\":100,\"height\":203,\"depth\":42}','pendiente','2025-11-04',NULL,'to-do'),(22,2,4,'Pedido personalizado - Coffee Table, Sofa, TV Entertainment Unit','{\"width\":303,\"height\":202,\"depth\":304}','pendiente','2025-11-04',NULL,'to-do'),(23,1,4,'Pedido personalizado - Sofa, Coffee Table, TV Entertainment Unit','{\"width\":302,\"height\":205,\"depth\":303}','pendiente','2025-11-06',NULL,'in progress');
+/*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-11-26 11:49:42
+
+-- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
+--
+-- Host: localhost    Database: moderni
+-- ------------------------------------------------------
+-- Server version	8.0.19
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `reseñas`
+--
+
+DROP TABLE IF EXISTS `reseñas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reseñas` (
   `id` int NOT NULL AUTO_INCREMENT,
   `cliente_id` int NOT NULL,
   `proyecto_id` int NOT NULL,
@@ -1025,19 +963,19 @@ CREATE TABLE `reseÃ±as` (
   PRIMARY KEY (`id`),
   KEY `cliente_id` (`cliente_id`),
   KEY `proyecto_id` (`proyecto_id`),
-  CONSTRAINT `reseÃ±as_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `usuarios` (`id`),
-  CONSTRAINT `reseÃ±as_ibfk_2` FOREIGN KEY (`proyecto_id`) REFERENCES `proyectos` (`id`),
-  CONSTRAINT `reseÃ±as_chk_1` CHECK ((`rating` between 1 and 5))
+  CONSTRAINT `reseñas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `usuarios` (`id`),
+  CONSTRAINT `reseñas_ibfk_2` FOREIGN KEY (`proyecto_id`) REFERENCES `proyectos` (`id`),
+  CONSTRAINT `reseñas_chk_1` CHECK ((`rating` between 1 and 5))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `reseÃ±as`
+-- Dumping data for table `reseñas`
 --
 
-LOCK TABLES `reseÃ±as` WRITE;
-/*!40000 ALTER TABLE `reseÃ±as` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reseÃ±as` ENABLE KEYS */;
+LOCK TABLES `reseñas` WRITE;
+/*!40000 ALTER TABLE `reseñas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `reseñas` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -1050,10 +988,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:43
-
--- <<<<< END moderni_reseñas.sql >>>>>
-
--- >>>>> BEGIN moderni_sketchup_projects.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -1114,10 +1048,6 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:41
-
--- <<<<< END moderni_sketchup_projects.sql >>>>>
-
--- >>>>> BEGIN moderni_user_favorites.sql <<<<<
 
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
@@ -1182,10 +1112,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:40
 
--- <<<<< END moderni_user_favorites.sql >>>>>
-
--- >>>>> BEGIN moderni_user_fcm_tokens.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -1245,10 +1171,6 @@ UNLOCK TABLES;
 
 -- Dump completed on 2025-11-26 11:49:43
 
--- <<<<< END moderni_user_fcm_tokens.sql >>>>>
-
--- >>>>> BEGIN moderni_usuarios.sql <<<<<
-
 -- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
 --
 -- Host: localhost    Database: moderni
@@ -1306,6 +1228,3 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-26 11:49:41
-
--- <<<<< END moderni_usuarios.sql >>>>>
-
