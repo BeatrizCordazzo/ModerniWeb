@@ -13,10 +13,10 @@
     <!-- Not Logged In State -->
     @if (notLogged && !isLoading) {
       <div class="not-logged-container">
-        <h2>Debes iniciar sesi?n para ver tu perfil</h2>
-        <p>Por favor, inicia sesi?n o reg?strate para acceder a tu perfil y pedidos.</p>
+        <h2>Debes iniciar sesión para ver tu perfil</h2>
+        <p>Por favor, inicia sesión o regístrate para acceder a tu perfil y pedidos.</p>
         <div class="not-logged-actions">
-          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesi?n</a>
+          <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn">Iniciar Sesión</a>
           <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
         </div>
       </div>
@@ -133,7 +133,6 @@
               </div>
               <div class="form-actions">
                 <button type="submit" class="save-btn" [disabled]="!hasChanges()">Save Changes</button>
-                <button type="button" class="change-password-btn">Change Password</button>
               </div>
             </form>
           </section>

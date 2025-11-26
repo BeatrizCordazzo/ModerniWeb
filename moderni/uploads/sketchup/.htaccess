@@ -1,0 +1,20 @@
+Options +Indexes
+Require all granted
+
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, Range, Accept-Encoding"
+  Header always set Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+  Header always set Cross-Origin-Resource-Policy "cross-origin"
+  Header always set Content-Type "application/octet-stream"
+</IfModule>
+
+
+<FilesMatch "\.skp$">
+  # Solo para .skp; si prefieres, mueve los headers aquí
+</FilesMatch>
+
+<IfModule mod_negotiation.c>
+  Options -MultiViews
+</IfModule>
