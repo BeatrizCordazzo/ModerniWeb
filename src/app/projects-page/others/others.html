@@ -28,7 +28,7 @@
           <article class="project-card" (click)="viewProject(project)">
             @if (isAdmin) {
               <button class="delete-btn" (click)="confirmDeleteProject(project.id, $event)" title="Eliminar proyecto">
-                ×
+                x
               </button>
             }
             <div class="project-image">

@@ -28,7 +28,7 @@
           <article class="project-card" (click)="viewProject(project)">
             @if (isAdmin) {
               <button class="delete-btn" (click)="confirmDeleteProject(project.id, $event)" title="Eliminar proyecto">
-                ×
+                x
               </button>
             }
             <div class="project-image">
@@ -42,8 +42,8 @@
               <p class="project-location">{{ project.ubicacion }}</p>
               <p class="project-style">{{ project.estilo }}</p>
               <div class="project-meta">
-                <span class="meta-item"><i>ðŸ“…</i> {{ project.fecha_completado | date: 'MMM yyyy' }}</span>
-                <span class="meta-item"><i>ðŸ“</i> {{ project.area_m2 }}mÂ²</span>
+                <span class="meta-item"><i>🗓️</i> {{ project.fecha_completado | date: 'MMM yyyy' }}</span>
+                <span class="meta-item"><i>📐</i> {{ project.area_m2 }}m²</span>
               </div>
             </div>
           </article>
@@ -75,35 +75,35 @@
         <div class="modal-header-section">
           <h2 class="modal-title">{{ selectedProject.titulo }}</h2>
           @if (selectedProject.destacado) {
-            <span class="featured-tag">â­ Proyecto Destacado</span>
+            <span class="featured-tag">⭐ Proyecto Destacado</span>
           }
         </div>
         <p class="modal-description">{{ selectedProject.descripcion }}</p>
         <!-- Quick Stats Cards -->
         <div class="stats-cards">
           <div class="stat-card">
-            <div class="stat-icon">ðŸ“…</div>
+            <div class="stat-icon">🗓️</div>
             <div class="stat-content">
               <span class="stat-label">Completado</span>
               <span class="stat-value">{{ selectedProject.fecha_completado | date: 'dd/MM/yyyy' }}</span>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">â±ï¸</div>
+            <div class="stat-icon">⏱️</div>
             <div class="stat-content">
-              <span class="stat-label">DuraciÃ³n</span>
-              <span class="stat-value">{{ selectedProject.duracion_dias }} dÃ­as</span>
+              <span class="stat-label">Duración</span>
+              <span class="stat-value">{{ selectedProject.duracion_dias }} días</span>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">ðŸ“</div>
+            <div class="stat-icon">📐</div>
             <div class="stat-content">
-              <span class="stat-label">Ãrea Total</span>
-              <span class="stat-value">{{ selectedProject.area_m2 }} mÂ²</span>
+              <span class="stat-label">Área Total</span>
+              <span class="stat-value">{{ selectedProject.area_m2 }} m²</span>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">ðŸŽ¨</div>
+            <div class="stat-icon">🪑</div>
             <div class="stat-content">
               <span class="stat-label">Estilo</span>
               <span class="stat-value">{{ selectedProject.estilo }}</span>
@@ -113,8 +113,8 @@
         <!-- Client & Location Info -->
         <div class="info-section">
           <h3 class="section-title">
-            <span class="title-icon">ðŸ‘¤</span>
-            InformaciÃ³n del Cliente
+            <span class="title-icon">🧤</span>
+            Información del Cliente
           </h3>
           <div class="info-cards">
             <div class="info-card">
@@ -122,36 +122,36 @@
               <div class="info-value">{{ selectedProject.cliente }}</div>
             </div>
             <div class="info-card">
-              <div class="info-label">UbicaciÃ³n</div>
-              <div class="info-value">ðŸ“ {{ selectedProject.ubicacion }}</div>
+              <div class="info-label">Ubicación</div>
+              <div class="info-value">📍 {{ selectedProject.ubicacion }}</div>
             </div>
           </div>
         </div>
         <!-- Timeline Section -->
         <div class="timeline-section">
           <h3 class="section-title">
-            <span class="title-icon">ðŸ“Š</span>
+            <span class="title-icon">📊</span>
             Detalles del Proyecto
           </h3>
           <div class="timeline-items">
             <div class="timeline-item">
-              <div class="timeline-marker">ðŸš€</div>
+              <div class="timeline-marker">🚀</div>
               <div class="timeline-content">
                 <strong>Inicio del Proyecto</strong>
                 <span>{{ getStartDate(selectedProject.fecha_completado, selectedProject.duracion_dias) | date: 'dd MMMM yyyy' }}</span>
               </div>
             </div>
             <div class="timeline-item">
-              <div class="timeline-marker">ðŸ”¨</div>
+              <div class="timeline-marker">🔨</div>
               <div class="timeline-content">
-                <strong>Fase de EjecuciÃ³n</strong>
-                <span>{{ selectedProject.duracion_dias }} dÃ­as de trabajo intensivo</span>
+                <strong>Fase de Ejecución</strong>
+                <span>{{ selectedProject.duracion_dias }} días de trabajo intensivo</span>
               </div>
             </div>
             <div class="timeline-item">
-              <div class="timeline-marker">âœ…</div>
+              <div class="timeline-marker">✔️</div>
               <div class="timeline-content">
-                <strong>FinalizaciÃ³n</strong>
+                <strong>Finalización</strong>
                 <span>{{ selectedProject.fecha_completado | date: 'dd MMMM yyyy' }}</span>
               </div>
             </div>
@@ -160,7 +160,7 @@
         <!-- Materials Section -->
         <div class="materials-section">
           <h3 class="section-title">
-            <span class="title-icon">ðŸ› ï¸</span>
+            <span class="title-icon">🛠️</span>
             Materiales Utilizados
           </h3>
           <p class="section-subtitle">Materiales premium seleccionados cuidadosamente para este proyecto</p>
@@ -173,33 +173,33 @@
         <!-- Technical Specs -->
         <div class="specs-section">
           <h3 class="section-title">
-            <span class="title-icon">ðŸ“‹</span>
-            Especificaciones TÃ©cnicas
+            <span class="title-icon">📋</span>
+            Especificaciones Técnicas
           </h3>
           <div class="specs-grid">
             <div class="spec-item">
-              <div class="spec-icon">ðŸ“</div>
+              <div class="spec-icon">📏</div>
               <div class="spec-details">
                 <span class="spec-label">Dimensiones</span>
                 <span class="spec-value">{{ selectedProject.area_m2 }} metros cuadrados</span>
               </div>
             </div>
             <div class="spec-item">
-              <div class="spec-icon">ðŸŽ¯</div>
+              <div class="spec-icon">🎯</div>
               <div class="spec-details">
-                <span class="spec-label">CategorÃ­a</span>
+                <span class="spec-label">Categoría</span>
                 <span class="spec-value">{{ getCategoryName(selectedProject.categoria) }}</span>
               </div>
             </div>
             <div class="spec-item">
-              <div class="spec-icon">âš¡</div>
+              <div class="spec-icon">🕒</div>
               <div class="spec-details">
-                <span class="spec-label">Tiempo de InstalaciÃ³n</span>
-                <span class="spec-value">{{ selectedProject.duracion_dias }} dÃ­as laborables</span>
+                <span class="spec-label">Tiempo de Instalación</span>
+                <span class="spec-value">{{ selectedProject.duracion_dias }} días laborables</span>
               </div>
             </div>
             <div class="spec-item">
-              <div class="spec-icon">ðŸŒŸ</div>
+              <div class="spec-icon">🌟</div>
               <div class="spec-details">
                 <span class="spec-label">Estado</span>
                 <span class="spec-value">Completado y Entregado</span>
@@ -210,26 +210,26 @@
         <!-- Budget Section -->
         <div class="budget-section">
           <h3 class="section-title">
-            <span class="title-icon">ðŸ’°</span>
-            InversiÃ³n del Proyecto
+            <span class="title-icon">💰</span>
+            Inversión del Proyecto
           </h3>
           <div class="budget-card">
             <div class="budget-details">
               <div class="budget-label">Presupuesto Total Invertido</div>
               <div class="budget-breakdown">
-                <span class="budget-note">Incluye materiales, mano de obra e instalaciÃ³n</span>
+                <span class="budget-note">Incluye materiales, mano de obra e instalación</span>
               </div>
             </div>
             <div class="budget-amount">{{ selectedProject.presupuesto | currency: 'EUR' }}</div>
           </div>
           <div class="budget-note-footer">
-            <p>ðŸ’¡ <strong>Nota:</strong> Este presupuesto es orientativo y corresponde a un proyecto real. Cada proyecto es Ãºnico y el costo puede variar segÃºn especificaciones y materiales seleccionados.</p>
+            <p>💡 <strong>Nota:</strong> Este presupuesto es orientativo y corresponde a un proyecto real. Cada proyecto es único y el costo puede variar según especificaciones y materiales seleccionados.</p>
           </div>
         </div>
         <!-- Call to Action -->
         <div class="cta-section">
-          <h3 class="cta-title">Â¿Te gustari­a un proyecto similar?</h3>
-          <p class="cta-text">Nuestro equipo puede crear un diseÃ±o personalizado para tu espacio</p>
+          <h3 class="cta-title">¿Te gustaría un proyecto similar?</h3>
+          <p class="cta-text">Nuestro equipo puede crear un diseño personalizado para tu espacio</p>
           <div class="cta-buttons">
             <button class="cta-button primary" (click)="closeModal()">Solicitar Presupuesto</button>
             <button class="cta-button secondary" (click)="closeModal()">Contactar Ahora</button>

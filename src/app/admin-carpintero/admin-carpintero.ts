@@ -51,7 +51,7 @@ export class AdminCarpintero implements OnInit {
   pendingPresupuestos: any[] = [];
   todoProjects: any[] = [];
   showTodo = false;
-  // UI tabs: 'pendientes', 'todo' or 'aceptados'
+  // UI tabs:
   activeTab: 'pendientes' | 'todo' | 'aceptados' = 'pendientes';
 
   acceptedProjects: any[] = [];

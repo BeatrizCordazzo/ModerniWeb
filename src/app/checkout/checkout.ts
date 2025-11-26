@@ -65,8 +65,7 @@ export class Checkout implements OnInit, OnDestroy {
 
   confirmPayment(): void {
     if (this.cartItems.length === 0) return;
-    // In a real app you'd integrate with a payment gateway here.
-    // We'll simulate payment confirmation and then create the custom order(s) on the backend.
+    // we simulate the payment confirmation and then we create the custom order on the backend
     this.loading = true;
 
     const payload: any = {

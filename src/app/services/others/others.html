@@ -141,13 +141,13 @@
       <div class="product-card">
         <div class="product-image">
           @if (isAdmin) {
-          <!-- NEW: botón eliminar -->
+          <!-- botón eliminar -->
           <button
             class="delete-btn"
             (click)="confirmDeleteProduct(product.id, $event)"
             title="Eliminar producto"
           >
-            ×
+            x
           </button>
           } @if (!isAdmin) {
           <div class="favorite-pill">

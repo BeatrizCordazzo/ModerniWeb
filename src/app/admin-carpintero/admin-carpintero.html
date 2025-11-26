@@ -438,17 +438,7 @@
               <h3>{{ sketchupSelectedName || 'Vista previa SketchUp' }}</h3>
               <p class="small-muted">Se abre con el embed de 3D Warehouse.</p>
             </div>
-            <iframe
-              [src]="sketchupViewerUrl"
-              frameborder="0"
-              scrolling="no"
-              marginheight="0"
-              marginwidth="0"
-              width="100%"
-              height="520"
-              allowfullscreen
-            >
-            </iframe>
+            <iframe [src]="sketchupViewerUrl" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="520" allowfullscreen></iframe>
           </div>
           }
         </div>
@@ -819,14 +809,7 @@
                   </p>
                 </div>
                 <div class="message-status-block">
-                  <span
-                    class="status-pill"
-                    [ngClass]="{
-                      'status-new': msg.status === 'new',
-                      'status-read': msg.status === 'read',
-                      'status-responded': msg.status === 'responded'
-                    }"
-                  >
+                  <span class="status-pill" [ngClass]="{'status-new': msg.status === 'new','status-read': msg.status === 'read','status-responded': msg.status === 'responded'}">
                     {{ formatMessageStatus(msg.status) }}
                   </span>
                   @if (isMessageUnread(msg)) {
@@ -839,13 +822,8 @@
               }
               <p class="message-body">{{ msg.message }}</p>
               <div class="message-status-actions">
-                <button
-                  type="button"
-                  class="btn btn-ghost"
-                  (click)="markMessageStatus(msg, 'read')"
-                  [disabled]="!isMessageUnread(msg)"
-                >
-                  Marcar como leÃ­do
+                <button type="button" class="btn btn-ghost" (click)="markMessageStatus(msg, 'read')" [disabled]="!isMessageUnread(msg)">
+                  Marcar como leído
                 </button>
                 <button
                   type="button"
@@ -853,7 +831,7 @@
                   (click)="markMessageStatus(msg, 'new')"
                   [disabled]="isMessageUnread(msg)"
                 >
-                  Marcar como no leÃ­do
+                  Marcar como no leído
                 </button>
               </div>
               @if (msg.response) {
@@ -866,9 +844,7 @@
               </div>
               }
               <div class="message-actions">
-                <textarea
-                  [(ngModel)]="msg.pendingResponse"
-                  placeholder="Write a response..."
+                <textarea [(ngModel)]="msg.pendingResponse" placeholder="Write a response..."
                 ></textarea>
                 <button (click)="sendResponse(msg)">Send Reply</button>
               </div>

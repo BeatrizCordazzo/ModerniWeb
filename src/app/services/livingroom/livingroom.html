@@ -1,4 +1,4 @@
-<div class="livingroom-page">
+﻿<div class="livingroom-page">
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
@@ -51,7 +51,7 @@
             <p class="description">{{ selectedSet.description }}</p>
             <div class="price-tag">
               <span class="price-label">Starting at:</span>
-              <span class="price">?{{ selectedSet.basePrice.toFixed(2) }}</span>
+              <span class="price">€{{ selectedSet.basePrice.toFixed(2) }}</span>
             </div>
             <div class="dimensions-section">
               <h3>Standard Dimensions</h3>
@@ -99,7 +99,7 @@
             <div class="action-buttons">
               @if (!isAdmin) {
               <button class="btn-primary" (click)="addSetToCart()">
-                Add to Cart - ?{{ selectedSet.basePrice.toFixed(2) }}
+                Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
               </button>
               } @if (isAdmin) {
               <button class="btn-primary admin-modify" (click)="addSetToCart()">
@@ -120,7 +120,7 @@
           @for (set of livingRoomSets; track set.id) {
           <div class="set-card" (click)="selectSet(set)">
             @if (isAdmin) {
-            <!-- NEW: boton eliminar -->
+            <!-- boton eliminar -->
             <button
               class="delete-btn"
               (click)="confirmDeleteProduct(set.id, $event)"
@@ -150,7 +150,7 @@
               <p class="style">{{ set.style }}</p>
               <div class="price">
                 <span class="from">From</span>
-                <span class="amount">?{{ set.basePrice.toFixed(2) }}</span>
+                <span class="amount">€{{ set.basePrice.toFixed(2) }}</span>
               </div>
               <div class="color-preview">
                 <span>Available in:</span>
@@ -280,7 +280,7 @@
               <img [src]="furniture.image" [alt]="furniture.name" />
               <div class="furniture-info">
                 <h4>{{ furniture.name }}</h4>
-                <p class="base-price">From &euro;{{ furniture.basePrice.toFixed(2) }}</p>
+                <p class="base-price">From €{{ furniture.basePrice.toFixed(2) }}</p>
                 <button
                   class="add-btn"
                   (click)="$event.stopPropagation(); isAdmin ? openEditFurnitureModal(furniture, $event) : addCustomFurniture(furniture)"
@@ -316,19 +316,19 @@
                 <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
               </label>
               <label>
-                Ancho (m?n)
+                Ancho (min)
                 <input type="number" [(ngModel)]="newFurnitureForm.minWidth" />
               </label>
               <label>
-                Ancho (m?x)
+                Ancho (max)
                 <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" />
               </label>
               <label>
-                Alto (m?n)
+                Alto (min)
                 <input type="number" [(ngModel)]="newFurnitureForm.minHeight" />
               </label>
               <label>
-                Alto (m?x)
+                Alto (max)
                 <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" />
               </label>
               <label>
@@ -432,7 +432,7 @@
                 </div>
                 <div class="selection-price">
                   <span class="label">Price for this item:</span>
-                  <span class="price">?{{ calculateCustomPrice(selection).toFixed(2) }}</span>
+                  <span class="price">€{{ calculateCustomPrice(selection).toFixed(2) }}</span>
                 </div>
               </div>
             </div>
@@ -442,7 +442,7 @@
           <div class="total-section">
             <div class="total-row">
               <span class="label">Total Living Room Cost:</span>
-              <span class="total-price">?{{ getTotalCustomPrice().toFixed(2) }}</span>
+              <span class="total-price">€{{ getTotalCustomPrice().toFixed(2) }}</span>
             </div>
             <button
               class="btn-submit"

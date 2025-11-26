@@ -1,4 +1,4 @@
-<div class="kitchen-page">
+﻿<div class="kitchen-page">
   <!-- Hero Section -->
   <div class="hero">
     <h1>Complete Kitchen Solutions</h1>
@@ -49,7 +49,7 @@
             <p class="description">{{ selectedSet.description }}</p>
             <div class="price-section">
               <span class="price-label">Starting at:</span>
-              <span class="price">�{{ selectedSet.basePrice.toFixed(2) }}</span>
+              <span class="price">€{{ selectedSet.basePrice.toFixed(2) }}</span>
             </div>
             <div class="dimensions">
               <h3>Standard Dimensions</h3>
@@ -95,7 +95,7 @@
             <div class="action-buttons">
               @if (!isAdmin) {
               <button class="btn-add-cart" (click)="addSetToCart()">
-                Add to Cart - �{{ selectedSet.basePrice.toFixed(2) }}
+                Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
               </button>
               } @if (isAdmin) {
               <button class="btn-add-cart admin-modify" (click)="addSetToCart()">
@@ -135,7 +135,7 @@
             (click)="confirmDeleteProduct(set.id, $event); $event.stopPropagation()"
             title="Eliminar producto"
           >
-            �
+            x
           </button>
           }
           <div class="set-image">
@@ -146,7 +146,7 @@
             <p class="set-style">{{ set.style }}</p>
             <div class="set-price">
               <span class="from">From</span>
-              <span class="price">�{{ set.basePrice.toFixed(2) }}</span>
+              <span class="price">€{{ set.basePrice.toFixed(2) }}</span>
             </div>
             <div class="color-previews">
               <span class="colors-label">Available in:</span>
@@ -238,7 +238,7 @@
         <div class="space-summary">
           <span class="summary-icon">📏</span>
           <span class="summary-text">
-            Your space: {{ customSpaceWidth }}cm × {{ customSpaceHeight }}cm ×
+            Your space: {{ customSpaceWidth }}cm - {{ customSpaceHeight }}cm -
             {{ customSpaceDepth }}cm
           </span>
         </div>
@@ -324,19 +324,19 @@
               <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
             </label>
             <label>
-              Ancho (m�n)
+              Ancho (min)
               <input type="number" [(ngModel)]="newFurnitureForm.minWidth" min="1" />
             </label>
             <label>
-              Ancho (m�x)
+              Ancho (max)
               <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" min="1" />
             </label>
             <label>
-              Alto (m�n)
+              Alto (min)
               <input type="number" [(ngModel)]="newFurnitureForm.minHeight" min="1" />
             </label>
             <label>
-              Alto (m�x)
+              Alto (max)
               <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" min="1" />
             </label>
             <label>
@@ -409,7 +409,7 @@
                 </select>
               </div>
               <div class="selection-price">
-                Subtotal: �{{ calculateCustomPrice(selection).toFixed(2) }}
+                Subtotal: €{{ calculateCustomPrice(selection).toFixed(2) }}
               </div>
             </div>
             <button class="btn-remove" (click)="removeCustomSelection(i)">Remove</button>
@@ -419,7 +419,7 @@
         <div class="total-section">
           <div class="total-row">
             <span class="total-label">Total Estimate:</span>
-            <span class="total-price">�{{ getTotalCustomPrice().toFixed(2) }}</span>
+            <span class="total-price">€{{ getTotalCustomPrice().toFixed(2) }}</span>
           </div>
           <p class="estimate-note">
             *This is an estimated price. Final price will be confirmed by our carpenters after
@@ -475,8 +475,8 @@
 <!-- Delete Confirmation Modal -->
 <app-confirmation-modal
   [isOpen]="showDeleteConfirm"
-  title="Confirmar eliminaci�n"
-  message="�Est�s seguro de que deseas eliminar este producto? Esta acci�n no se puede deshacer."
+  title="Confirmar eliminación"
+  message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
   confirmLabel="Eliminar"
   cancelLabel="Cancelar"
   (confirm)="executeDelete()"

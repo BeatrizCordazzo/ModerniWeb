@@ -1,0 +1,67 @@
+-- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
+--
+-- Host: localhost    Database: moderni
+-- ------------------------------------------------------
+-- Server version	8.0.19
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `proyectos_showcase`
+--
+
+DROP TABLE IF EXISTS `proyectos_showcase`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `proyectos_showcase` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(200) NOT NULL,
+  `descripcion` text,
+  `categoria` enum('kitchen','bathroom','bedroom','livingroom','others') NOT NULL,
+  `cliente` varchar(150) DEFAULT NULL,
+  `ubicacion` varchar(150) DEFAULT NULL,
+  `fecha_completado` date DEFAULT NULL,
+  `duracion_dias` int DEFAULT NULL,
+  `presupuesto` decimal(10,2) DEFAULT NULL,
+  `imagen_principal` varchar(500) DEFAULT NULL,
+  `imagen_2` varchar(500) DEFAULT NULL,
+  `imagen_3` varchar(500) DEFAULT NULL,
+  `imagen_4` varchar(500) DEFAULT NULL,
+  `estilo` varchar(100) DEFAULT NULL,
+  `area_m2` decimal(10,2) DEFAULT NULL,
+  `materiales` text,
+  `destacado` tinyint(1) DEFAULT '0',
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `proyectos_showcase`
+--
+
+LOCK TABLES `proyectos_showcase` WRITE;
+/*!40000 ALTER TABLE `proyectos_showcase` DISABLE KEYS */;
+INSERT INTO `proyectos_showcase` VALUES (1,'Modern Kitchen Renovation','Complete kitchen transformation with custom cabinets, quartz countertops, and integrated appliances. The design emphasizes clean lines and functionality while maximizing storage space.','kitchen','Rodríguez Family','Madrid','2024-09-15',45,18500.00,'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','Contemporary',25.50,'High-gloss white lacquer cabinets|Quartz countertops|Stainless steel appliances|LED under-cabinet lighting|Soft-close hardware',1,'2025-10-22 20:07:38'),(2,'Rustic Farmhouse Kitchen','Charming rustic kitchen featuring reclaimed wood elements, open shelving, and a farmhouse sink. Traditional design meets modern functionality.','kitchen','García Residence','Barcelona','2024-08-22',38,15200.00,'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop','Rustic Farmhouse',22.00,'Reclaimed oak cabinets|Butcher block countertops|Ceramic farmhouse sink|Open wood shelving|Vintage brass fixtures',0,'2025-10-22 20:07:38'),(3,'Industrial Loft Kitchen','Bold industrial design with exposed brick, metal accents, and concrete countertops. Perfect for modern urban living.','kitchen','López Studio','Valencia','2024-07-10',42,16800.00,'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=800&h=600&fit=crop','Industrial',28.00,'Metal-framed cabinets|Polished concrete countertops|Exposed brick backsplash|Industrial pendant lights|Black steel fixtures',1,'2025-10-22 20:07:38'),(4,'Luxury Spa Bathroom','Resort-style spa bathroom with freestanding soaking tub, walk-in rain shower, and premium natural stone finishes. A personal sanctuary for relaxation.','bathroom','Martínez Estate','Marbella','2024-09-01',30,22000.00,'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','Luxury Spa',18.50,'Travertine stone tiles|Freestanding bathtub|Frameless glass shower|Double vanity|Heated floors|Ambient LED lighting',1,'2025-10-22 20:07:38'),(5,'Modern Minimalist Bathroom','Sleek contemporary bathroom with floating vanity, frameless fixtures, and monochromatic color scheme. Clean lines and sophisticated simplicity.','bathroom','Fernández Apartment','Madrid','2024-08-15',25,12500.00,'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Contemporary',12.00,'White porcelain tiles|Floating vanity|Wall-mounted toilet|Frameless mirror|Matte black fixtures|LED backlit mirror',0,'2025-10-22 20:07:38'),(6,'Classic Traditional Bathroom','Elegant traditional bathroom with marble countertops, ornate fixtures, and timeless design elements. Sophisticated and functional.','bathroom','Sánchez Villa','Sevilla','2024-07-20',28,14800.00,'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1564540583246-934409427776?w=800&h=600&fit=crop','Traditional',15.00,'Carrara marble countertop|Classic wood vanity|Chrome fixtures|Framed mirror|Subway tile|Elegant hardware',0,'2025-10-22 20:07:38'),(7,'Master Bedroom Suite','Luxurious master bedroom with custom built-in wardrobes, upholstered headboard, and integrated lighting. Creating the perfect retreat.','bedroom','Torres Penthouse','Barcelona','2024-09-10',35,16500.00,'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','Contemporary Luxury',30.00,'Built-in wardrobes|Upholstered bed frame|Premium wood flooring|Integrated LED lighting|Custom nightstands|Soft-close drawers',1,'2025-10-22 20:07:38'),(8,'Scandinavian Bedroom','Light and airy Nordic-inspired bedroom with light wood furniture, minimalist design, and functional storage solutions.','bedroom','Andersen Home','Madrid','2024-08-05',28,11200.00,'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','Scandinavian',22.00,'Light oak furniture|Minimalist bed frame|Open wardrobe system|Natural fiber textiles|Simple hardware|White wall finishes',0,'2025-10-22 20:07:38'),(9,'Modern Platform Bedroom','Contemporary bedroom with platform bed, floating nightstands, and sleek storage solutions. Sophisticated minimalism.','bedroom','Silva Residence','Valencia','2024-07-28',32,13800.00,'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop','Modern',25.00,'Platform bed with storage|Floating nightstands|Built-in closet system|LED accent lighting|High-gloss finishes|Modern hardware',0,'2025-10-22 20:07:38'),(10,'Contemporary Living Space','Open-concept living room with custom entertainment unit, built-in shelving, and modern furniture. Perfect for entertaining.','livingroom','Morales Family','Madrid','2024-09-18',40,19500.00,'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Contemporary',35.00,'Custom entertainment unit|Built-in shelving|Premium upholstery|Wood flooring|Recessed lighting|Modern coffee table',1,'2025-10-22 20:07:38'),(11,'Cozy Traditional Living Room','Warm and inviting traditional living room with custom built-ins, classic furniture, and rich wood finishes.','livingroom','Delgado Home','Barcelona','2024-08-12',36,17200.00,'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Traditional',32.00,'Built-in bookshelves|Classic wood furniture|Area rug|Traditional hardware|Crown molding|Table lamps',0,'2025-10-22 20:07:38'),(12,'Industrial Living Loft','Urban industrial living space with exposed elements, metal accents, and custom furniture pieces. Modern city living.','livingroom','Costa Loft','Valencia','2024-07-15',38,18600.00,'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=800&h=600&fit=crop','Industrial',40.00,'Metal shelving units|Exposed brick|Leather furniture|Concrete accents|Industrial lighting|Reclaimed wood',1,'2025-10-22 20:07:38'),(13,'Custom Home Office','Bespoke home office with built-in desk, custom shelving, and ergonomic storage solutions. Productivity meets style.','others','Ramírez Studio','Madrid','2024-09-05',25,8500.00,'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','Modern',15.00,'Built-in desk system|Custom shelving|Cable management|Ergonomic storage|LED task lighting|Premium wood finish',0,'2025-10-22 20:07:38'),(14,'Dining Room Furniture Set','Complete custom dining room set with extendable table, matching chairs, and sideboard. Perfect for family gatherings.','others','Navarro Family','Barcelona','2024-08-20',30,12000.00,'https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1565794529569-e6e6c4c7b77b?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','Contemporary',20.00,'Extendable dining table|Upholstered dining chairs|Matching sideboard|Premium wood|Custom finish|Soft-close drawers',0,'2025-10-22 20:07:38'),(15,'Entry Hall Solution','Custom entryway furniture including coat storage, shoe cabinet, and decorative mirror. First impressions matter.','others','Jiménez Home','Sevilla','2024-07-25',20,5800.00,'https://images.unsplash.com/photo-1550254478-ead40cc54513?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=400&fit=crop','https://images.unsplash.com/photo-1595516695946-e22a04b82d70?w=400&h=400&fit=crop','Modern',8.00,'Built-in coat storage|Shoe cabinet|Wall mirror|Bench seating|Hooks and organizers|Durable finishes',0,'2025-10-22 20:07:38');
+/*!40000 ALTER TABLE `proyectos_showcase` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-11-26 11:49:41

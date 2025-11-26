@@ -1,4 +1,4 @@
-<!-- Navbar principal (ahora transparente y por encima del banner) -->
+<!-- Navbar principal -->
 <mat-toolbar class="navbar">
   <!-- Left controls: hamburger + logo side-by-side -->
   <div class="left-controls">
@@ -12,7 +12,6 @@
   </div>
   <!-- Solo las opciones "visibles" en la barra: profile y cart -->
   <div class="nav-actions">
-    <!-- Moved search here so it appears next to profile icon -->
     <div class="search-container">
       <div class="search-box">
         <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"

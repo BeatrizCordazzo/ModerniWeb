@@ -32,7 +32,7 @@
     <div class="selected-set-detail">
       <div class="detail-container">
         <button class="btn-back" (click)="selectedSet = null; showColorPicker = false">
-          â† Back to Sets
+          ← Back to Sets
         </button>
         <div class="detail-content">
           <div class="detail-image">
@@ -44,7 +44,7 @@
             <p class="description">{{ selectedSet.description }}</p>
             <div class="price-section">
               <span class="price-label">Starting at:</span>
-              <span class="price">â‚¬{{ selectedSet.basePrice.toFixed(2) }}</span>
+              <span class="price">€{{ selectedSet.basePrice.toFixed(2) }}</span>
             </div>
             <div class="dimensions">
               <h3>Standard Dimensions</h3>
@@ -67,7 +67,7 @@
               <h3>Includes:</h3>
               <ul class="includes-list">
                 @for (item of selectedSet.includes; track item) {
-                <li><span class="check-icon">âœ“</span> {{ item }}</li>
+                <li><span class="check-icon">🛠</span> {{ item }}</li>
                 }
               </ul>
             </div>
@@ -90,7 +90,7 @@
             <div class="action-buttons">
               @if (!isAdmin) {
               <button class="btn-add-cart" (click)="addSetToCart()">
-                Add to Cart - â‚¬{{ selectedSet.basePrice.toFixed(2) }}
+                Add to Cart - €{{ selectedSet.basePrice.toFixed(2) }}
               </button>
               } @if (isAdmin) {
               <button class="btn-add-cart admin-modify" (click)="addSetToCart()">
@@ -110,13 +110,13 @@
         @for (set of bathroomSets; track set.id) {
         <div class="set-card" (click)="selectSet(set)">
           @if (isAdmin) {
-          <!-- NEW: botón eliminar -->
+          <!-- botón eliminar -->
           <button
             class="delete-btn"
             (click)="confirmDeleteProduct(set.id, $event)"
             title="Eliminar producto"
           >
-            ×
+            x
           </button>
           } @if (!isAdmin) {
           <div class="card-favorite">
@@ -140,7 +140,7 @@
             <p class="set-style">{{ set.style }}</p>
             <div class="set-price">
               <span class="from">From</span>
-              <span class="price">â‚¬{{ set.basePrice.toFixed(2) }}</span>
+              <span class="price">€{{ set.basePrice.toFixed(2) }}</span>
             </div>
             <div class="color-previews">
               <span class="colors-label">Available in:</span>
@@ -225,9 +225,9 @@
         </div>
         @if (isCustomSpaceValid()) {
         <div class="space-summary">
-          <span class="summary-icon">ðŸ“</span>
+          <span class="summary-icon">📏</span>
           <span class="summary-text"
-            >Your space: {{ customSpaceWidth }}cm Ã— {{ customSpaceHeight }}cm Ã—
+            >Your space: {{ customSpaceWidth }}cm — {{ customSpaceHeight }}cm — 
             {{ customSpaceDepth }}cm</span
           >
         </div>
@@ -261,7 +261,7 @@
             <div class="furniture-info">
               <h4>{{ furniture.name }}</h4>
               <p class="furniture-type">{{ furniture.type }}</p>
-              <div class="furniture-price">From â‚¬{{ furniture.basePrice.toFixed(2) }}</div>
+              <div class="furniture-price">From €{{ furniture.basePrice.toFixed(2) }}</div>
               <div class="furniture-dims">
                 <small>
                   W: {{ furniture.dimensions.minWidth }}-{{ furniture.dimensions.maxWidth }}cm<br />
@@ -400,7 +400,7 @@
                 </select>
               </div>
               <div class="selection-price">
-                Subtotal: â‚¬{{ calculateCustomPrice(selection).toFixed(2) }}
+                Subtotal: €{{ calculateCustomPrice(selection).toFixed(2) }}
               </div>
             </div>
             <button class="btn-remove" (click)="removeCustomSelection(i)">Remove</button>
@@ -410,7 +410,7 @@
         <div class="total-section">
           <div class="total-row">
             <span class="total-label">Total Estimate:</span>
-            <span class="total-price">â‚¬{{ getTotalCustomPrice().toFixed(2) }}</span>
+            <span class="total-price">€{{ getTotalCustomPrice().toFixed(2) }}</span>
           </div>
           <p class="estimate-note">
             *This is an estimated price. Final price will be confirmed by our carpenters after
@@ -427,7 +427,7 @@
       </div>
       } @if (customSelections.length === 0 && isCustomSpaceValid()) {
       <div class="empty-state">
-        <span class="empty-icon">ðŸ›</span>
+        <span class="empty-icon">🛠</span>
         <h3>Start Building Your Bathroom</h3>
         <p>Select fixtures and furniture from above to begin designing your custom bathroom</p>
       </div>
