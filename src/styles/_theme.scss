@@ -305,6 +305,10 @@ $breakpoints: (
         .logo-image {
           filter: brightness(0.5);
         }
+
+        .user-greeting {
+          color: $text-hover !important;
+        }
       }
     }
   }
