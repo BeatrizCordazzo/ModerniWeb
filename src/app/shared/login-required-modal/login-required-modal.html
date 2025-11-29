@@ -1,0 +1,12 @@
+@if (state.visible) {
+  <div class="login-modal-backdrop" (click)="close()">
+    <div class="login-modal" (click)="$event.stopPropagation()">
+      <h3>You need to be logged in</h3>
+      <p>{{ state.message }}</p>
+      <div class="actions">
+        <button type="button" class="btn-secondary" (click)="close()">Cancel</button>
+        <button type="button" class="btn-primary" (click)="goToLogin()">Login</button>
+      </div>
+    </div>
+  </div>
+}

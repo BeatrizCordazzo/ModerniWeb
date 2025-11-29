@@ -181,12 +181,19 @@
               </button>
               }
             </div>
-          </div>
-          }
+        </div>
+        }
+      </div>
+      <div class="custom-cta">
+        <div class="cta-content">
+          <h3>Need Something Different?</h3>
+          <p>Design your perfect bedroom with custom measurements and furniture selection</p>
+          <button class="btn-custom" (click)="switchToCustom()">Make It Your Own &rarr;</button>
         </div>
       </div>
-      }
     </div>
+    }
+  </div>
   </section>
   }
 
@@ -265,7 +272,7 @@
         @if (isLoadingCustomFurniture) {
         <div class="custom-furniture-loading">
           <div class="spinner"></div>
-          <p>Cargando opciones personalizadas...</p>
+          <p>Loading custom options...</p>
         </div>
         }
         <div class="step-content">
@@ -307,43 +314,43 @@
             <h4>Add new furniture option</h4>
             <div class="admin-form-grid">
               <label>
-                Nombre
+                Name
                 <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="Ej. Bed Frame" />
               </label>
               <label>
-                Tipo
+                Type
                 <input type="text" [(ngModel)]="newFurnitureForm.type" placeholder="bed, storage..." />
               </label>
               <label>
-                Precio base
+                Base Price
                 <input type="number" min="0" step="0.01" [(ngModel)]="newFurnitureForm.basePrice" />
               </label>
               <label>
-                Imagen (URL)
+                Image (URL)
                 <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
               </label>
               <label>
-                Ancho (min)
+                Width (min)
                 <input type="number" [(ngModel)]="newFurnitureForm.minWidth" />
               </label>
               <label>
-                Ancho (max)
+                Width (max)
                 <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" />
               </label>
               <label>
-                Alto (min)
+                Height (min)
                 <input type="number" [(ngModel)]="newFurnitureForm.minHeight" />
               </label>
               <label>
-                Alto (max)
+                Height (max)
                 <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" />
               </label>
               <label>
-                Profundidad
+                Depth
                 <input type="number" [(ngModel)]="newFurnitureForm.depth" />
               </label>
               <label class="wide">
-                Colores (Nombre:#HEX separados por comas)
+                Colors (Name:#HEX separated by commas)
                 <input type="text" [(ngModel)]="newFurnitureForm.colors" />
               </label>
             </div>
@@ -510,8 +517,8 @@
   [isOpen]="showFurnitureConfirm"
   [title]="furnitureConfirmTitle"
   [message]="furnitureConfirmMessage"
-  confirmLabel="Confirmar"
-  cancelLabel="Cancelar"
+  confirmLabel="Confirm"
+  cancelLabel="Cancel"
   (confirm)="confirmFurnitureAction()"
   (cancel)="cancelFurnitureAction()"
 ></app-confirmation-modal>

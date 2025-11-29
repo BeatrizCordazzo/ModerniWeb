@@ -6,6 +6,7 @@ import { ToastNotification } from '../../shared/toast-notification/toast-notific
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
 import { Datos, Product as ApiProduct, Color, CustomFurnitureOptionPayload } from '../../datos';
 import { CartService } from '../../shared/cart.service';
+import { LoginRequiredModalService } from '../../shared/login-required-modal/login-required-modal.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
 
@@ -117,7 +118,12 @@ export class Kitchen implements OnInit {
   optionPendingDelete: CustomFurniture | null = null;
   isProcessingFurniture = false;
 
-  constructor(private datosService: Datos, private cartService: CartService, private router: Router) {}
+  constructor(
+    private datosService: Datos,
+    private cartService: CartService,
+    private router: Router,
+    private loginPrompt: LoginRequiredModalService
+  ) {}
 
   ngOnInit() {
     this.loadKitchenSets();
@@ -761,8 +767,7 @@ export class Kitchen implements OnInit {
             setTimeout(() => { this.showToast = false; }, 3500);
           } else {
             this.closeModal();
-            alert('You must be logged in to add items to the cart. Please log in first.');
-            try { this.router.navigate(['/login']); } catch (e) {}
+            this.loginPrompt.open('You need to be logged to add items to the cart.');
           }
         },
         error: () => {
@@ -785,8 +790,7 @@ export class Kitchen implements OnInit {
             }
           } catch (e) { /* ignore */ }
           this.closeModal();
-          alert('You must be logged in to add items to the cart. Please log in first.');
-          try { this.router.navigate(['/login']); } catch (e) {}
+          this.loginPrompt.open('You need to be logged to add items to the cart.');
         }
       });
     }

@@ -169,4 +169,15 @@
   </div>
 </main>
 
+<app-confirmation-modal
+  [isOpen]="showContactConfirmModal"
+  title="Enviar mensaje"
+  message="¿Quieres enviar este mensaje ahora?"
+  confirmLabel="Enviar"
+  cancelLabel="Cancelar"
+  (confirm)="onConfirmSendMessage()"
+  (cancel)="onCancelSendMessage()">
+</app-confirmation-modal>
+
+
 <app-footer></app-footer>

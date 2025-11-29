@@ -24,28 +24,28 @@ export class Home implements OnInit, OnDestroy {
 
   projects: Project[] = [
     {
-      title: 'Cocina Moderna Minimalista',
-      description: 'Diseño contemporáneo con acabados de primera calidad',
+      title: 'Modern Minimalist Kitchen',
+      description: 'Contemporary design with top-quality finishes',
       image: 'https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=1200&h=600&fit=crop'
     },
     {
-      title: 'Living Elegante',
-      description: 'Espacio acogedor con estilo sofisticado',
+      title: 'Elegant Living Room',
+      description: 'Cozy space with sophisticated style',
       image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop'
     },
     {
-      title: 'Dormitorio de Ensueño',
-      description: 'Tu refugio personal de descanso',
+      title: 'Dream Bedroom',
+      description: 'Your personal retreat for rest',
       image: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&h=600&fit=crop'
     },
     {
-      title: 'Baño Spa',
-      description: 'Confort y elegancia en cada detalle',
+      title: 'Spa Bathroom',
+      description: 'Comfort and elegance in every detail',
       image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&h=600&fit=crop'
     },
     {
-      title: 'Muebles Personalizados',
-      description: 'Piezas únicas diseñadas a medida',
+      title: 'Custom Furniture',
+      description: 'Unique pieces designed to measure',
       image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=1200&h=600&fit=crop'
     }
   ];

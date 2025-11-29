@@ -392,3 +392,22 @@ ON DUPLICATE KEY UPDATE total=total;
 SELECT 'Total seeded users' as Info, COUNT(*) FROM usuarios WHERE email LIKE 'cliente%@moderni.local';
 SELECT 'Total seeded proyectos matching pattern', COUNT(*) FROM proyectos WHERE nombre LIKE 'Proyecto % Cliente%';
 SELECT 'Total pending presupuestos', COUNT(*) FROM presupuestos WHERE estado='pendiente' AND proyecto_id IN (SELECT id FROM proyectos WHERE nombre LIKE 'Proyecto % Cliente%');
+
+-- Add direccion column to usuarios table if it's missing
+SET @has_direccion := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'usuarios'
+    AND COLUMN_NAME = 'direccion'
+);
+
+SET @sql_add_direccion := IF(
+  @has_direccion = 0,
+  'ALTER TABLE `usuarios` ADD COLUMN `direccion` VARCHAR(255) NULL AFTER `telefono`;',
+  'SELECT "direccion_already_exists"'
+);
+
+PREPARE stmt_direccion FROM @sql_add_direccion;
+EXECUTE stmt_direccion;
+DEALLOCATE PREPARE stmt_direccion;

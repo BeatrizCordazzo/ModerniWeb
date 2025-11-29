@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { Datos, FavoriteItem, FavoritePayload } from '../../datos';
+import { LoginRequiredModalService } from '../login-required-modal/login-required-modal.service';
 
 @Component({
   selector: 'app-favorite-toggle',
@@ -25,7 +26,10 @@ export class FavoriteToggleComponent implements OnInit, OnDestroy {
   private favoriteId: number | null = null;
   private sub?: Subscription;
 
-  constructor(private datosService: Datos) {}
+  constructor(
+    private datosService: Datos,
+    private loginPrompt: LoginRequiredModalService
+  ) {}
 
   ngOnInit(): void {
     this.sub = this.datosService.favorites$.subscribe(list => this.syncFavoriteState(list));
@@ -105,7 +109,7 @@ export class FavoriteToggleComponent implements OnInit, OnDestroy {
     console.error('Favorite toggle error', err);
     this.isLoading = false;
     if (err && err.status === 401) {
-      alert('Please log in to manage favorites.');
+      this.loginPrompt.open('You need to be logged to add favorites.');
       return;
     }
     alert('Could not update favorites. Please try again.');

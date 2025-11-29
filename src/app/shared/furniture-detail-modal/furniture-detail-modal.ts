@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 
@@ -9,27 +9,55 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './furniture-detail-modal.html',
   styleUrls: ['./furniture-detail-modal.scss']
 })
-export class FurnitureDetailModal {
+export class FurnitureDetailModal implements OnChanges {
   @Input() isOpen = false;
   @Input() title = 'Detalles del proyecto';
   @Input() data: any = null; // presupuesto, proyecto u order
   @Output() cancel = new EventEmitter<void>();
 
   selectedImageIndex = 0;
+  private detalleCache: any = null;
+  private detalleSource: any = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
+      this.detalleCache = null;
+      this.detalleSource = null;
+      this.selectedImageIndex = 0;
+    }
+  }
 
   onCancel(): void { this.cancel.emit(); }
+
+  private resolveDetalle(): any | null {
+    const source = this.data?.detalle ?? this.data?.detalles ?? null;
+    if (!source) return null;
+    if (this.detalleSource === source && this.detalleCache) {
+      return this.detalleCache;
+    }
+    let parsed: any = source;
+    if (typeof source === 'string') {
+      try {
+        parsed = JSON.parse(source);
+      } catch (e) {
+        parsed = null;
+      }
+    }
+    this.detalleSource = source;
+    this.detalleCache = parsed && typeof parsed === 'object' ? parsed : null;
+    return this.detalleCache;
+  }
 
   // Normalized items array from several possible payload shapes
   getItems(): any[] {
     if (!this.data) return [];
-    // common shapes: data.detalle.furniture, data.detalle.items, data.items, data.furniture
-    let d: any = this.data.detalle || this.data.detalles || this.data;
-    // If detalle is a JSON string (stored in DB), try to parse it
-    if (d && typeof d === 'string') {
-      try { d = JSON.parse(d); } catch (e) { /* leave as string */ }
+    const detalle = this.resolveDetalle();
+    if (Array.isArray(detalle)) return detalle;
+    if (detalle) {
+      if (Array.isArray(detalle.furniture)) return detalle.furniture;
+      if (detalle.furniture && Array.isArray(detalle.furniture.items)) return detalle.furniture.items;
+      if (Array.isArray(detalle.items)) return detalle.items;
     }
-    if (d && Array.isArray(d.furniture)) return d.furniture;
-    if (d && Array.isArray(d.items)) return d.items;
     if (Array.isArray(this.data.items)) return this.data.items;
     if (Array.isArray(this.data.furniture)) return this.data.furniture;
     // fallback: try to detect any array-valued prop
@@ -85,7 +113,14 @@ export class FurnitureDetailModal {
 
   getOrderId(): string {
     if (!this.data) return '-';
-    return (this.data.id || this.data.pedido_id || this.data.order_id) ? (this.data.id || this.data.pedido_id || this.data.order_id).toString() : '-';
+    const raw =
+      this.data.id ??
+      this.data.pedido_id ??
+      this.data.order_id ??
+      this.data.presupuesto_id ??
+      this.data.proyecto_id ??
+      null;
+    return raw !== null && raw !== undefined ? raw.toString() : '-';
   }
 
   getStatus(): string {
@@ -162,6 +197,12 @@ export class FurnitureDetailModal {
     });
     // also allow top-level images array
     let top = this.data && (this.data.images || this.data.imagenes || this.data.fotos);
+    if (!top) {
+      const detalle = this.resolveDetalle();
+      if (detalle && (detalle.images || detalle.imagenes)) {
+        top = detalle.images || detalle.imagenes;
+      }
+    }
     // if top is a JSON string (from DB), try parse
     if (top && typeof top === 'string') {
       try { top = JSON.parse(top); } catch (e) { /* leave */ }
@@ -188,7 +229,7 @@ export class FurnitureDetailModal {
       if (this.data[k]) return this.data[k];
     }
     // check detalle/detalles (may be object or JSON string)
-    const det = this.data.detalle || this.data.detalles || null;
+    const det = this.resolveDetalle();
     if (det) {
       if (typeof det === 'string') {
         try {

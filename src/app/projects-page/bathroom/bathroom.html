@@ -7,246 +7,262 @@
 
     <!-- Loading State -->
     @if (isLoading) {
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Loading bathroom projects...</p>
-      </div>
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading bathroom projects...</p>
+    </div>
     }
 
     <!-- Error State -->
     @if (errorMessage && !isLoading) {
-      <div class="error-container">
-        <p class="error-message">{{ errorMessage }}</p>
-        <button class="retry-button" (click)="retryLoad()">Retry</button>
-      </div>
+    <div class="error-container">
+      <p class="error-message">{{ errorMessage }}</p>
+      <button class="retry-button" (click)="retryLoad()">Retry</button>
+    </div>
     }
 
     <!-- Projects Grid -->
     @if (!isLoading && !errorMessage && projects.length > 0) {
-      <div class="projects-grid">
-        @for (project of projects; track project.id) {
-          <article class="project-card" (click)="viewProject(project)">
-            @if (isAdmin) {
-              <button class="delete-btn" (click)="confirmDeleteProject(project.id, $event)" title="Eliminar proyecto">
-                x
-              </button>
-            }
-            <div class="project-image">
-              <img [src]="project.imagenes[0]" [alt]="project.titulo" loading="lazy">
-              @if (project.destacado) {
-                <span class="featured-badge">Featured</span>
-              }
-            </div>
-            <div class="project-content">
-              <h3 class="project-title">{{ project.titulo }}</h3>
-              <p class="project-location">{{ project.ubicacion }}</p>
-              <p class="project-style">{{ project.estilo }}</p>
-              <div class="project-meta">
-                <span class="meta-item"><i>🗓️</i> {{ project.fecha_completado | date: 'MMM yyyy' }}</span>
-                <span class="meta-item"><i>📐</i> {{ project.area_m2 }}m²</span>
-              </div>
-            </div>
-          </article>
+    <div class="projects-grid">
+      @for (project of projects; track project.id) {
+      <article class="project-card" (click)="viewProject(project)">
+        @if (isAdmin) {
+        <button
+          class="delete-btn"
+          (click)="confirmDeleteProject(project.id, $event)"
+          title="Delete project"
+        >
+          x
+        </button>
         }
-      </div>
+        <div class="project-image">
+          <img [src]="project.imagenes[0]" [alt]="project.titulo" loading="lazy" />
+          @if (project.destacado) {
+          <span class="featured-badge">Featured</span>
+          }
+        </div>
+        <div class="project-content">
+          <h3 class="project-title">{{ project.titulo }}</h3>
+          <p class="project-location">{{ project.ubicacion }}</p>
+          <p class="project-style">{{ project.estilo }}</p>
+          <div class="project-meta">
+            <span class="meta-item"
+              ><i>🗓️</i> {{ project.fecha_completado | date : 'MMM yyyy' }}</span
+            >
+            <span class="meta-item"><i>📐</i> {{ project.area_m2 }}m²</span>
+          </div>
+        </div>
+      </article>
+      }
+    </div>
     }
 
     <!-- Empty State -->
     @if (!isLoading && !errorMessage && projects.length === 0) {
-      <div class="empty-state">
-        <p>No kitchen projects available at the moment.</p>
-      </div>
+    <div class="empty-state">
+      <p>No kitchen projects available at the moment.</p>
+    </div>
     }
   </div>
 </section>
 
 <!-- Project Detail Modal -->
 @if (selectedProject) {
-  <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <button class="modal-close" (click)="closeModal()">&times;</button>
-      <div class="modal-images">
-        @for (imagen of selectedProject.imagenes; track imagen) {
-          <img [src]="imagen" [alt]="selectedProject.titulo" loading="lazy">
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeModal()">&times;</button>
+    <div class="modal-images">
+      @for (imagen of selectedProject.imagenes; track imagen) {
+      <img [src]="imagen" [alt]="selectedProject.titulo" loading="lazy" />
+      }
+    </div>
+    <div class="modal-details">
+      <!-- Header Section -->
+      <div class="modal-header-section">
+        <h2 class="modal-title">{{ selectedProject.titulo }}</h2>
+        @if (selectedProject.destacado) {
+        <span class="featured-tag">⭐ Featured Project</span>
         }
       </div>
-      <div class="modal-details">
-        <!-- Header Section -->
-        <div class="modal-header-section">
-          <h2 class="modal-title">{{ selectedProject.titulo }}</h2>
-          @if (selectedProject.destacado) {
-            <span class="featured-tag">⭐ Proyecto Destacado</span>
+      <p class="modal-description">{{ selectedProject.descripcion }}</p>
+      <!-- Quick Stats Cards -->
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <span class="stat-label">Completed</span>
+            <span class="stat-value">{{
+              selectedProject.fecha_completado | date : 'dd/MM/yyyy'
+            }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-content">
+            <span class="stat-label">Duration</span>
+            <span class="stat-value">{{ selectedProject.duracion_dias }} days</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📐</div>
+          <div class="stat-content">
+            <span class="stat-label">Total Area</span>
+            <span class="stat-value">{{ selectedProject.area_m2 }} m²</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🪑</div>
+          <div class="stat-content">
+            <span class="stat-label">Style</span>
+            <span class="stat-value">{{ selectedProject.estilo }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- Client & Location Info -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <span class="title-icon">🧤</span>
+          Client Information
+        </h3>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-label">Client</div>
+            <div class="info-value">{{ selectedProject.cliente }}</div>
+          </div>
+          <div class="info-card">
+            <div class="info-label">Location</div>
+            <div class="info-value">📍 {{ selectedProject.ubicacion }}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Timeline Section -->
+      <div class="timeline-section">
+        <h3 class="section-title">
+          <span class="title-icon">📊</span>
+          Project Details
+        </h3>
+        <div class="timeline-items">
+          <div class="timeline-item">
+            <div class="timeline-marker">🚀</div>
+            <div class="timeline-content">
+              <strong>Project Start</strong>
+              <span>{{
+                getStartDate(selectedProject.fecha_completado, selectedProject.duracion_dias)
+                  | date : 'dd MMMM yyyy'
+              }}</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">🔨</div>
+            <div class="timeline-content">
+              <strong>Execution Phase</strong>
+              <span>{{ selectedProject.duracion_dias }} days of intensive work</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">✔️</div>
+            <div class="timeline-content">
+              <strong>Completion</strong>
+              <span>{{ selectedProject.fecha_completado | date : 'dd MMMM yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Materials Section -->
+      <div class="materials-section">
+        <h3 class="section-title">
+          <span class="title-icon">🛠️</span>
+          Materials Used
+        </h3>
+        <p class="section-subtitle">
+          Premium materials carefully selected for this project
+        </p>
+        <ul class="materials-list">
+          @for (material of selectedProject.materiales; track material) {
+          <li>{{ material }}</li>
           }
-        </div>
-        <p class="modal-description">{{ selectedProject.descripcion }}</p>
-        <!-- Quick Stats Cards -->
-        <div class="stats-cards">
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-content">
-              <span class="stat-label">Completado</span>
-              <span class="stat-value">{{ selectedProject.fecha_completado | date: 'dd/MM/yyyy' }}</span>
+        </ul>
+      </div>
+      <!-- Technical Specs -->
+      <div class="specs-section">
+        <h3 class="section-title">
+          <span class="title-icon">📋</span>
+          Technical Specifications
+        </h3>
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-icon">📏</div>
+            <div class="spec-details">
+              <span class="spec-label">Dimensions</span>
+              <span class="spec-value">{{ selectedProject.area_m2 }} square meters</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">⏱️</div>
-            <div class="stat-content">
-              <span class="stat-label">Duración</span>
-              <span class="stat-value">{{ selectedProject.duracion_dias }} días</span>
+          <div class="spec-item">
+            <div class="spec-icon">🎯</div>
+            <div class="spec-details">
+              <span class="spec-label">Category</span>
+              <span class="spec-value">{{ getCategoryName(selectedProject.categoria) }}</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">📐</div>
-            <div class="stat-content">
-              <span class="stat-label">Área Total</span>
-              <span class="stat-value">{{ selectedProject.area_m2 }} m²</span>
+          <div class="spec-item">
+            <div class="spec-icon">🛠️</div>
+            <div class="spec-details">
+              <span class="spec-label">Installation Time</span>
+              <span class="spec-value">{{ selectedProject.duracion_dias }} working days</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">🪑</div>
-            <div class="stat-content">
-              <span class="stat-label">Estilo</span>
-              <span class="stat-value">{{ selectedProject.estilo }}</span>
-            </div>
-          </div>
-        </div>
-        <!-- Client & Location Info -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="title-icon">🧤</span>
-            Información del Cliente
-          </h3>
-          <div class="info-cards">
-            <div class="info-card">
-              <div class="info-label">Cliente</div>
-              <div class="info-value">{{ selectedProject.cliente }}</div>
-            </div>
-            <div class="info-card">
-              <div class="info-label">Ubicación</div>
-              <div class="info-value">📍 {{ selectedProject.ubicacion }}</div>
+          <div class="spec-item">
+            <div class="spec-icon">🌟</div>
+            <div class="spec-details">
+              <span class="spec-label">Status</span>
+              <span class="spec-value">Completed and Delivered</span>
             </div>
           </div>
         </div>
-        <!-- Timeline Section -->
-        <div class="timeline-section">
-          <h3 class="section-title">
-            <span class="title-icon">📊</span>
-            Detalles del Proyecto
-          </h3>
-          <div class="timeline-items">
-            <div class="timeline-item">
-              <div class="timeline-marker">🚀</div>
-              <div class="timeline-content">
-                <strong>Inicio del Proyecto</strong>
-                <span>{{ getStartDate(selectedProject.fecha_completado, selectedProject.duracion_dias) | date: 'dd MMMM yyyy' }}</span>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-marker">🔨</div>
-              <div class="timeline-content">
-                <strong>Fase de Ejecución</strong>
-                <span>{{ selectedProject.duracion_dias }} días de trabajo intensivo</span>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-marker">✔️</div>
-              <div class="timeline-content">
-                <strong>Finalización</strong>
-                <span>{{ selectedProject.fecha_completado | date: 'dd MMMM yyyy' }}</span>
-              </div>
+      </div>
+      <!-- Budget Section -->
+      <div class="budget-section">
+        <h3 class="section-title">
+          <span class="title-icon">💰</span>
+          Project Investment
+        </h3>
+        <div class="budget-card">
+          <div class="budget-details">
+            <div class="budget-label">Total Budget Invested</div>
+            <div class="budget-breakdown">
+              <span class="budget-note">Includes materials, labor, and installation</span>
             </div>
           </div>
+          <div class="budget-amount">{{ selectedProject.presupuesto | currency : 'EUR' }}</div>
         </div>
-        <!-- Materials Section -->
-        <div class="materials-section">
-          <h3 class="section-title">
-            <span class="title-icon">🛠️</span>
-            Materiales Utilizados
-          </h3>
-          <p class="section-subtitle">Materiales premium seleccionados cuidadosamente para este proyecto</p>
-          <ul class="materials-list">
-            @for (material of selectedProject.materiales; track material) {
-              <li>{{ material }}</li>
-            }
-          </ul>
+        <div class="budget-note-footer">
+          <p>
+            💡 <strong>Note:</strong> This budget is indicative and corresponds to a real project. Each project is unique and the cost may vary depending on specifications and selected materials.
+          </p>
         </div>
-        <!-- Technical Specs -->
-        <div class="specs-section">
-          <h3 class="section-title">
-            <span class="title-icon">📋</span>
-            Especificaciones Técnicas
-          </h3>
-          <div class="specs-grid">
-            <div class="spec-item">
-              <div class="spec-icon">📏</div>
-              <div class="spec-details">
-                <span class="spec-label">Dimensiones</span>
-                <span class="spec-value">{{ selectedProject.area_m2 }} metros cuadrados</span>
-              </div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-icon">🎯</div>
-              <div class="spec-details">
-                <span class="spec-label">Categoría</span>
-                <span class="spec-value">{{ getCategoryName(selectedProject.categoria) }}</span>
-              </div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-icon">🛠️</div>
-              <div class="spec-details">
-                <span class="spec-label">Tiempo de Instalación</span>
-                <span class="spec-value">{{ selectedProject.duracion_dias }} días laborables</span>
-              </div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-icon">🌟</div>
-              <div class="spec-details">
-                <span class="spec-label">Estado</span>
-                <span class="spec-value">Completado y Entregado</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Budget Section -->
-        <div class="budget-section">
-          <h3 class="section-title">
-            <span class="title-icon">💰</span>
-            Inversión del Proyecto
-          </h3>
-          <div class="budget-card">
-            <div class="budget-details">
-              <div class="budget-label">Presupuesto Total Invertido</div>
-              <div class="budget-breakdown">
-                <span class="budget-note">Incluye materiales, mano de obra e instalación</span>
-              </div>
-            </div>
-            <div class="budget-amount">{{ selectedProject.presupuesto | currency: 'EUR' }}</div>
-          </div>
-          <div class="budget-note-footer">
-            <p>💡 <strong>Nota:</strong> Este presupuesto es orientativo y corresponde a un proyecto real. Cada proyecto es único y el costo puede variar según especificaciones y materiales seleccionados.</p>
-          </div>
-        </div>
-        <!-- Call to Action -->
-        <div class="cta-section">
-          <h3 class="cta-title">¿Te gustaría un proyecto similar?</h3>
-          <p class="cta-text">Nuestro equipo puede crear un diseño personalizado para tu espacio</p>
-          <div class="cta-buttons">
-            <button class="cta-button primary" (click)="closeModal()">Solicitar Presupuesto</button>
-            <button class="cta-button secondary" (click)="closeModal()">Contactar Ahora</button>
-          </div>
+      </div>
+      <!-- Call to Action -->
+      <div class="cta-section">
+        <h3 class="cta-title">Would you like a similar project?</h3>
+        <p class="cta-text">Our team can create a custom design for your space</p>
+        <div class="cta-buttons">
+          <button class="cta-button primary" (click)="goToServices()">Request a Quote</button>
+          <button class="cta-button secondary" (click)="goToContact()">Contact Now</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 }
 
 <!-- Delete Confirmation Modal -->
 <app-confirmation-modal
   [isOpen]="showDeleteConfirm"
-  title="Confirmar eliminación"
-  message="¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer."
-  confirmLabel="Eliminar"
-  cancelLabel="Cancelar"
+  title="Confirm Deletion"
+  message="Are you sure you want to delete this project? This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
   (confirm)="executeDelete()"
-  (cancel)="cancelDelete()">
+  (cancel)="cancelDelete()"
+>
 </app-confirmation-modal>

@@ -15,6 +15,24 @@
 	overflow: hidden;
 }
 
+/* Responsive tweaks for small screens */
+@media (max-width: 720px) {
+	.modal { width: 96%; padding: 12px; }
+	.grid { flex-direction: column; }
+	.gallery { flex: none; width: 100%; }
+	.gallery .main-image { height: 220px; }
+	.details { min-width: 0; width: 100%; }
+	.thumbs img { width: 56px; height: 44px; }
+	.items-table { font-size: 0.9rem; }
+	.cell-img img.thumb { width: 64px; height: 48px }
+	.actions { padding-top: 8px; }
+}
+
+/* Style modal action buttons */
+.modal .actions .btn { padding: 0.55rem 0.85rem; border-radius: 8px; font-weight: 700; }
+.modal .actions .btn-ghost { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+.modal .actions .btn-primary { background: linear-gradient(135deg,#1976d2,#115293); color: theme.color('surface'); border: none; }
+
 .modal .modal-body {
 	overflow: auto;
 	padding-right: 6px;

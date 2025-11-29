@@ -1,13 +1,23 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ArchitectProject, Datos, FavoriteItem, ContactMessage, OrderReviewPayload } from '../datos';
+import {
+  ArchitectProject,
+  Datos,
+  FavoriteItem,
+  ContactMessage,
+  OrderReviewPayload,
+  UpdateProfilePayload,
+} from '../datos';
 import { Nav } from '../nav/nav';
 import { Footer } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { ConfirmationModal } from '../shared/confirmation-modal/confirmation-modal';
+import { ToastNotification } from '../shared/toast-notification/toast-notification';
 
 interface User {
+  id?: number | null;
   name: string;
   email: string;
   phone: string;
@@ -33,7 +43,12 @@ interface OrderItem {
     name?: string | null;
     code?: string | null;
   } | null;
-  availableColors?: Array<{ nombre?: string; codigo_hex?: string; name?: string; code?: string }> | null;
+  availableColors?: Array<{
+    nombre?: string;
+    codigo_hex?: string;
+    name?: string;
+    code?: string;
+  }> | null;
   includes?: string[];
 }
 
@@ -74,12 +89,21 @@ interface ReviewFormState {
 
 @Component({
   selector: 'app-profile',
-  imports: [Nav, Footer, CommonModule, FormsModule, RouterLink],
+  imports: [
+    Nav,
+    Footer,
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    ConfirmationModal,
+    ToastNotification,
+  ],
   templateUrl: './profile.html',
-  styleUrl: './profile.scss'
+  styleUrl: './profile.scss',
 })
 export class Profile implements OnInit, OnDestroy {
-  activeTab: 'credentials' | 'orders' | 'favorites' | 'rejected' | 'messages' | 'projects' = 'credentials';
+  activeTab: 'credentials' | 'orders' | 'favorites' | 'rejected' | 'messages' | 'projects' =
+    'credentials';
   user: User | null = null;
   originalUser: User | null = null;
   isLoading = true;
@@ -89,21 +113,49 @@ export class Profile implements OnInit, OnDestroy {
   isAdminUser = false;
   adminUnreadCount = 0;
   isArchitectUser = false;
+  savingProfile = false;
+  profileSaveSuccess = '';
+  profileSaveError = '';
   architectProjects: ArchitectProject[] = [];
   architectProjectsLoading = false;
   architectProjectsError = '';
   architectProjectForm: { title: string; notes: string; file: File | null } = {
     title: '',
     notes: '',
-    file: null
+    file: null,
   };
   architectProjectFileName = '';
   architectProjectSubmitting = false;
   architectProjectSubmitError = '';
   architectProjectSubmitSuccess = '';
+
+  // Modal de confirmación de perfil
+  showProfileConfirmModal = false;
+
+  // Modal de confirmación de logout
+  showLogoutConfirmModal = false;
+
+  // Toast de perfil
+  showProfileToast = false;
+  profileToastMessage = '';
+  profileToastType: 'success' | 'error' | 'info' | 'warning' = 'success';
+
   @ViewChild('architectFileInput') architectFileInput?: ElementRef<HTMLInputElement>;
 
   constructor(private router: Router, private datosService: Datos) {}
+
+  openLogoutConfirm(): void {
+    this.showLogoutConfirmModal = true;
+  }
+
+  onConfirmLogout(): void {
+    this.showLogoutConfirmModal = false;
+    this.logout();
+  }
+
+  onCancelLogout(): void {
+    this.showLogoutConfirmModal = false;
+  }
 
   logout(): void {
     // Call backend to clear cookie/session
@@ -116,7 +168,11 @@ export class Profile implements OnInit, OnDestroy {
       },
       complete: () => {
         // Clear client-side stored user data
-        try { localStorage.removeItem('loggedUser'); } catch (e) { /* ignore */ }
+        try {
+          localStorage.removeItem('loggedUser');
+        } catch (e) {
+          /* ignore */
+        }
         this.user = null;
         this.originalUser = null;
         this.notLogged = true;
@@ -126,6 +182,9 @@ export class Profile implements OnInit, OnDestroy {
         this.adminUnreadCount = 0;
         this.userMessages = [];
         this.isArchitectUser = false;
+        this.profileSaveSuccess = '';
+        this.profileSaveError = '';
+        this.savingProfile = false;
         this.architectProjects = [];
         this.architectProjectForm = { title: '', notes: '', file: null };
         this.architectProjectFileName = '';
@@ -134,7 +193,7 @@ export class Profile implements OnInit, OnDestroy {
         this.architectProjectSubmitSuccess = '';
         // Optionally navigate to profile root to refresh UI
         this.router.navigate(['/profile']);
-      }
+      },
     });
   }
 
@@ -142,14 +201,15 @@ export class Profile implements OnInit, OnDestroy {
     this.datosService.getLoggedUser().subscribe({
       next: (user: any) => {
         if (user && user.email) {
-          this.user = user;
-          this.originalUser = { ...user };
-          this.userRole = this.normalizeRole(user?.rol);
+          const normalizedUser = this.mapBackendUser(user);
+          this.user = normalizedUser;
+          this.originalUser = { ...normalizedUser };
+          this.userRole = this.normalizeRole(normalizedUser?.rol);
           this.isAdminUser = this.userRole === 'admin';
           this.isArchitectUser = this.userRole === 'arquitecto';
           this.isLoading = false;
-          // Load real orders for this logged user
-          this.fetchOrders(user.email);
+          this.persistUserLocally(user);
+          this.fetchOrders(normalizedUser.email);
           this.initializeFavorites();
           this.initializeMessages();
           if (this.isArchitectUser) {
@@ -169,23 +229,16 @@ export class Profile implements OnInit, OnDestroy {
           if (stored) {
             const parsed = JSON.parse(stored);
             // Map backend field names to frontend User interface if needed
-            this.user = {
-              name: parsed.nombre || parsed.name || '',
-              email: parsed.email || '',
-              phone: parsed.telefono || parsed.phone || '',
-              address: parsed.direccion || parsed.address || '',
-              avatar: parsed.avatar || '',
-              memberSince: parsed.fecha_registro || parsed.memberSince || '',
-              rol: parsed.rol || parsed.role || ''
-            };
-            this.originalUser = { ...this.user };
-            this.userRole = this.normalizeRole(parsed.rol || parsed.role);
+            const normalizedUser = this.mapBackendUser(parsed);
+            this.user = normalizedUser;
+            this.originalUser = { ...normalizedUser };
+            this.userRole = this.normalizeRole(normalizedUser.rol);
             this.isAdminUser = this.userRole === 'admin';
             this.isArchitectUser = this.userRole === 'arquitecto';
             this.isLoading = false;
             this.notLogged = false;
-            if (this.user.email) {
-              this.fetchOrders(this.user.email);
+            if (normalizedUser.email) {
+              this.fetchOrders(normalizedUser.email);
             }
             this.initializeFavorites();
             this.initializeMessages();
@@ -202,19 +255,88 @@ export class Profile implements OnInit, OnDestroy {
 
         this.notLogged = true;
         this.isLoading = false;
-      }
+      },
     });
   }
 
   hasChanges(): boolean {
-    return !!(this.user && this.originalUser && JSON.stringify(this.user) !== JSON.stringify(this.originalUser));
+    return !!(
+      this.user &&
+      this.originalUser &&
+      JSON.stringify(this.user) !== JSON.stringify(this.originalUser)
+    );
   }
 
-  saveChanges(): void {
-    if (this.user) {
-      this.originalUser = { ...this.user };
-      console.log('Changes saved:', this.user);
+  // --- Guardar perfil + toast ---
+  saveChangesWithToast(): void {
+    if (!this.user) return;
+
+    const payload: UpdateProfilePayload = {
+      nombre: this.user.name?.trim() || '',
+      email: this.user.email?.trim() || '',
+      telefono: this.user.phone?.trim() || null,
+      direccion: this.user.address?.trim() || null,
+    };
+
+    if (!payload.nombre || !payload.email) {
+      this.profileSaveError = 'Name and email are required.';
+      this.showProfileToastMessage('Name and email are required.', 'error');
+      return;
     }
+
+    this.savingProfile = true;
+    this.profileSaveError = '';
+    this.profileSaveSuccess = '';
+
+    this.datosService.updateMyProfile(payload).subscribe({
+      next: (res) => {
+        const updatedRaw = res?.user ?? null;
+        if (updatedRaw) {
+          const normalized = this.mapBackendUser(updatedRaw);
+          this.user = normalized;
+          this.originalUser = { ...normalized };
+          this.userRole = this.normalizeRole(normalized.rol);
+          this.isArchitectUser = this.userRole === 'arquitecto';
+          this.persistUserLocally(updatedRaw);
+          this.profileSaveSuccess = 'Profile updated successfully.';
+          if (normalized.email) {
+            this.fetchOrders(normalized.email);
+          }
+        } else if (this.user) {
+          this.originalUser = { ...this.user };
+          this.profileSaveSuccess = 'Profile updated.';
+        }
+
+        this.savingProfile = false;
+        // Toast de éxito
+        this.showProfileToastMessage('Profile updated successfully.', 'success');
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        this.profileSaveError =
+          err?.error?.error || 'Could not update your profile. Please try again.';
+        this.savingProfile = false;
+
+        // Toast de error
+        const toastMsg = err?.error?.error || 'Error updating profile.';
+        this.showProfileToastMessage(toastMsg, 'error');
+      },
+    });
+  }
+
+  // Helper para mostrar toast de perfil
+  private showProfileToastMessage(
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'success'
+  ): void {
+    this.profileToastMessage = message;
+    this.profileToastType = type;
+
+    // Forzamos recreación del componente para que OnInit vuelva a disparar la animación
+    this.showProfileToast = false;
+    setTimeout(() => {
+      this.showProfileToast = true;
+    }, 0);
   }
 
   orders: Order[] = [];
@@ -243,7 +365,7 @@ export class Profile implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error loading user orders:', err);
-      }
+      },
     });
   }
 
@@ -257,20 +379,62 @@ export class Profile implements OnInit, OnDestroy {
     return role.toLowerCase().trim();
   }
 
+  private mapBackendUser(raw: any): User {
+    const name = raw?.nombre ?? raw?.name ?? '';
+    const email = raw?.email ?? '';
+    const phone = raw?.telefono ?? raw?.phone ?? '';
+    const address = raw?.direccion ?? raw?.address ?? '';
+    const avatar = raw?.avatar ?? 'assets/images/profile-placeholder.png';
+    const memberSince = raw?.fecha_registro ?? raw?.memberSince ?? '';
+    const role = raw?.rol ?? raw?.role ?? '';
+    const id = typeof raw?.id === 'number' ? raw.id : Number(raw?.id) || null;
+
+    return {
+      id,
+      name,
+      email,
+      phone,
+      address,
+      avatar,
+      memberSince,
+      rol: role,
+    };
+  }
+
+  private persistUserLocally(raw: any): void {
+    try {
+      if (raw) {
+        localStorage.setItem('loggedUser', JSON.stringify(raw));
+      }
+    } catch (e) {
+      console.warn('No se pudo actualizar loggedUser en localStorage:', e);
+    }
+  }
+
   getOrderTotal(order: Order | null): number {
     if (!order) return 0;
-    if (order.total !== null && order.total !== undefined && !Number.isNaN(order.total) && order.total > 0) {
+    if (
+      order.total !== null &&
+      order.total !== undefined &&
+      !Number.isNaN(order.total) &&
+      order.total > 0
+    ) {
       return order.total;
     }
-    if (order.estimatedTotal !== null && order.estimatedTotal !== undefined && !Number.isNaN(order.estimatedTotal) && order.estimatedTotal > 0) {
+    if (
+      order.estimatedTotal !== null &&
+      order.estimatedTotal !== undefined &&
+      !Number.isNaN(order.estimatedTotal) &&
+      order.estimatedTotal > 0
+    ) {
       return order.estimatedTotal;
     }
-    return order.items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+    return order.items.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
   }
 
   private updateRejectedOrders(): void {
     const rejectedKeywords = ['rejected', 'rechazado'];
-    this.rejectedOrders = this.orders.filter(order => {
+    this.rejectedOrders = this.orders.filter((order) => {
       const status = (order.status || '').toLowerCase();
       if (rejectedKeywords.includes(status)) return true;
       const label = (order.statusLabel || '').toLowerCase();
@@ -293,8 +457,8 @@ export class Profile implements OnInit, OnDestroy {
       }
       if (typeof raw === 'object') {
         const keys = Object.keys(raw);
-        const numericLike = keys.length && keys.every(k => String(Number(k)) === k);
-        if (numericLike) return keys.map(k => raw[k]);
+        const numericLike = keys.length && keys.every((k) => String(Number(k)) === k);
+        if (numericLike) return keys.map((k) => raw[k]);
         return [raw];
       }
       return [];
@@ -310,7 +474,7 @@ export class Profile implements OnInit, OnDestroy {
         const resolvedColor = colorSource
           ? {
               name: colorSource.name ?? colorSource.nombre ?? null,
-              code: colorSource.code ?? colorSource.codigo_hex ?? null
+              code: colorSource.code ?? colorSource.codigo_hex ?? null,
             }
           : null;
         const dims = it?.dimensions;
@@ -318,14 +482,17 @@ export class Profile implements OnInit, OnDestroy {
           ? {
               width: dims.width ?? null,
               height: dims.height ?? null,
-              depth: dims.depth ?? null
+              depth: dims.depth ?? null,
             }
           : null;
         const includes = Array.isArray(it?.includes)
           ? it.includes
           : typeof it?.includes === 'string'
-            ? it.includes.split(/[,|]/).map((part: string) => part.trim()).filter(Boolean)
-            : [];
+          ? it.includes
+              .split(/[,|]/)
+              .map((part: string) => part.trim())
+              .filter(Boolean)
+          : [];
 
         return {
           id: it?.id ?? null,
@@ -337,23 +504,40 @@ export class Profile implements OnInit, OnDestroy {
           dimensions: resolvedDimensions,
           color: resolvedColor,
           availableColors: it?.availableColors ?? null,
-          includes
+          includes,
         };
       });
 
       const backendTotalSource = o.total ?? o.totalPrice ?? o.precio_total;
-      const backendTotalParsed = backendTotalSource !== undefined && backendTotalSource !== null ? Number(backendTotalSource) : null;
-      const backendTotal = backendTotalParsed !== null && !Number.isNaN(backendTotalParsed) ? backendTotalParsed : null;
+      const backendTotalParsed =
+        backendTotalSource !== undefined && backendTotalSource !== null
+          ? Number(backendTotalSource)
+          : null;
+      const backendTotal =
+        backendTotalParsed !== null && !Number.isNaN(backendTotalParsed)
+          ? backendTotalParsed
+          : null;
       const estimatedTotalSource = o.estimated_total ?? o.estimatedTotal ?? o.total_estimate;
-      const estimatedTotalParsed = estimatedTotalSource !== undefined && estimatedTotalSource !== null ? Number(estimatedTotalSource) : null;
-      const estimatedTotal = estimatedTotalParsed !== null && !Number.isNaN(estimatedTotalParsed) ? estimatedTotalParsed : null;
-      const computedTotal = parsedItems.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 1), 0);
+      const estimatedTotalParsed =
+        estimatedTotalSource !== undefined && estimatedTotalSource !== null
+          ? Number(estimatedTotalSource)
+          : null;
+      const estimatedTotal =
+        estimatedTotalParsed !== null && !Number.isNaN(estimatedTotalParsed)
+          ? estimatedTotalParsed
+          : null;
+      const computedTotal = parsedItems.reduce(
+        (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
+        0
+      );
       const statusRaw = (o.status ?? o.estado ?? 'pending') as string;
       const statusLabel = o.status_label ?? this.getStatusText(statusRaw);
       const createdAt = o.created_at ?? o.fecha ?? null;
       let displayDate = createdAt;
       try {
-        displayDate = createdAt ? new Date(createdAt).toLocaleDateString() : new Date().toLocaleDateString();
+        displayDate = createdAt
+          ? new Date(createdAt).toLocaleDateString()
+          : new Date().toLocaleDateString();
       } catch (e) {
         displayDate = createdAt || new Date().toLocaleDateString();
       }
@@ -368,13 +552,14 @@ export class Profile implements OnInit, OnDestroy {
         rejectionDate = Number.isNaN(parsed.getTime()) ? rejectionDateRaw : parsed.toISOString();
       }
       const reviewPayload = o.review ?? null;
-      const reviewData: OrderReview | null = reviewPayload && typeof reviewPayload === 'object'
-        ? {
-            rating: Number(reviewPayload.rating) || 0,
-            comment: reviewPayload.comment ?? null,
-            createdAt: reviewPayload.created_at ?? reviewPayload.createdAt ?? null
-          }
-        : null;
+      const reviewData: OrderReview | null =
+        reviewPayload && typeof reviewPayload === 'object'
+          ? {
+              rating: Number(reviewPayload.rating) || 0,
+              comment: reviewPayload.comment ?? null,
+              createdAt: reviewPayload.created_at ?? reviewPayload.createdAt ?? null,
+            }
+          : null;
       const canReview = Boolean(o.can_review ?? o.canReview);
 
       return {
@@ -394,7 +579,7 @@ export class Profile implements OnInit, OnDestroy {
         rejectionReason,
         rejectionDate,
         canReview,
-        review: reviewData
+        review: reviewData,
       } as Order;
     });
   }
@@ -407,17 +592,17 @@ export class Profile implements OnInit, OnDestroy {
   getStatusText(status: string): string {
     if (!status) return 'Pending';
     const statusMap: { [key: string]: string } = {
-      'pending': 'Pending',
-      'processing': 'Processing',
-      'shipped': 'Shipped',
-      'delivered': 'Delivered',
-      'cancelled': 'Cancelled',
+      pending: 'Pending',
+      processing: 'Processing',
+      shipped: 'Shipped',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled',
       'to-do': 'To-do',
       'in progress': 'In Progress',
-      'done': 'Completed',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'rechazado': 'Rejected'
+      done: 'Completed',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      rechazado: 'Rejected',
     };
     if (statusMap[status]) return statusMap[status];
     const readable = status.replace(/[-_]/g, ' ');
@@ -446,7 +631,7 @@ export class Profile implements OnInit, OnDestroy {
   removeFavorite(id: number): void {
     if (!id) return;
     this.datosService.removeFavoriteById(id).subscribe({
-      error: (err) => console.error('Error removing favorite', err)
+      error: (err) => console.error('Error removing favorite', err),
     });
   }
 
@@ -492,7 +677,7 @@ export class Profile implements OnInit, OnDestroy {
       order_id: order.id,
       order_type: order.type,
       rating: order.pendingReview.rating,
-      comment: order.pendingReview.comment?.trim() || ''
+      comment: order.pendingReview.comment?.trim() || '',
     };
     order.reviewSubmitting = true;
     order.reviewError = '';
@@ -502,7 +687,7 @@ export class Profile implements OnInit, OnDestroy {
         order.review = {
           rating: payload.rating,
           comment: payload.comment,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         };
         order.canReview = false;
         order.showReviewForm = false;
@@ -510,7 +695,7 @@ export class Profile implements OnInit, OnDestroy {
       error: (err) => {
         order.reviewSubmitting = false;
         order.reviewError = err?.error?.error || 'Unable to submit your review right now.';
-      }
+      },
     });
   }
 
@@ -536,7 +721,7 @@ export class Profile implements OnInit, OnDestroy {
         } else {
           this.architectProjectsError = 'Unable to load your architect projects.';
         }
-      }
+      },
     });
   }
 
@@ -561,7 +746,11 @@ export class Profile implements OnInit, OnDestroy {
       formData.append('project_title', this.architectProjectForm.title.trim());
     }
     formData.append('project_notes', notes);
-    formData.append('project_file', this.architectProjectForm.file, this.architectProjectForm.file.name);
+    formData.append(
+      'project_file',
+      this.architectProjectForm.file,
+      this.architectProjectForm.file.name
+    );
 
     this.architectProjectSubmitting = true;
     this.architectProjectSubmitError = '';
@@ -583,7 +772,7 @@ export class Profile implements OnInit, OnDestroy {
         this.architectProjectSubmitting = false;
         this.architectProjectSubmitError =
           err?.error?.error || 'Unable to send your project right now.';
-      }
+      },
     });
   }
 
@@ -613,8 +802,12 @@ export class Profile implements OnInit, OnDestroy {
     if (project.file_url.startsWith('http')) {
       return project.file_url;
     }
-    const base = this.datosService.url.endsWith('/') ? this.datosService.url : `${this.datosService.url}/`;
-    const relative = project.file_url.startsWith('/') ? project.file_url.substring(1) : project.file_url;
+    const base = this.datosService.url.endsWith('/')
+      ? this.datosService.url
+      : `${this.datosService.url}/`;
+    const relative = project.file_url.startsWith('/')
+      ? project.file_url.substring(1)
+      : project.file_url;
     return base + relative;
   }
 
@@ -629,7 +822,7 @@ export class Profile implements OnInit, OnDestroy {
 
   private initializeFavorites(): void {
     if (this.favoritesSub) return;
-    this.favoritesSub = this.datosService.favorites$.subscribe(favs => {
+    this.favoritesSub = this.datosService.favorites$.subscribe((favs) => {
       this.favorites = favs || [];
     });
     this.favoritesLoading = true;
@@ -646,7 +839,7 @@ export class Profile implements OnInit, OnDestroy {
         } else {
           this.favoritesError = 'Unable to load favorites right now.';
         }
-      }
+      },
     });
   }
 
@@ -658,7 +851,7 @@ export class Profile implements OnInit, OnDestroy {
     if (this.messagesSub) return;
     this.messagesLoading = true;
     this.messagesError = '';
-    this.messagesSub = this.datosService.myMessages$.subscribe(msgs => {
+    this.messagesSub = this.datosService.myMessages$.subscribe((msgs) => {
       this.userMessages = msgs || [];
     });
     this.datosService.loadMyMessages(true).subscribe({
@@ -675,7 +868,7 @@ export class Profile implements OnInit, OnDestroy {
         } else {
           this.messagesError = 'Unable to load messages.';
         }
-      }
+      },
     });
   }
 
@@ -703,7 +896,7 @@ export class Profile implements OnInit, OnDestroy {
         } else {
           this.messagesError = 'Unable to load messages.';
         }
-      }
+      },
     });
   }
 
@@ -732,7 +925,7 @@ export class Profile implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error updating admin message state', err);
         this.messagesError = 'Unable to update message state.';
-      }
+      },
     });
   }
 
@@ -743,5 +936,25 @@ export class Profile implements OnInit, OnDestroy {
   formatAdminMessageStatus(status: string): string {
     if (!status) return 'New';
     return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  // Submit del formulario de perfil
+  onSubmitProfile(event: Event): void {
+    event.preventDefault();
+
+    if (!this.hasChanges() || this.savingProfile) {
+      return;
+    }
+
+    this.showProfileConfirmModal = true;
+  }
+
+  onConfirmProfileSave(): void {
+    this.showProfileConfirmModal = false;
+    this.saveChangesWithToast();
+  }
+
+  onCancelProfileSave(): void {
+    this.showProfileConfirmModal = false;
   }
 }

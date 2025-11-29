@@ -210,6 +210,19 @@
           }
         }
 
+        /* CVV input smaller on desktop but full-width on mobile */
+        .cvv-input {
+          width: 58px;
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+
+        @include theme.respond-to('mobile') {
+          .cvv-input {
+            width: 100%;
+          }
+        }
+
         .two-col {
           display: flex;
           gap: 0.75rem;

@@ -73,6 +73,7 @@ export interface ManagedUser {
   nombre: string;
   email: string;
   telefono?: string | null;
+  direccion?: string | null;
   rol: 'cliente' | 'arquitecto';
   fecha_registro?: string | null;
 }
@@ -81,8 +82,16 @@ export interface ManagedUserPayload {
   nombre?: string;
   email?: string;
   telefono?: string | null;
+  direccion?: string | null;
   rol?: 'cliente' | 'arquitecto';
   password?: string;
+}
+
+export interface UpdateProfilePayload {
+  nombre: string;
+  email: string;
+  telefono?: string | null;
+  direccion?: string | null;
 }
 
 export interface ArchitectProject {
@@ -313,6 +322,12 @@ export class Datos {
     return this.http.get<any>(this.url + 'get_logged_user.php', { withCredentials: true });
   }
 
+  updateMyProfile(payload: UpdateProfilePayload): Observable<{ success: boolean; user?: any }> {
+    return this.http.post<{ success: boolean; user?: any }>(this.url + 'update_profile.php', payload, {
+      withCredentials: true,
+    });
+  }
+
   // ===== CARPINTERO / ADMIN ENDPOINTS =====
 
   // Get pending presupuestos for carpintero/admin
@@ -387,14 +402,6 @@ export class Datos {
   ): Observable<ManagedUser> {
     return this.http
       .post<{ success: boolean; user?: ManagedUser }>(this.url + 'manage_users.php', payload, {
-        withCredentials: true,
-      })
-      .pipe(map((res) => (res && res.success && res.user ? res.user : (null as any))));
-  }
-
-  updateManagedUser(id: number, payload: ManagedUserPayload): Observable<ManagedUser> {
-    return this.http
-      .put<{ success: boolean; user?: ManagedUser }>(this.url + `manage_users.php?id=${id}`, payload, {
         withCredentials: true,
       })
       .pipe(map((res) => (res && res.success && res.user ? res.user : (null as any))));

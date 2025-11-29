@@ -3,6 +3,8 @@
 .projects-section {
   padding: 40px 0;
   background: theme.color('surface');
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .projects-header {
@@ -27,11 +29,13 @@
 
 .projects-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 30px;
-  padding: 0 50px;
-  max-width: 100%;
-  margin: 0;
+  padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .project-card {
@@ -39,24 +43,32 @@
   justify-self: stretch;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s ease;
-  
+  max-width: 100%;
+  box-sizing: border-box;
+
   &:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   img {
     height: 350px;
     object-fit: cover;
   }
-  
+
+  mat-card-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
   mat-card-content {
     min-height: 80px;
   }
-  
+
   mat-card-actions {
     justify-content: space-between;
     padding: 16px;
-    
+
     button {
       color: #854e26;
       border: none;
@@ -64,7 +76,7 @@
       font-weight: 500;
       border-radius: 4px;
       transition: background-color 0.3s ease;
-      
+
       &:hover {
         background-color: #854e2648;
       }
@@ -73,28 +85,78 @@
 }
 
 @media (max-width: 768px) {
+  .projects-section {
+    padding: 30px 0;
+  }
+
   .projects-header {
-    padding: 0 20px;
+    padding: 0 16px;
     margin-bottom: 30px;
   }
-  
+
   .projects-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
-  
+
   .projects-subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
-  
+
   .projects-container {
     grid-template-columns: 1fr;
-    padding: 0 20px;
+    padding: 0 16px;
     gap: 20px;
+    max-width: 100%;
   }
-  
+
   .project-card {
     width: 100%;
+    max-width: 100%;
+    
+    img {
+      height: 250px;
+    }
+
+    mat-card-content {
+      min-height: auto;
+      
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    mat-card-actions {
+      flex-direction: column;
+      gap: 8px;
+      
+      button {
+        width: 100%;
+      }
+    }
   }
 }
 
+@media (max-width: 480px) {
+  .projects-header {
+    padding: 0 12px;
+  }
 
+  .projects-title {
+    font-size: 1.5rem;
+  }
+
+  .projects-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .projects-container {
+    padding: 0 12px;
+    gap: 16px;
+  }
+
+  .project-card {
+    img {
+      height: 200px;
+    }
+  }
+}

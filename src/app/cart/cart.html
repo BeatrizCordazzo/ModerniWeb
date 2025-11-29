@@ -70,29 +70,6 @@
               <span>Subtotal ({{getTotalItems()}} {{getTotalItems() === 1 ? 'item' : 'items'}}):</span>
               <span>${{getSubtotal().toLocaleString()}}</span>
             </div>
-            <div class="summary-row">
-              <span>Shipping:</span>
-              @if (getSubtotal() >= 50000) {
-                <span class="free-shipping">Free!</span>
-              }
-              @if (getSubtotal() < 50000) {
-                <span>${{shippingCost.toLocaleString()}}</span>
-              }
-            </div>
-            @if (discount > 0) {
-              <div class="summary-row discount">
-                <span>Discount:</span>
-                <span class="discount-value">-${{discount.toLocaleString()}}</span>
-              </div>
-            }
-            <div class="coupon-section">
-              <input
-                type="text"
-                placeholder="Coupon code"
-                [(ngModel)]="couponCode"
-                class="coupon-input">
-                <button class="apply-coupon-btn" (click)="applyCoupon()">Apply</button>
-              </div>
               <div class="summary-total">
                 <span>Total:</span>
                 <span class="total-amount">${{getTotal().toLocaleString()}}</span>

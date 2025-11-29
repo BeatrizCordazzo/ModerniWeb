@@ -76,7 +76,7 @@ export class ProjectsPage implements OnInit, OnDestroy {
     this.datosService.getLoggedUser().subscribe({
       next: (user) => {
         const role = user && (user.rol || user.role) ? (user.rol || user.role) : null;
-        this.isAdmin = !!role && ['admin', 'carpintero', 'superadmin', 'arquitecto'].includes(role);
+        this.isAdmin = !!role && ['admin', 'arquitecto'].includes(role);
       },
       error: () => { this.isAdmin = false; }
     });
@@ -94,7 +94,7 @@ export class ProjectsPage implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading showcase projects:', error);
-        this.errorMessage = 'Error al cargar los proyectos. Por favor, intenta de nuevo.';
+        this.errorMessage = 'Error loading projects. Please try again.';
         this.isLoading = false;
       }
     });
@@ -161,12 +161,12 @@ export class ProjectsPage implements OnInit, OnDestroy {
     this.datosService.createShowcaseProject(payload).subscribe({
       next: () => {
         this.isSaving = false;
-        this.saveSuccess = 'Proyecto creado correctamente.';
+        this.saveSuccess = 'Project created successfully.';
         this.resetForm();
       },
       error: (err) => {
         this.isSaving = false;
-        this.saveError = err?.error?.error || 'No se pudo crear el proyecto.';
+        this.saveError = err?.error?.error || 'Failed to create project.';
       }
     });
   }
@@ -196,7 +196,7 @@ export class ProjectsPage implements OnInit, OnDestroy {
         console.error('Error deleting project:', err);
         this.showDeleteConfirm = false;
         this.projectToDelete = null;
-        this.errorMessage = 'Error al eliminar el proyecto.';
+        this.errorMessage = 'Error deleting project.';
       }
     });
   }

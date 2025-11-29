@@ -31,13 +31,13 @@
               <tbody>
                 @for (p of pendingPresupuestos; track p.presupuesto_id ?? p.id ?? p) {
                 <tr>
-                  <td>{{ p.presupuesto_id }}</td>
-                  <td>{{ p.cliente_nombre }}</td>
-                  <td>{{ p.proyecto_nombre }}</td>
-                  <td>{{ p.total }}</td>
-                  <td><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
-                  <td>{{ p.fecha_creacion }}</td>
-                  <td class="actions-cell">
+                  <td data-label="ID">{{ p.presupuesto_id }}</td>
+                  <td data-label="Cliente">{{ p.cliente_nombre }}</td>
+                  <td data-label="Proyecto">{{ p.proyecto_nombre }}</td>
+                  <td data-label="Total">{{ p.total }}</td>
+                  <td data-label="Ver"><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
+                  <td data-label="Fecha">{{ p.fecha_creacion }}</td>
+                  <td class="actions-cell" data-label="Acciones">
                     <button class="btn btn-accept" (click)="accept(p.presupuesto_id)">
                       Aceptar
                     </button>
@@ -589,9 +589,6 @@
               <button class="btn btn-ghost" type="button" (click)="refreshManagedUsers()">
                 Refrescar
               </button>
-              <button class="btn btn-primary" type="button" (click)="startCreateUser()">
-                Nuevo
-              </button>
             </div>
           </div>
 
@@ -649,13 +646,6 @@
                       <td class="user-actions">
                         <button
                           type="button"
-                          class="btn btn-ghost"
-                          (click)="openEditUserModal(user)"
-                        >
-                          Modificar
-                        </button>
-                        <button
-                          type="button"
                           class="btn btn-reject"
                           (click)="confirmDeleteManagedUser(user)"
                         >
@@ -670,11 +660,18 @@
             </div>
 
             <div class="clients-card form-card">
-              <h3>{{ editingUserId ? 'Modificar usuario' : 'Añadir usuario' }}</h3>
+              <h3>Añadir usuario</h3>
               <form class="user-form" (ngSubmit)="submitUserForm()">
                 <label>
                   Nombre
-                  <input type="text" name="userName" [(ngModel)]="createUserForm.nombre" required />
+                  <input
+                    type="text"
+                    name="userName"
+                    [(ngModel)]="createUserForm.nombre"
+                    required
+                    minlength="3"
+                  />
+                  <small class="small-muted">Mínimo 3 letras, sin caracteres especiales.</small>
                 </label>
                 <label>
                   Email
@@ -684,10 +681,18 @@
                     [(ngModel)]="createUserForm.email"
                     required
                   />
+                  <small class="small-muted">Debe ser un correo válido.</small>
                 </label>
                 <label>
                   Teléfono
-                  <input type="text" name="userPhone" [(ngModel)]="createUserForm.telefono" />
+                  <input
+                    type="tel"
+                    name="userPhone"
+                    [(ngModel)]="createUserForm.telefono"
+                    maxlength="20"
+                    placeholder="+52 123 456 7890"
+                  />
+                  <small class="small-muted">Solo dígitos, espacios, +, -, ()</small>
                 </label>
                 <label>
                   Rol
@@ -703,9 +708,11 @@
                     name="userPassword"
                     [(ngModel)]="createUserForm.password"
                     required
-                    minlength="4"
+                    minlength="6"
                   />
-                  <small class="small-muted"> Mínimo 4 caracteres. </small>
+                  <small class="small-muted">
+                    Al menos 6 caracteres, con una mayúscula, un número y un carácter especial.
+                  </small>
                 </label>
                 <div class="form-actions">
                   <button class="btn btn-primary" type="submit" [disabled]="savingUser">
@@ -717,62 +724,6 @@
           </div>
           }
         </div>
-        @if (showUserModal) {
-        <div class="user-modal-backdrop" (click)="closeUserModal()">
-          <div class="user-modal" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-              <h3>Modificar usuario</h3>
-              <button
-                type="button"
-                class="close-btn"
-                (click)="closeUserModal()"
-                aria-label="Cerrar"
-              >
-                &times;
-              </button>
-            </div>
-            <form class="user-form" (ngSubmit)="submitEditUserForm()">
-              <label>
-                Nombre
-                <input type="text" name="editName" [(ngModel)]="editUserForm.nombre" required />
-              </label>
-              <label>
-                Email
-                <input type="email" name="editEmail" [(ngModel)]="editUserForm.email" required />
-              </label>
-              <label>
-                Teléfono
-                <input type="text" name="editPhone" [(ngModel)]="editUserForm.telefono" />
-              </label>
-              <label>
-                Rol
-                <select name="editRole" [(ngModel)]="editUserForm.rol">
-                  <option value="cliente">Cliente</option>
-                  <option value="arquitecto">Arquitecto</option>
-                </select>
-              </label>
-              <label>
-                Contraseña (opcional)
-                <input
-                  type="password"
-                  name="editPassword"
-                  [(ngModel)]="editUserForm.password"
-                  minlength="4"
-                />
-                <small class="small-muted">Déjala vacía para mantener la actual.</small>
-              </label>
-              <div class="form-actions">
-                <button type="button" class="btn btn-ghost" (click)="closeUserModal()">
-                  Cancelar
-                </button>
-                <button type="submit" class="btn btn-primary" [disabled]="savingUser">
-                  {{ savingUser ? 'Guardando...' : 'Guardar cambios' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-        }
       </mat-tab>
 
       <mat-tab>
@@ -881,6 +832,7 @@
     [presupuesto]="priceModalPresupuesto"
     (confirm)="onPriceModalConfirm($event)"
     (cancel)="onPriceModalCancel()"
+    (invalid)="showToast($event, 'warning')"
   >
   </app-price-modal>
   } @if (showDetailModal) {

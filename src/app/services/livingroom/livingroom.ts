@@ -6,6 +6,7 @@ import { CustomOrderConfirmationModal } from '../../shared/custom-order-confirma
 import { ToastNotification } from '../../shared/toast-notification/toast-notification';
 import { Datos, Product as ApiProduct, Color, CustomFurnitureOptionPayload } from '../../datos';
 import { CartService } from '../../shared/cart.service';
+import { LoginRequiredModalService } from '../../shared/login-required-modal/login-required-modal.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
@@ -250,7 +251,8 @@ export class Livingroom implements OnInit {
   constructor(
     private datosService: Datos,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private loginPrompt: LoginRequiredModalService
   ) {}
 
   ngOnInit() {
@@ -650,14 +652,8 @@ export class Livingroom implements OnInit {
               this.showToast = false;
             }, 3500);
           } else {
-            // Not logged - prompt to login
             this.closeModal();
-            alert('You must be logged in to add items to the cart. Please log in first.');
-            try {
-              this.router.navigate(['/login']);
-            } catch (e) {
-              // ignore navigation errors
-            }
+            this.loginPrompt.open('You need to be logged to add items to the cart.');
           }
         },
         error: () => {
@@ -686,10 +682,7 @@ export class Livingroom implements OnInit {
           }
 
           this.closeModal();
-          alert('You must be logged in to add items to the cart. Please log in first.');
-          try {
-            this.router.navigate(['/login']);
-          } catch (e) {}
+          this.loginPrompt.open('You need to be logged to add items to the cart.');
         },
       });
     }

@@ -95,11 +95,12 @@ export class AdminCarpintero implements OnInit {
   managedUsersLoading = false;
   managedUsersError = '';
   managedUsersSearch = '';
-  editingUserId: number | null = null;
   savingUser = false;
   createUserForm: UserFormModel = this.createEmptyUserForm();
-  editUserForm: UserFormModel = this.createEmptyUserForm();
-  showUserModal = false;
+
+  private readonly nameRegex = /^[A-Za-z\u00C0-\u024F\s]+$/;
+  private readonly emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  private readonly phoneRegex = /^[0-9+()\s-]{7,20}$/;
 
   architectProjectsPending: ArchitectProject[] = [];
   architectProjectsAccepted: ArchitectProject[] = [];
@@ -521,39 +522,45 @@ export class AdminCarpintero implements OnInit {
     });
   }
 
-  startCreateUser(): void {
-    this.editingUserId = null;
-    this.createUserForm = this.createEmptyUserForm();
-  }
 
-  openEditUserModal(user: ManagedUser): void {
-    if (!user) return;
-    this.editingUserId = user.id;
-    this.editUserForm = {
-      nombre: user.nombre || '',
-      email: user.email || '',
-      telefono: user.telefono || '',
-      rol: (user.rol as ManagedUserRole) || 'cliente',
-      password: '',
-    };
-    this.showUserModal = true;
-  }
-
-  closeUserModal(): void {
-    this.showUserModal = false;
-    this.editingUserId = null;
-    this.editUserForm = this.createEmptyUserForm();
-  }
-
-  submitUserForm(): void {
+  async submitUserForm(): Promise<void> {
     const form = this.createUserForm;
-    if (!form.nombre.trim() || !form.email.trim()) {
+    const nombre = form.nombre.trim();
+    const email = form.email.trim();
+    const telefono = form.telefono.trim();
+    if (!nombre || !email) {
       this.showToast('Nombre y email son obligatorios', 'warning');
       return;
     }
+
+    if (!this.isValidName(nombre)) {
+      this.showToast('El nombre debe tener al menos 3 letras y sin caracteres especiales', 'warning');
+      return;
+    }
+
+    if (!this.isValidEmail(email)) {
+      this.showToast('Ingresa un email valido', 'warning');
+      return;
+    }
+
+    if (telefono && !this.isValidPhone(telefono)) {
+      this.showToast('Ingresa un telefono valido (solo digitos, espacios, +, -, parentesis)', 'warning');
+      return;
+    }
+
     const passwordValue = form.password.trim();
-    if (passwordValue.length < 4) {
-      this.showToast('Ingresa una contrasena de al menos 4 caracteres', 'warning');
+    const passwordError = this.getPasswordValidationError(passwordValue);
+    if (passwordError) {
+      this.showToast(passwordError, 'warning');
+      return;
+    }
+
+    let hashedPassword: string;
+    try {
+      hashedPassword = await this.hashPassword(passwordValue);
+    } catch (error) {
+      console.error('Error hashing password', error);
+      this.showToast('No se pudo procesar la contrasena', 'error');
       return;
     }
 
@@ -563,11 +570,11 @@ export class AdminCarpintero implements OnInit {
       rol: ManagedUserRole;
       password: string;
     } = {
-      nombre: form.nombre.trim(),
-      email: form.email.trim(),
+      nombre,
+      email,
       rol: form.rol,
-      telefono: form.telefono.trim() ? form.telefono.trim() : null,
-      password: passwordValue,
+      telefono: telefono ? telefono : null,
+      password: hashedPassword,
     };
 
     this.savingUser = true;
@@ -575,55 +582,13 @@ export class AdminCarpintero implements OnInit {
       next: () => {
         this.showToast('Usuario creado', 'success');
         this.savingUser = false;
-        this.startCreateUser();
+        // Reset model for the form (button 'Nuevo' and helper removed)
+        this.createUserForm = this.createEmptyUserForm();
         this.loadManagedUsers();
       },
       error: (err: any) => {
         console.error('Error guardando usuario', err);
         const message = err?.error?.error || 'No se pudo crear el usuario';
-        this.showToast(message, 'error');
-        this.savingUser = false;
-      },
-    });
-  }
-
-  submitEditUserForm(): void {
-    if (!this.editingUserId) {
-      this.showToast('Selecciona un usuario para modificar', 'warning');
-      return;
-    }
-    const form = this.editUserForm;
-    if (!form.nombre.trim() || !form.email.trim()) {
-      this.showToast('Nombre y email son obligatorios', 'warning');
-      return;
-    }
-    const passwordValue = form.password.trim();
-    if (passwordValue && passwordValue.length < 4) {
-      this.showToast('La contrasena debe tener al menos 4 caracteres', 'warning');
-      return;
-    }
-
-    const payload: ManagedUserPayload = {
-      nombre: form.nombre.trim(),
-      email: form.email.trim(),
-      telefono: form.telefono.trim() ? form.telefono.trim() : null,
-      rol: form.rol,
-    };
-    if (passwordValue) {
-      payload.password = passwordValue;
-    }
-
-    this.savingUser = true;
-    this.datos.updateManagedUser(this.editingUserId, payload).subscribe({
-      next: () => {
-        this.showToast('Usuario modificado', 'success');
-        this.savingUser = false;
-        this.closeUserModal();
-        this.loadManagedUsers();
-      },
-      error: (err) => {
-        console.error('Error guardando usuario', err);
-        const message = err?.error?.error || 'No se pudo actualizar el usuario';
         this.showToast(message, 'error');
         this.savingUser = false;
       },
@@ -643,16 +608,61 @@ export class AdminCarpintero implements OnInit {
       next: () => {
         this.showToast('Usuario excluido', 'success');
         this.managedUsers = this.managedUsers.filter((u) => u.id !== id);
-        if (this.editingUserId === id) {
-          this.closeUserModal();
-          this.startCreateUser();
-        }
       },
       error: (err) => {
         console.error('Error deleting user', err);
         this.showToast('No se pudo excluir el usuario', 'error');
       },
     });
+  }
+
+  private isValidName(value: string): boolean {
+    return value.length >= 3 && this.nameRegex.test(value);
+  }
+
+  private isValidEmail(value: string): boolean {
+    return this.emailRegex.test(value);
+  }
+
+  private isValidPhone(value: string): boolean {
+    return this.phoneRegex.test(value);
+  }
+
+  private getPasswordValidationError(value: string, optional = false): string | null {
+    if (!value) {
+      return optional ? null : 'La contrasena es obligatoria';
+    }
+
+    if (value.length < 6) {
+      return 'La contrasena debe tener al menos 6 caracteres';
+    }
+    if (!/[A-Z]/.test(value)) {
+      return 'La contrasena debe incluir al menos una letra mayuscula';
+    }
+    if (!/\d/.test(value)) {
+      return 'La contrasena debe incluir al menos un numero';
+    }
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)) {
+      return 'La contrasena debe incluir al menos un caracter especial';
+    }
+
+    return null;
+  }
+
+  private async hashPassword(plainText: string): Promise<string> {
+    if (!plainText) {
+      throw new Error('Invalid password value');
+    }
+
+    if (!crypto?.subtle) {
+      throw new Error('Crypto API no disponible');
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plainText);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
   }
 
   private createEmptyUserForm(): UserFormModel {

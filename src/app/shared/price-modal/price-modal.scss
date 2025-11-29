@@ -3,7 +3,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,9 +15,52 @@
   border-radius: 10px;
   width: 420px;
   max-width: 92%;
-  box-shadow: 0 12px 40px rgba(12,20,40,0.18);
+  box-shadow: 0 12px 40px rgba(12, 20, 40, 0.18);
 }
-.detalle-block { background:#f7f7fb; padding:8px; border-radius:6px; max-height:160px; overflow:auto }
-.actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px }
-.actions .btn { padding:8px 12px }
+.detalle-block {
+  background: #f7f7fb;
+  padding: 8px;
+  border-radius: 6px;
+  max-height: 160px;
+  overflow: auto;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.actions .btn {
+  padding: 8px 12px;
+}
 
+/* Buttons style & responsive stacking */
+.actions .btn {
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-weight: 700;
+}
+.actions .btn.btn-ghost {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+.actions .btn.btn-primary {
+  background: #1976d2;
+  color: theme.color('surface');
+  border: none;
+}
+@media (max-width: 480px) {
+  .modal {
+    width: 94%;
+    padding: 12px;
+  }
+  .actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .actions .btn {
+    width: 100%;
+  }
+}

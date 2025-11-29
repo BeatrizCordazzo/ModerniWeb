@@ -256,7 +256,7 @@
         @if (isLoadingCustomFurniture) {
         <div class="custom-furniture-loading">
           <div class="spinner"></div>
-          <p>Cargando opciones personalizadas...</p>
+          <p>Loading custom options...</p>
         </div>
         }
         <div class="furniture-grid" [class.loading]="isLoadingCustomFurniture">
@@ -302,15 +302,15 @@
           <h4>Add new furniture option</h4>
           <div class="admin-form-grid">
             <label>
-              Nombre
-              <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="Ej. Base Cabinet" />
+              Name
+              <input type="text" [(ngModel)]="newFurnitureForm.name" placeholder="E.g. Base Cabinet" />
             </label>
             <label>
-              Tipo
+              Type
               <input type="text" [(ngModel)]="newFurnitureForm.type" placeholder="cabinet, island..." />
             </label>
             <label>
-              Precio base
+              Base Price
               <input
                 type="number"
                 min="0"
@@ -320,31 +320,31 @@
               />
             </label>
             <label>
-              Imagen (URL)
+              Image (URL)
               <input type="text" [(ngModel)]="newFurnitureForm.image" placeholder="https://..." />
             </label>
             <label>
-              Ancho (min)
+              Width (min)
               <input type="number" [(ngModel)]="newFurnitureForm.minWidth" min="1" />
             </label>
             <label>
-              Ancho (max)
+              Width (max)
               <input type="number" [(ngModel)]="newFurnitureForm.maxWidth" min="1" />
             </label>
             <label>
-              Alto (min)
+              Height (min)
               <input type="number" [(ngModel)]="newFurnitureForm.minHeight" min="1" />
             </label>
             <label>
-              Alto (max)
+              Height (max)
               <input type="number" [(ngModel)]="newFurnitureForm.maxHeight" min="1" />
             </label>
             <label>
-              Profundidad
+              Depth
               <input type="number" [(ngModel)]="newFurnitureForm.depth" min="1" />
             </label>
             <label class="wide">
-              Colores (Nombre:#HEX separados por comas)
+              Colors (Name:#HEX separated by commas)
               <input
                 type="text"
                 [(ngModel)]="newFurnitureForm.colors"
@@ -397,16 +397,25 @@
                   <input type="number" [(ngModel)]="selection.quantity" min="1" max="10" />
                 </div>
               </div>
-              <div class="color-select">
+              <div class="color-selection">
                 <label>Color:</label>
-                <select [(ngModel)]="selection.selectedColor">
+                <div class="color-options">
                   @for (color of selection.furniture.availableColors; track color.code ??
                   color.codigo_hex ?? color.name ?? color) {
-                  <option [ngValue]="color">
-                    {{ color.name }}
-                  </option>
+                  <div
+                    class="color-option"
+                    [class.selected]="selection.selectedColor.name === color.name"
+                    (click)="selection.selectedColor = color"
+                    [style.background-color]="color.code"
+                    [title]="color.name"
+                  >
+                    @if (selection.selectedColor.name === color.name) {
+                    <i class="fas fa-check"></i>
+                    }
+                  </div>
                   }
-                </select>
+                </div>
+                <span class="selected-color-name">{{ selection.selectedColor.name }}</span>
               </div>
               <div class="selection-price">
                 Subtotal: €{{ calculateCustomPrice(selection).toFixed(2) }}
@@ -475,10 +484,10 @@
 <!-- Delete Confirmation Modal -->
 <app-confirmation-modal
   [isOpen]="showDeleteConfirm"
-  title="Confirmar eliminación"
-  message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-  confirmLabel="Eliminar"
-  cancelLabel="Cancelar"
+  title="Confirm deletion"
+  message="Are you sure you want to delete this product? This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
   (confirm)="executeDelete()"
   (cancel)="cancelDelete()"
 >
@@ -489,8 +498,8 @@
   [isOpen]="showFurnitureConfirm"
   [title]="furnitureConfirmTitle"
   [message]="furnitureConfirmMessage"
-  confirmLabel="Confirmar"
-  cancelLabel="Cancelar"
+  confirmLabel="Confirm"
+  cancelLabel="Cancel"
   (confirm)="confirmFurnitureAction()"
   (cancel)="cancelFurnitureAction()"
 ></app-confirmation-modal>

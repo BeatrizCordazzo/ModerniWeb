@@ -4,6 +4,7 @@ import * as L from 'leaflet';
 import { Datos } from '../datos';
 import { Footer } from '../footer/footer';
 import { Nav } from '../nav/nav';
+import { ConfirmationModal } from '../shared/confirmation-modal/confirmation-modal';
 
 interface ContactFormData {
   name: string;
@@ -15,19 +16,23 @@ interface ContactFormData {
 
 @Component({
   selector: 'app-contact',
-  imports: [Nav, Footer, FormsModule],
+  imports: [Nav, Footer, FormsModule, ConfirmationModal],
   templateUrl: './contact.html',
-  styleUrl: './contact.scss'
+  styleUrl: './contact.scss',
 })
 export class Contact implements AfterViewInit, OnDestroy {
   formSubmitted = false;
   isSubmitting = false;
   submitError = '';
+
+  //to control the modal
+  showContactConfirmModal = false;
+
   private map: L.Map | null = null;
   readonly showroomLocation = {
     lat: 41.6523,
     lng: -4.7245,
-    title: 'Moderni Showroom'
+    title: 'Moderni Showroom',
   };
 
   formData: ContactFormData = {
@@ -35,7 +40,7 @@ export class Contact implements AfterViewInit, OnDestroy {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
   };
 
   constructor(private datosService: Datos) {}
@@ -68,6 +73,24 @@ export class Contact implements AfterViewInit, OnDestroy {
     if (!this.isFormValid() || this.isSubmitting) {
       return;
     }
+    // Solo abrimos el modal de confirmación
+    this.showContactConfirmModal = true;
+  }
+
+  onConfirmSendMessage(): void {
+    this.showContactConfirmModal = false;
+    this.sendContactMessage();
+  }
+
+  onCancelSendMessage(): void {
+    this.showContactConfirmModal = false;
+  }
+
+  private sendContactMessage(): void {
+    if (!this.isFormValid() || this.isSubmitting) {
+      return;
+    }
+
     this.isSubmitting = true;
     this.submitError = '';
 
@@ -81,14 +104,14 @@ export class Contact implements AfterViewInit, OnDestroy {
           email: '',
           phone: '',
           subject: '',
-          message: ''
+          message: '',
         };
       },
       error: (err) => {
         console.error('Error sending contact message', err);
         this.isSubmitting = false;
         this.submitError = 'There was an error sending your message. Please try again.';
-      }
+      },
     });
   }
 
@@ -104,11 +127,11 @@ export class Contact implements AfterViewInit, OnDestroy {
     this.map = L.map(container, {
       center: [this.showroomLocation.lat, this.showroomLocation.lng],
       zoom: 13,
-      scrollWheelZoom: false
+      scrollWheelZoom: false,
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
 
     const markerIcon = L.icon({
@@ -118,11 +141,11 @@ export class Contact implements AfterViewInit, OnDestroy {
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     });
 
     L.marker([this.showroomLocation.lat, this.showroomLocation.lng], {
-      icon: markerIcon
+      icon: markerIcon,
     })
       .addTo(this.map)
       .bindPopup(

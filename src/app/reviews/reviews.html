@@ -1,15 +1,15 @@
 <section class="reviews-section">
   <div class="reviews-container">
     <header class="reviews-header">
-      <p class="eyebrow">Testimonios reales</p>
-      <h2>Nuestros clientes confían en Moderni</h2>
+      <p class="eyebrow">Real testimonials</p>
+      <h2>Our clients trust Moderni</h2>
       <p class="subtitle">
-        Descubre lo que dicen quienes ya completaron sus proyectos con nosotros.
+        Discover what those who have completed their projects with us have to say.
       </p>
     </header>
 
     @if (isLoading) {
-      <p class="state">Cargando reseñas...</p>
+      <p class="state">Loading reviews...</p>
     }
     @if (!isLoading && error) {
       <p class="state error">{{ error }}</p>

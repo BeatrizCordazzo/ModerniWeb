@@ -23,7 +23,7 @@
     <aside class="checkout-summary">
       <h2>Resumen</h2>
       <div class="row"><span>Subtotal</span><span>${{ getSubtotal().toLocaleString() }}</span></div>
-      <div class="row"><span>Envio</span><span>${{ (getSubtotal() >= 50000 ? 0 : 5000).toLocaleString() }}</span></div>
+      <!-- Shipping removed per request -->
       <div class="row total"><span>Total</span><span>${{ getTotal().toLocaleString() }}</span></div>
 
       <div class="payment-form">
@@ -40,7 +40,7 @@
           </div>
           <div>
             <label>CVV</label>
-            <input type="text" [(ngModel)]="cardCvv" />
+            <input type="text" class="cvv-input" [(ngModel)]="cardCvv" />
           </div>
         </div>
 

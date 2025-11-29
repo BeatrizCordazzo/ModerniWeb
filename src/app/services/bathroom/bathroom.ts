@@ -12,6 +12,7 @@ import { CartService } from '../../shared/cart.service';
 import { Router } from '@angular/router';
 import { FavoriteToggleComponent } from '../../shared/favorite-toggle/favorite-toggle';
 import { ConfirmationModal } from '../../shared/confirmation-modal/confirmation-modal';
+import { LoginRequiredModalService } from '../../shared/login-required-modal/login-required-modal.service';
 
 interface BathroomSet {
   id: number;
@@ -115,7 +116,8 @@ export class Bathroom implements OnInit {
   constructor(
     private datosService: Datos,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private loginPrompt: LoginRequiredModalService
   ) {}
 
   ngOnInit() {
@@ -884,10 +886,7 @@ export class Bathroom implements OnInit {
             }, 3500);
           } else {
             this.closeModal();
-            alert('You must be logged in to add items to the cart. Please log in first.');
-            try {
-              this.router.navigate(['/login']);
-            } catch (e) {}
+            this.loginPrompt.open('You need to be logged to add items to the cart.');
           }
         },
         error: () => {
@@ -915,10 +914,7 @@ export class Bathroom implements OnInit {
             /* ignore */
           }
           this.closeModal();
-          alert('You must be logged in to add items to the cart. Please log in first.');
-          try {
-            this.router.navigate(['/login']);
-          } catch (e) {}
+          this.loginPrompt.open('You need to be logged to add items to the cart.');
         },
       });
     }

@@ -94,7 +94,7 @@ $jsonInput = strlen($rawInput) ? json_decode($rawInput, true) : null;
 if ($method === 'GET') {
     try {
         $inPlaceholder = implode(',', array_fill(0, count($manageableRoles), '?'));
-        $stmt = $pdo->prepare("SELECT id, nombre, email, telefono, rol, fecha_registro FROM usuarios WHERE LOWER(rol) IN ($inPlaceholder) ORDER BY nombre ASC");
+        $stmt = $pdo->prepare("SELECT id, nombre, email, telefono, direccion, rol, fecha_registro FROM usuarios WHERE LOWER(rol) IN ($inPlaceholder) ORDER BY nombre ASC");
         $stmt->execute($manageableRolesLower);
         $users = $stmt->fetchAll();
         echo json_encode(['success' => true, 'users' => $users], JSON_UNESCAPED_UNICODE);
@@ -126,6 +126,7 @@ if ($method === 'POST') {
     $telefono = trim($jsonInput['telefono'] ?? '');
     $rol = $normalizeRole($jsonInput['rol'] ?? '', $manageableRolesLower);
     $password = $jsonInput['password'] ?? '';
+    $direccion = isset($jsonInput['direccion']) ? trim((string)$jsonInput['direccion']) : '';
 
     if ($nombre === '' || $email === '' || !$rol) {
         http_response_code(400);
@@ -147,17 +148,18 @@ if ($method === 'POST') {
             exit;
         }
 
-        $insert = $pdo->prepare('INSERT INTO usuarios (nombre, email, password, telefono, rol, fecha_registro) VALUES (:nombre, :email, :password, :telefono, :rol, NOW())');
+        $insert = $pdo->prepare('INSERT INTO usuarios (nombre, email, password, telefono, direccion, rol, fecha_registro) VALUES (:nombre, :email, :password, :telefono, :direccion, :rol, NOW())');
         $insert->execute([
             ':nombre' => $nombre,
             ':email' => $email,
             ':password' => $password,
             ':telefono' => $telefono ?: null,
+            ':direccion' => $direccion !== '' ? $direccion : null,
             ':rol' => $rol,
         ]);
         $id = (int)$pdo->lastInsertId();
 
-        $stmt = $pdo->prepare('SELECT id, nombre, email, telefono, rol, fecha_registro FROM usuarios WHERE id = :id LIMIT 1');
+        $stmt = $pdo->prepare('SELECT id, nombre, email, telefono, direccion, rol, fecha_registro FROM usuarios WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $id]);
         $newUser = $stmt->fetch();
 
@@ -207,6 +209,11 @@ if ($method === 'PUT') {
         $fields[] = 'telefono = :telefono';
         $telefono = trim((string)$jsonInput['telefono']);
         $params[':telefono'] = $telefono !== '' ? $telefono : null;
+    }
+    if (array_key_exists('direccion', $jsonInput)) {
+        $fields[] = 'direccion = :direccion';
+        $direccion = trim((string)$jsonInput['direccion']);
+        $params[':direccion'] = $direccion !== '' ? $direccion : null;
     }
     if (isset($jsonInput['rol'])) {
         $role = $normalizeRole($jsonInput['rol'], $manageableRolesLower);
@@ -349,9 +356,6 @@ http_response_code(405);
 echo json_encode(['success' => false, 'error' => 'Method not allowed']);
 exit;
 ?>
-
-
-
 
 
 

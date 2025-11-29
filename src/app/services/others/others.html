@@ -220,7 +220,7 @@
         @if (filteredProducts.length === 0) {
         <div class="no-products">
           <div class="no-products-content">
-            <i class="no-products-icon">ðŸ”</i>
+            <i class="no-products-icon">🔍</i>
             <h3>No products found</h3>
             <p>Try adjusting your filters or browse all categories</p>
             <button class="btn-reset" (click)="clearFilters()">Reset Filters</button>
@@ -254,10 +254,10 @@
 <!-- Delete Confirmation Modal -->
 <app-confirmation-modal
   [isOpen]="showDeleteConfirm"
-  title="Confirmar eliminación"
-  message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-  confirmLabel="Eliminar"
-  cancelLabel="Cancelar"
+  title="Confirm deletion"
+  message="Are you sure you want to delete this product? This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
   (confirm)="executeDelete()"
   (cancel)="cancelDelete()"
 >

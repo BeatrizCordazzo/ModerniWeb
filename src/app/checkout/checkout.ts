@@ -8,6 +8,20 @@ import { CartService, SimpleCartItem } from '../shared/cart.service';
 import { Datos } from '../datos';
 import { Subscription } from 'rxjs';
 import { ToastNotification } from '../shared/toast-notification/toast-notification';
+import { InvoiceService, InvoiceSpaceDimensions } from '../shared/invoice.service';
+
+interface LoggedUser {
+  id?: number;
+  nombre?: string;
+  name?: string;
+  email?: string;
+  telefono?: string;
+  phone?: string;
+  rol?: string;
+  direccion?: string | null;
+  address?: string | null;
+  memberSince?: string | null;
+}
 
 @Component({
   selector: 'app-checkout',
@@ -18,10 +32,12 @@ import { ToastNotification } from '../shared/toast-notification/toast-notificati
 export class Checkout implements OnInit, OnDestroy {
   cartItems: SimpleCartItem[] = [];
   private sub: Subscription | null = null;
+  private userSub: Subscription | null = null;
   loading = false;
   toastVisible = false;
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
+  loggedUser: LoggedUser | null = null;
 
   // Simple mock payment fields
   cardName = '';
@@ -29,12 +45,25 @@ export class Checkout implements OnInit, OnDestroy {
   cardExpiry = '';
   cardCvv = '';
 
-  constructor(private cartService: CartService, private datos: Datos, private router: Router) {}
+  constructor(
+    private cartService: CartService,
+    private datos: Datos,
+    private router: Router,
+    private invoiceService: InvoiceService
+  ) {}
 
   ngOnInit(): void {
     // read current cart items
     this.sub = this.cartService.items$.subscribe(items => {
       this.cartItems = items;
+    });
+    this.userSub = this.datos.getLoggedUser().subscribe({
+      next: user => {
+        this.loggedUser = user && typeof user === 'object' ? (user as LoggedUser) : null;
+      },
+      error: () => {
+        this.loggedUser = null;
+      }
     });
     // Make navbar solid for checkout so it's readable on white background
     try {
@@ -46,6 +75,7 @@ export class Checkout implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.sub) this.sub.unsubscribe();
+    if (this.userSub) this.userSub.unsubscribe();
     try {
       document && document.body && document.body.classList.remove('solid-navbar');
     } catch (e) {
@@ -58,15 +88,14 @@ export class Checkout implements OnInit, OnDestroy {
   }
 
   getTotal(): number {
-    const subtotal = this.getSubtotal();
-    const shipping = subtotal >= 50000 ? 0 : 5000;
-    return subtotal + shipping;
+    return this.getSubtotal();
   }
 
   confirmPayment(): void {
     if (this.cartItems.length === 0) return;
     // we simulate the payment confirmation and then we create the custom order on the backend
     this.loading = true;
+    const cartSnapshot = [...this.cartItems];
 
     const payload: any = {
       title: 'Pedido desde carrito - ' + new Date().toISOString(),
@@ -89,6 +118,8 @@ export class Checkout implements OnInit, OnDestroy {
 
     this.datos.createOrder(payload).subscribe({
       next: (res) => {
+        const orderId = res?.pedido_id ?? res?.id ?? Date.now();
+        this.generateInvoice(orderId, cartSnapshot, payload.spaceDimensions, payload.description);
         this.loading = false;
         // success: clear cart and navigate home
         this.cartService.clear();
@@ -109,5 +140,75 @@ export class Checkout implements OnInit, OnDestroy {
         this.toastVisible = true;
       }
     });
+  }
+
+  private generateInvoice(
+    orderId: number | string,
+    items: SimpleCartItem[],
+    spaceDimensions: InvoiceSpaceDimensions | null | undefined,
+    orderNotes?: string | null
+  ): void {
+    try {
+      const subtotal = items.reduce(
+        (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+        0
+      );
+      const shipping = 0; // Shipping not used
+      const dims: InvoiceSpaceDimensions | null =
+        (spaceDimensions && typeof spaceDimensions === 'object' && spaceDimensions) ||
+        this.extractDimensionsFromItems(items);
+      const userName =
+        this.loggedUser?.nombre ||
+        this.loggedUser?.name ||
+        this.cardName ||
+        'Cliente Moderni';
+      const userPhone = this.loggedUser?.telefono || this.loggedUser?.phone || null;
+      const billingAddress =
+        this.loggedUser?.direccion || this.loggedUser?.address || null;
+
+      this.invoiceService.generateOrderInvoice({
+        orderId,
+        orderDate: new Date(),
+        customer: {
+          name: userName,
+          email: this.loggedUser?.email || null,
+          phone: userPhone,
+        },
+        paymentInfo: {
+          method: 'Tarjeta de credito',
+          cardHolder: this.cardName || this.loggedUser?.nombre || 'Cliente Moderni',
+          lastDigits: this.extractCardDigits(this.cardNumber),
+        },
+        items: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity || 1,
+          unitPrice: item.price || 0,
+          description: item.description || null,
+          color: item.selectedColor?.name || null,
+        })),
+        subtotal,
+        shipping,
+        total: subtotal,
+        notes:
+          orderNotes ||
+          'Factura generada automaticamente desde el checkout de Moderni. Conserva este comprobante.',
+        spaceDimensions: dims,
+        billingAddress,
+      });
+    } catch (error) {
+      console.error('Error generando la factura del pedido', error);
+    }
+  }
+
+  private extractDimensionsFromItems(items: SimpleCartItem[]): InvoiceSpaceDimensions | null {
+    const withDimensions = items.find(
+      item => item.dimensions && typeof item.dimensions === 'object'
+    );
+    return withDimensions ? (withDimensions.dimensions as InvoiceSpaceDimensions) : null;
+  }
+
+  private extractCardDigits(value: string): string | null {
+    const digits = (value || '').replace(/\D+/g, '');
+    return digits ? digits.slice(-4) : null;
   }
 }

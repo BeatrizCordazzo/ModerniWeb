@@ -26,10 +26,15 @@ try {
     $password = $data['password'];
     $nombre = $data['nombre'];
     $telefono = isset($data['telefono']) ? $data['telefono'] : null;
+    $direccion = isset($data['direccion']) ? $data['direccion'] : null;
     $rol = isset($data['rol']) ? $data['rol'] : 'cliente';
 
     if (!$email || !$password || !$nombre) {
         throw new Exception('Nombre, email y contraseña son obligatorios');
+    }
+
+    if (!preg_match('/^[\p{L}\s]+$/u', $nombre)) {
+        throw new Exception('El nombre solo puede contener letras y espacios');
     }
 
     $pdo = get_pdo_connection();
@@ -42,8 +47,8 @@ try {
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO usuarios (nombre, email, password, telefono, rol) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$nombre, $email, $hashedPassword, $telefono, $rol]);
+    $stmt = $pdo->prepare('INSERT INTO usuarios (nombre, email, password, telefono, direccion, rol) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$nombre, $email, $hashedPassword, $telefono, $direccion, $rol]);
 
     echo json_encode([
         'success' => true,
@@ -57,6 +62,3 @@ try {
     ]);
 }
 ?>
-
-
-

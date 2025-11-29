@@ -74,6 +74,54 @@
   .lista { min-width: 600px; }
 }
 
+/* Make pending presupuestos table stack into card-like rows on small screens */
+@media (max-width: 720px) {
+  .lista { min-width: 100%; }
+  .lista thead { display: none; }
+  .lista tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.04);
+    padding: 0.6rem;
+    border: 1px solid #eef3fb;
+  }
+  .lista tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.45rem 0.4rem;
+    border-bottom: none;
+  }
+  .lista tbody tr td[data-label]::before {
+    content: "" attr(data-label) ": ";
+    font-weight: 700;
+    color: #4b5563;
+    margin-right: 0.5rem;
+  }
+  .lista tbody tr td.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+  }
+  .lista tbody tr td.actions-cell .btn { flex: 1 1 auto; min-width: 120px; }
+}
+
+/* Button polish for consistency across admin */
+.btn { padding: 0.5rem 0.75rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
+.btn-ghost { background: transparent; border: 1px solid #d1d5db; color: #374151; }
+.btn-primary { background: linear-gradient(135deg,#1976d2,#115293); color: theme.color('surface'); }
+.btn-accept { background: linear-gradient(135deg,#2e7d32,#256029); color: theme.color('surface'); }
+.btn-reject { background: linear-gradient(135deg,#d32f2f,#b71c1c); color: theme.color('surface'); }
+
+/* Ensure action buttons stack nicely in modals on mobile */
+@media (max-width: 480px) {
+  .actions { display:flex; flex-direction:column-reverse; gap:8px; }
+  .actions .btn { width: 100%; }
+}
+
 .small-muted { font-size: 0.85rem; color: theme.color('gray-500'); }
 .empty-state { color: #7b8794; font-style: italic; margin: 0.75rem 0; }
 
@@ -327,6 +375,47 @@
       cursor: pointer;
     }
   }
+
+  /* Responsive adjustments for message reply box on small screens */
+  @media (max-width: 640px) {
+    .message-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .message-actions textarea {
+      min-height: 64px;
+      padding: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .message-actions button {
+      width: 100%;
+      align-self: stretch;
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+    }
+  }
+
+/* Further reduce left/right space for reply box on small screens */
+@media (max-width: 640px) {
+  .message-card {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    /* Pull the card slightly left/right to compensate for container padding */
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
+
+  .message-card .message-actions {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .message-card .message-actions textarea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+}
 
 .message-status-actions {
     display: flex;

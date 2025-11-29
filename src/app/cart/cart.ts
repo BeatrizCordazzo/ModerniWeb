@@ -24,9 +24,6 @@ interface CartItem {
   styleUrl: './cart.scss'
 })
 export class Cart {
-  shippingCost = 5000;
-  discount = 0;
-  couponCode = '';
   cartItems: CartItem[] = [];
   private sub: Subscription | null = null;
 
@@ -54,9 +51,7 @@ export class Cart {
   }
 
   getTotal(): number {
-    const subtotal = this.getSubtotal();
-    const shipping = subtotal >= 50000 ? 0 : this.shippingCost;
-    return subtotal + shipping - this.discount;
+    return this.getSubtotal();
   }
 
   increaseQuantity(itemId: number): void {
@@ -85,18 +80,7 @@ export class Cart {
     this.cartService.removeItem(idx);
   }
 
-  applyCoupon(): void {
-    // Simple coupon logic
-    if (this.couponCode.toUpperCase() === 'DISCOUNT10') {
-      this.discount = this.getSubtotal() * 0.1;
-      alert('Coupon applied! 10% discount');
-    } else if (this.couponCode.toUpperCase() === 'WELCOME20') {
-      this.discount = this.getSubtotal() * 0.2;
-      alert('Coupon applied! 20% discount');
-    } else if (this.couponCode) {
-      alert('Invalid coupon');
-    }
-  }
+  // applyCoupon removed — coupons are not used
 
   proceedToCheckout(): void {
     // Navigate to a dedicated checkout / payment page

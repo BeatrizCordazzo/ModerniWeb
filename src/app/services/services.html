@@ -8,7 +8,7 @@
       @if (isAdmin) {
         <div class="admin-toolbar">
           <button class="admin-add-btn" (click)="toggleAddForm()">
-            {{ showAddForm ? 'Cerrar' : 'Añadir' }} nuevo
+            {{ showAddForm ? 'Close' : 'Add' }} new
           </button>
         </div>
       }
@@ -21,10 +21,10 @@
         <div class="admin-card">
           <header class="admin-card-header">
             <div>
-              <p class="eyebrow">Gestión de muebles y servicios</p>
-              <h2>Crear nuevo elemento</h2>
+              <p class="eyebrow">Furniture and Services Management</p>
+              <h2>Create New Item</h2>
             </div>
-            <button class="admin-close" type="button" (click)="toggleAddForm()" aria-label="Cerrar formulario">
+            <button class="admin-close" type="button" (click)="toggleAddForm()" aria-label="Close form">
               &times;
             </button>
           </header>
@@ -32,15 +32,15 @@
           <form [formGroup]="addProductForm" (ngSubmit)="submitNewProduct()" class="admin-add-form">
             <div class="form-grid">
               <label class="form-field">
-                <span>Nombre*</span>
-                <input type="text" formControlName="name" placeholder="Ej. Modern Kitchen">
+                <span>Name*</span>
+                <input type="text" formControlName="name" placeholder="E.g. Modern Kitchen">
                 @if (addProductForm.get('name')?.invalid && addProductForm.get('name')?.touched) {
-                  <small class="error-text">El nombre es obligatorio.</small>
+                  <small class="error-text">Name is required.</small>
                 }
               </label>
 
               <label class="form-field">
-                <span>Categoría / Tipo*</span>
+                <span>Category / Type*</span>
                 <select formControlName="type">
                   @for (option of productTypeOptions; track option.value) {
                     <option [value]="option.value">{{ option.label }}</option>
@@ -49,7 +49,7 @@
               </label>
 
               <label class="form-field">
-                <span>Subcategoría</span>
+                <span>Subcategory</span>
                 @if (isCategoryLocked) {
                   <input type="text" [value]="addProductForm.get('categoryName')?.value" readonly>
                 } @else {
@@ -62,15 +62,15 @@
               </label>
 
               <label class="form-field">
-                <span>Precio base*</span>
+                <span>Base Price*</span>
                 <input type="number" formControlName="price" placeholder="0.00" step="0.01" min="0">
                 @if (addProductForm.get('price')?.invalid && addProductForm.get('price')?.touched) {
-                  <small class="error-text">Introduce un precio válido.</small>
+                  <small class="error-text">Enter a valid price.</small>
                 }
               </label>
 
               <label class="form-field">
-                <span>Precio anterior</span>
+                <span>Old Price</span>
                 <input type="number" formControlName="oldPrice" placeholder="0.00" step="0.01" min="0">
               </label>
 
@@ -83,53 +83,53 @@
             <div class="form-row checkbox-row">
               <label class="checkbox-field">
                 <input type="checkbox" formControlName="inStock">
-                <span>Disponible para venta inmediata</span>
+                <span>Available for immediate sale</span>
               </label>
             </div>
 
             <label class="form-field">
-              <span>Descripción</span>
-              <textarea formControlName="description" rows="3" placeholder="Describe materiales, estilo o lo que incluye."></textarea>
+              <span>Description</span>
+              <textarea formControlName="description" rows="3" placeholder="Describe materials, style, or what is included."></textarea>
             </label>
 
             <div class="form-grid">
               <label class="form-field">
-                <span>Colección</span>
-                <input type="text" formControlName="collection" placeholder="Ej. Nordic">
+                <span>Collection</span>
+                <input type="text" formControlName="collection" placeholder="E.g. Nordic">
               </label>
               <label class="form-field">
-                <span>Estilo</span>
+                <span>Style</span>
                 <input type="text" formControlName="style" placeholder="Contemporary, Rustic, etc.">
               </label>
               <label class="form-field">
-                <span>Imagen principal (URL)</span>
+                <span>Main Image (URL)</span>
                 <input type="url" formControlName="image" placeholder="https://">
               </label>
             </div>
 
             <div class="form-grid three">
               <label class="form-field">
-                <span>Ancho</span>
-                <input type="text" formControlName="dimensionsWidth" placeholder="Ej. 3.5m">
+                <span>Width</span>
+                <input type="text" formControlName="dimensionsWidth" placeholder="E.g. 3.5m">
               </label>
               <label class="form-field">
-                <span>Alto</span>
-                <input type="text" formControlName="dimensionsHeight" placeholder="Ej. 2.4m">
+                <span>Height</span>
+                <input type="text" formControlName="dimensionsHeight" placeholder="E.g. 2.4m">
               </label>
               <label class="form-field">
-                <span>Profundidad</span>
-                <input type="text" formControlName="dimensionsDepth" placeholder="Ej. 60cm">
+                <span>Depth</span>
+                <input type="text" formControlName="dimensionsDepth" placeholder="E.g. 60cm">
               </label>
             </div>
 
             <label class="form-field">
-              <span>Incluye (una línea por elemento)</span>
-              <textarea formControlName="includes" rows="2" placeholder="Isla central&#10;Encimera de cuarzo&#10;Iluminación LED"></textarea>
+              <span>Includes (one per line)</span>
+              <textarea formControlName="includes" rows="2" placeholder="Kitchen island&#10;Quartz countertop&#10;LED lighting"></textarea>
             </label>
 
             <label class="form-field">
-              <span>Colores (uno por línea, formato: Nombre #HEX)</span>
-              <textarea formControlName="colors" rows="2" placeholder="Blanco #FFFFFF&#10;Negro #000000"></textarea>
+              <span>Colors (one per line, format: Name #HEX)</span>
+              <textarea formControlName="colors" rows="2" placeholder="White #FFFFFF&#10;Black #000000"></textarea>
             </label>
 
             @if (saveError) {
@@ -140,9 +140,9 @@
             }
 
             <div class="form-actions">
-              <button type="button" class="btn-secondary" (click)="toggleAddForm()">Cancelar</button>
+              <button type="button" class="btn-secondary" (click)="toggleAddForm()">Cancel</button>
               <button type="submit" class="btn-primary" [disabled]="isSaving">
-                {{ isSaving ? 'Guardando…' : 'Guardar producto' }}
+                {{ isSaving ? 'Saving…' : 'Save Product' }}
               </button>
             </div>
           </form>
