@@ -262,7 +262,7 @@ export class Livingroom implements OnInit {
     this.datosService.getLoggedUser().subscribe({
       next: (u: any) => {
         const role = u && u.rol ? u.rol : u && u.role ? u.role : null;
-        this.isAdmin = role && (role === 'admin' || role === 'carpintero' || role === 'superadmin');
+        this.isAdmin = role && (role === 'admin');
       },
       error: () => {
         this.isAdmin = false;
@@ -334,7 +334,7 @@ export class Livingroom implements OnInit {
       error: (error) => {
         console.error('Error loading living room custom furniture options:', error);
         this.customFurnitureError =
-          'No se pudieron cargar las opciones personalizadas del salon. Mostrando opciones base.';
+          'Failed to load custom living room options. Displaying base options.';
         this.customFurnitureOptions = this.getFallbackFurnitureOptions();
         this.isLoadingCustomFurniture = false;
       },
@@ -404,8 +404,8 @@ export class Livingroom implements OnInit {
     this.pendingFurnitureId = furniture.id;
     this.optionPendingDelete = furniture;
     this.pendingFurniturePayload = null;
-    this.furnitureConfirmTitle = 'Confirmar exclusion';
-    this.furnitureConfirmMessage = `¿Deseas excluir "${furniture.name}" de las opciones disponibles?`;
+    this.furnitureConfirmTitle = 'Confirm deletion';
+    this.furnitureConfirmMessage = `Do you want to delete "${furniture.name}" from the available options?`;
     this.showFurnitureConfirm = true;
   }
 
@@ -420,8 +420,8 @@ export class Livingroom implements OnInit {
     this.furnitureConfirmAction = 'add';
     this.pendingFurniturePayload = payload;
     this.pendingFurnitureId = null;
-    this.furnitureConfirmTitle = 'Confirmar nuevo mueble';
-    this.furnitureConfirmMessage = `¿Deseas agregar "${payload.name}" a las opciones del salon?`;
+    this.furnitureConfirmTitle = 'Confirm new furniture';
+    this.furnitureConfirmMessage = `Do you want to add "${payload.name}" to the living room options?`;
     this.showFurnitureConfirm = true;
   }
   confirmFurnitureAction() {
@@ -450,12 +450,12 @@ export class Livingroom implements OnInit {
             const option = this.mapOptionToFurniture(res.option);
             this.handleFurnitureActionSuccess('add', option);
           } else {
-            this.handleFurnitureActionError('No se pudo crear el mueble.');
+            this.handleFurnitureActionError('Failed to create the furniture.');
           }
         },
         error: (error) => {
           console.error('Error creating living room furniture option', error);
-          this.handleFurnitureActionError('Error creando el nuevo mueble.');
+          this.handleFurnitureActionError('Error creating the new furniture.');
         }
       });
       return;
@@ -468,12 +468,12 @@ export class Livingroom implements OnInit {
           if (res?.success) {
             this.handleFurnitureActionSuccess('delete');
           } else {
-            this.handleFurnitureActionError('No se pudo excluir el mueble.');
+            this.handleFurnitureActionError('Failed to delete the furniture.');
           }
         },
         error: (error) => {
           console.error('Error deleting living room furniture option', error);
-          this.handleFurnitureActionError('Error excluyendo el mueble.');
+          this.handleFurnitureActionError('Error deleting the furniture.');
         }
       });
     }
@@ -509,8 +509,8 @@ export class Livingroom implements OnInit {
         const names = this.customSelections.map((s) => s.furniture.name).filter(Boolean);
         const setName = this.selectedSet?.name;
         const base =
-          setName || (names.length ? names.slice(0, 3).join(', ') : 'Pedido personalizado');
-        return `Pedido personalizado - ${base}`;
+          setName || (names.length ? names.slice(0, 3).join(', ') : 'Custom order');
+        return `Custom order - ${base}`;
       })(),
       type: 'custom-livingroom',
       spaceDimensions: {
@@ -567,7 +567,7 @@ export class Livingroom implements OnInit {
       },
       error: (err: any) => {
         console.error('Error submitting custom living room order', err);
-        alert('Error enviando el pedido personalizado. Intenta de nuevo.');
+        alert('Error submitting the custom order. Please try again.');
       },
     });
   }
@@ -702,7 +702,7 @@ export class Livingroom implements OnInit {
 
     const targetId = this.modalProductId ?? (this.selectedSet ? this.selectedSet.id : null);
     if (targetId == null) {
-      this.toastMessage = 'Cambios guardados';
+      this.toastMessage = 'Changes saved';
       this.showToast = true;
       setTimeout(() => {
         this.showToast = false;
@@ -712,7 +712,7 @@ export class Livingroom implements OnInit {
 
     const idx = this.livingRoomSets.findIndex((s) => s.id === targetId);
     if (idx === -1) {
-      this.toastMessage = 'Cambios guardados';
+      this.toastMessage = 'Changes saved';
       this.showToast = true;
       setTimeout(() => {
         this.showToast = false;
@@ -757,7 +757,7 @@ export class Livingroom implements OnInit {
 
     this.datosService.updateProduct(payload).subscribe({
       next: () => {
-        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.toastMessage = 'Changes saved on the server.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -765,7 +765,7 @@ export class Livingroom implements OnInit {
       },
       error: (err) => {
         console.error('Error saving product changes to server', err);
-        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.toastMessage = 'Error saving changes to the server. Changes remain local.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -800,7 +800,7 @@ export class Livingroom implements OnInit {
       next: () => {
         this.showDeleteConfirm = false;
         this.productToDelete = null;
-        this.toastMessage = 'Producto eliminado correctamente.';
+        this.toastMessage = 'Product deleted successfully.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -808,8 +808,8 @@ export class Livingroom implements OnInit {
         this.loadLivingRoomSets(); // << recarga livingroom
       },
       error: (err) => {
-        console.error('Error eliminando producto', err);
-        this.toastMessage = 'Error eliminando el producto.';
+        console.error('Error deleting product', err);
+        this.toastMessage = 'Error deleting the product.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -870,7 +870,7 @@ export class Livingroom implements OnInit {
           option.id === current.id ? updatedFurniture : option
         );
         this.updateSelectionsWithFurniture(updatedFurniture);
-        this.toastMessage = 'Opcion personalizada actualizada.';
+        this.toastMessage = 'Custom option updated.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -880,7 +880,7 @@ export class Livingroom implements OnInit {
       error: (error) => {
         this.isProcessingFurniture = false;
         console.error('Error updating living room custom furniture option', error);
-        this.toastMessage = 'Error al actualizar la opcion personalizada.';
+        this.toastMessage = 'Error updating the custom option.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -905,8 +905,8 @@ export class Livingroom implements OnInit {
         this.removeSelectionsByFurnitureId(targetId);
       }
       this.toastMessage = deletedOption
-        ? `${deletedOption.name} excluido correctamente.`
-        : 'Mueble excluido correctamente.';
+        ? `${deletedOption.name} deleted successfully.`
+        : 'Furniture deleted successfully.';
     }
 
     this.showToast = true;
@@ -931,7 +931,7 @@ export class Livingroom implements OnInit {
 
   private buildModalItemFromFurniture(furniture: CustomFurniture): ModalCartItem {
     const primaryColor =
-      furniture.availableColors[0] ?? ({ name: 'Personalizado', code: '#C0C0C0' } as Color);
+      furniture.availableColors[0] ?? ({ name: 'Custom', code: '#C0C0C0' } as Color);
 
     return {
       id: furniture.id,
@@ -996,7 +996,7 @@ export class Livingroom implements OnInit {
       maxHeight == null ||
       depth == null
     ) {
-      alert('Completa todos los campos obligatorios antes de continuar.');
+      alert('Please complete all required fields before continuing.');
       return null;
     }
 
@@ -1028,7 +1028,7 @@ export class Livingroom implements OnInit {
   }
 
   private parseColorInput(input: string): Color[] {
-    const fallback: Color[] = [{ name: 'Personalizado', code: '#C0C0C0' }];
+    const fallback: Color[] = [{ name: 'Custom', code: '#C0C0C0' }];
     if (!input || !input.trim()) {
       return fallback;
     }
@@ -1069,7 +1069,7 @@ export class Livingroom implements OnInit {
     const safeColors =
       Array.isArray(option?.availableColors) && option.availableColors.length > 0
         ? option.availableColors
-        : [{ name: 'Personalizado', code: '#C0C0C0' }];
+        : [{ name: 'Custom', code: '#C0C0C0' }];
 
     return {
       id: safeId,

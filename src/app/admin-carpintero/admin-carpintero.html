@@ -2,9 +2,9 @@
 
 <main class="admin-container">
   <div class="admin-header">
-    <h1>Panel Carpintero / Admin</h1>
+    <h1>Carpenter Panel / Admin</h1>
     <div class="controls">
-      <button class="btn btn-ghost" (click)="loadPending()">Refrescar</button>
+      <button class="btn btn-ghost" (click)="loadPending()">Refresh</button>
       <!-- Mat tabs below provide the tab UI; these header buttons are kept for quick actions only -->
     </div>
   </div>
@@ -12,37 +12,37 @@
   <div class="panel">
     <!-- Angular Material tabs: Proyectos pendientes / To-Do -->
     <mat-tab-group class="admin-tabs" (selectedIndexChange)="onTabChange($event)">
-      <mat-tab label="Proyectos pendientes">
+      <mat-tab label="Pending Projects">
         <div class="tab-content">
-          <h2>Presupuestos pendientes</h2>
+          <h2>Pending Budgets</h2>
           <div class="lista-wrapper">
             <table class="lista">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Proyecto</th>
+                  <th>Client</th>
+                  <th>Project</th>
                   <th>Total</th>
-                  <th>Ver</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
+                  <th>View</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 @for (p of pendingPresupuestos; track p.presupuesto_id ?? p.id ?? p) {
                 <tr>
                   <td data-label="ID">{{ p.presupuesto_id }}</td>
-                  <td data-label="Cliente">{{ p.cliente_nombre }}</td>
-                  <td data-label="Proyecto">{{ p.proyecto_nombre }}</td>
+                  <td data-label="Client">{{ p.cliente_nombre }}</td>
+                  <td data-label="Project">{{ p.proyecto_nombre }}</td>
                   <td data-label="Total">{{ p.total }}</td>
-                  <td data-label="Ver"><button class="btn btn-ghost" (click)="openDetails(p)">Ver</button></td>
-                  <td data-label="Fecha">{{ p.fecha_creacion }}</td>
-                  <td class="actions-cell" data-label="Acciones">
+                  <td data-label="View"><button class="btn btn-ghost" (click)="openDetails(p)">View</button></td>
+                  <td data-label="Date">{{ p.fecha_creacion }}</td>
+                  <td class="actions-cell" data-label="Actions">
                     <button class="btn btn-accept" (click)="accept(p.presupuesto_id)">
-                      Aceptar
+                      Accept
                     </button>
                     <button class="btn btn-reject" (click)="openReject(p.presupuesto_id)">
-                      Rechazar
+                      Reject
                     </button>
                   </td>
                 </tr>
@@ -55,33 +55,33 @@
 
       <mat-tab label="To-Do">
         <div class="tab-content">
-          <h2>To-Do - Proyectos aceptados</h2>
+          <h2>To-Do - Accepted Projects</h2>
           @if (acceptedProjects.length === 0) {
-          <div>No hay proyectos aceptados.</div>
+          <div>No accepted projects.</div>
           }
           <div class="columns-wrapper">
             <div class="column">
               <h3>To-Do</h3>
               @if (todoProjectsList.length === 0) {
-              <div class="small-muted">No hay proyectos en To-Do.</div>
+              <div class="small-muted">No projects in To-Do.</div>
               } @for (proj of todoProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
                     <h3>{{ proj.proyecto_nombre }}</h3>
-                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                    <div class="project-meta small-muted">Client: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Budget: {{ proj.total || '-' }}</div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
+                    Status: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">View Details</button>
                 </div>
                 <div class="project-desc">{{ proj.descripcion }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
                     (ngModelChange)="setPendingStatus(proj, $event)"
@@ -91,7 +91,7 @@
                     <option value="done">Done</option>
                   </select>
                   <button class="btn btn-primary" (click)="requestSaveProject(proj)">
-                    Guardar
+                    Save
                   </button>
                 </div>
               </div>
@@ -101,25 +101,25 @@
             <div class="column">
               <h3>In Progress</h3>
               @if (inProgressProjectsList.length === 0) {
-              <div class="small-muted">No hay proyectos en progreso.</div>
+              <div class="small-muted">There are no projects in progress..</div>
               } @for (proj of inProgressProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
                     <h3>{{ proj.proyecto_nombre }}</h3>
-                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                    <div class="project-meta small-muted">Client: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Budget: {{ proj.total || '-' }}</div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
+                    Status: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">View Details</button>
                 </div>
                 <div class="project-desc">{{ proj.descripcion }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
                     (ngModelChange)="setPendingStatus(proj, $event)"
@@ -129,7 +129,7 @@
                     <option value="done">Done</option>
                   </select>
                   <button class="btn btn-primary" (click)="requestSaveProject(proj)">
-                    Guardar
+                    Save
                   </button>
                 </div>
               </div>
@@ -139,25 +139,25 @@
             <div class="column">
               <h3>Done</h3>
               @if (doneProjectsList.length === 0) {
-              <div class="small-muted">No hay proyectos finalizados.</div>
+              <div class="small-muted">There are no completed projects.</div>
               } @for (proj of doneProjectsList; track proj.proyecto_id ?? proj.id ?? proj) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
                     <h3>{{ proj.proyecto_nombre }}</h3>
-                    <div class="project-meta small-muted">Cliente: {{ proj.cliente_nombre }}</div>
-                    <div class="project-meta small-muted">Presupuesto: {{ proj.total || '-' }}</div>
+                    <div class="project-meta small-muted">Client: {{ proj.cliente_nombre }}</div>
+                    <div class="project-meta small-muted">Budget: {{ proj.total || '-' }}</div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ proj.carpintero_estado }}</strong>
+                    Status: <strong>{{ proj.carpintero_estado }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(proj)">Ver detalles</button>
+                  <button class="btn btn-ghost" (click)="openDetails(proj)">View Details</button>
                 </div>
                 <div class="project-desc">{{ proj.descripcion }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="proj.pendingEstado ?? proj.carpintero_estado"
                     (ngModelChange)="setPendingStatus(proj, $event)"
@@ -167,7 +167,7 @@
                     <option value="done">Done</option>
                   </select>
                   <button class="btn btn-primary" (click)="requestSaveProject(proj)">
-                    Guardar
+                    Save
                   </button>
                 </div>
               </div>
@@ -175,8 +175,8 @@
             </div>
           </div>
           <div style="margin-top: 1rem; text-align: right">
-            <button class="btn btn-ghost" (click)="loadAcceptedProjects()">Refrescar</button>
-            <button class="btn btn-primary" (click)="requestSaveAll()">Guardar todos</button>
+            <button class="btn btn-ghost" (click)="loadAcceptedProjects()">Refresh</button>
+            <button class="btn btn-primary" (click)="requestSaveAll()">Save All</button>
           </div>
         </div>
       </mat-tab>
@@ -340,38 +340,38 @@
       <mat-tab label="SketchUp">
         <div class="tab-content sketchup-tab">
           <div class="tab-heading">
-            <h2>Modelos SketchUp</h2>
+            <h2>SketchUp models</h2>
             <button class="btn btn-ghost" type="button" (click)="loadSketchupProjects()">
-              Refrescar
+              Refresh
             </button>
           </div>
 
           <div class="skp-upload">
             <div class="form-grid">
               <label>
-                Archivo (.skp)
+                File (.skp)
                 <input type="file" accept=".skp" (change)="onSketchupFileChange($event)" />
               </label>
               <label>
-                Título (opcional)
-                <input type="text" [(ngModel)]="sketchupTitle" placeholder="Nombre del modelo" />
+                Title (optional)
+                <input type="text" [(ngModel)]="sketchupTitle" placeholder="Model name" />
               </label>
                 <label>
-                  Notas (opcional)
+                  Notes (optional)
                   <textarea
                     rows="3"
                     [(ngModel)]="sketchupNotes"
-                    placeholder="Notas internas"
+                    placeholder="Internal notes"
                   ></textarea>
                 </label>
                 <label>
-                  Iframe / URL de 3D Warehouse
+                  Iframe / 3D Warehouse URL
                   <textarea
                     rows="2"
                     [(ngModel)]="sketchupEmbedCode"
-                    placeholder="Pega la URL o el iframe de 3D Warehouse"
+                    placeholder="Paste the URL or iframe from 3D Warehouse"
                   ></textarea>
-                  <small class="field-hint">Solo necesitas el iframe que entrega 3D Warehouse.</small>
+                  <small class="field-hint">You only need the iframe provided by 3D Warehouse.</small>
                 </label>
               </div>
             <div class="actions-row">
@@ -381,7 +381,7 @@
                 [disabled]="sketchupUploading"
                 (click)="uploadSketchupModel()"
               >
-                {{ sketchupUploading ? 'Subiendo...' : 'Subir modelo' }}
+                {{ sketchupUploading ? 'Uploading...' : 'Upload model' }}
               </button>
               @if (sketchupError) {
               <span class="error-state inline">{{ sketchupError }}</span>
@@ -390,16 +390,16 @@
           </div>
 
           @if (sketchupLoading) {
-          <div class="loading-state">Cargando modelos...</div>
+          <div class="loading-state">Loading models...</div>
           } @if (!sketchupLoading && sketchupProjects.length === 0) {
-          <p class="empty-state">Aún no hay modelos SketchUp subidos.</p>
+          <p class="empty-state">No SketchUp models uploaded yet.</p>
           } @if (!sketchupLoading && sketchupProjects.length) {
           <div class="skp-list">
             @for (proj of sketchupProjects; track proj.id ?? proj) {
             <article class="skp-card">
               <header>
                 <div>
-                  <h3>{{ proj.title || proj.file_original_name || 'Modelo #' + proj.id }}</h3>
+                  <h3>{{ proj.title || proj.file_original_name || 'Model #' + proj.id }}</h3>
                   @if (proj.created_at) {
                   <p class="small-muted">{{ proj.created_at | date : 'short' }}</p>
                   }
@@ -411,10 +411,10 @@
                     target="_blank"
                     rel="noopener"
                     >
-                      Descargar
+                      Download
                     </a>
                     <button class="btn btn-ghost" type="button" (click)="openSketchupViewer(proj)">
-                      Ver
+                      View
                     </button>
                     <button
                       class="btn btn-danger"
@@ -422,7 +422,7 @@
                       [disabled]="sketchupDeleting[proj.id]"
                       (click)="confirmDeleteSketchup(proj)"
                     >
-                      {{ sketchupDeleting[proj.id] ? 'Excluyendo...' : 'Excluir' }}
+                      {{ sketchupDeleting[proj.id] ? 'Deleting...' : 'Delete' }}
                     </button>
                   </div>
                 </header>
@@ -435,8 +435,8 @@
           } @if (sketchupViewerUrl) {
           <div class="skp-viewer">
             <div class="viewer-header">
-              <h3>{{ sketchupSelectedName || 'Vista previa SketchUp' }}</h3>
-              <p class="small-muted">Se abre con el embed de 3D Warehouse.</p>
+              <h3>{{ sketchupSelectedName || 'SketchUp Preview' }}</h3>
+              <p class="small-muted">Opens with the 3D Warehouse embed.</p>
             </div>
             <iframe [src]="sketchupViewerUrl" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="520" allowfullscreen></iframe>
           </div>
@@ -444,39 +444,39 @@
         </div>
       </mat-tab>
 
-      <mat-tab label="Pedidos">
+      <mat-tab label="Orders">
         <div class="tab-content">
-          <h2>Pedidos (carrito)</h2>
+          <h2>Orders (cart)</h2>
           @if (orders.length === 0) {
-          <div>No hay pedidos.</div>
+          <div>No orders.</div>
           } @if (orders.length) {
           <div class="columns-wrapper">
             <div class="column">
               <h3>To-Do</h3>
               @if (orderTodoList.length === 0) {
-              <div class="small-muted">No hay pedidos en To-Do.</div>
+              <div class="small-muted">No orders in To-Do.</div>
               } @for (o of orderTodoList; track o.id ?? o.pedido_id ?? o) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
-                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <h3>{{ o.titulo || o.title || 'Order #' + (o.id || o.pedido_id) }}</h3>
                     <div class="project-meta small-muted">
-                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
+                      Client: {{ o.cliente_nombre || o.customer_name || '-' }}
                     </div>
                     <div class="project-meta small-muted">
                       Total: {{ o.total || o.totalPrice || '-' }}
                     </div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ o.estado || o.status || 'pendiente' }}</strong>
+                    Status: <strong>{{ o.estado || o.status || 'pending' }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                  <button class="btn btn-ghost" (click)="openDetails(o)">View</button>
                 </div>
                 <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="o.pendingEstado ?? o.estado"
                     (ngModelChange)="o.pendingEstado = $event"
@@ -485,7 +485,7 @@
                     <option value="in progress">In Progress</option>
                     <option value="done">Done</option>
                   </select>
-                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Save</button>
                 </div>
               </div>
               }
@@ -493,29 +493,29 @@
             <div class="column">
               <h3>In Progress</h3>
               @if (orderInProgressList.length === 0) {
-              <div class="small-muted">No hay pedidos en progreso.</div>
+              <div class="small-muted">There are no orders in progress..</div>
               } @for (o of orderInProgressList; track o.id ?? o.pedido_id ?? o) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
-                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <h3>{{ o.titulo || o.title || 'Order #' + (o.id || o.pedido_id) }}</h3>
                     <div class="project-meta small-muted">
-                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
+                      Client: {{ o.cliente_nombre || o.customer_name || '-' }}
                     </div>
                     <div class="project-meta small-muted">
                       Total: {{ o.total || o.totalPrice || '-' }}
                     </div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ o.estado || o.status || 'in progress' }}</strong>
+                    Status: <strong>{{ o.estado || o.status || 'in progress' }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                  <button class="btn btn-ghost" (click)="openDetails(o)">View</button>
                 </div>
                 <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="o.pendingEstado ?? o.estado"
                     (ngModelChange)="o.pendingEstado = $event"
@@ -524,7 +524,7 @@
                     <option value="in progress">In Progress</option>
                     <option value="done">Done</option>
                   </select>
-                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Save</button>
                 </div>
               </div>
               }
@@ -532,29 +532,29 @@
             <div class="column">
               <h3>Done</h3>
               @if (orderDoneList.length === 0) {
-              <div class="small-muted">No hay pedidos finalizados.</div>
+              <div class="small-muted">There are no completed orders.</div>
               } @for (o of orderDoneList; track o.id ?? o.pedido_id ?? o) {
               <div class="project-card">
                 <div class="project-row">
                   <div>
-                    <h3>{{ o.titulo || o.title || 'Pedido #' + (o.id || o.pedido_id) }}</h3>
+                    <h3>{{ o.titulo || o.title || 'Order #' + (o.id || o.pedido_id) }}</h3>
                     <div class="project-meta small-muted">
-                      Cliente: {{ o.cliente_nombre || o.customer_name || '-' }}
+                      Client: {{ o.cliente_nombre || o.customer_name || '-' }}
                     </div>
                     <div class="project-meta small-muted">
                       Total: {{ o.total || o.totalPrice || '-' }}
                     </div>
                   </div>
                   <div class="project-meta">
-                    Estado: <strong>{{ o.estado || o.status || 'done' }}</strong>
+                    Status: <strong>{{ o.estado || o.status || 'done' }}</strong>
                   </div>
                 </div>
                 <div style="margin-top: 6px; text-align: right">
-                  <button class="btn btn-ghost" (click)="openDetails(o)">Ver</button>
+                  <button class="btn btn-ghost" (click)="openDetails(o)">View</button>
                 </div>
                 <div class="project-desc">{{ o.descripcion || o.description || '' }}</div>
                 <div class="progress-controls">
-                  <label class="small-muted">Estado:</label>
+                  <label class="small-muted">Status:</label>
                   <select
                     [ngModel]="o.pendingEstado ?? o.estado"
                     (ngModelChange)="o.pendingEstado = $event"
@@ -563,7 +563,7 @@
                     <option value="in progress">In Progress</option>
                     <option value="done">Done</option>
                   </select>
-                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Guardar</button>
+                  <button class="btn btn-primary" (click)="saveOrderStatus(o)">Save</button>
                 </div>
               </div>
               }
@@ -577,23 +577,23 @@
         <div class="tab-content clients-tab">
           <div class="clients-header">
             <div>
-              <h2>Clientes & Arquitectos</h2>
-              <p class="small-muted">Gestiona los usuarios que pueden crear pedidos y proyectos.</p>
+              <h2>Clients & Architects</h2>
+              <p class="small-muted">Manage users who can create orders and projects.</p>
             </div>
             <div class="clients-actions">
               <input
                 type="search"
-                placeholder="Buscar por nombre, email o rol"
+                placeholder="Search by name, email, or role"
                 [(ngModel)]="managedUsersSearch"
               />
               <button class="btn btn-ghost" type="button" (click)="refreshManagedUsers()">
-                Refrescar
+                Refresh
               </button>
             </div>
           </div>
 
           @if (managedUsersLoading) {
-          <div class="loading-state">Cargando usuarios...</div>
+          <div class="loading-state">Loading users...</div>
           } @if (managedUsersError) {
           <div class="error-state">{{ managedUsersError }}</div>
           } @if (!managedUsersLoading) {
@@ -601,25 +601,25 @@
             <div class="clients-card list-card">
               <div class="list-header">
                 <div>
-                  <h3>Listado de usuarios</h3>
-                  <p class="small-muted">{{ filteredManagedUsers.length }} resultado(s)</p>
+                  <h3>User List</h3>
+                  <p class="small-muted">{{ filteredManagedUsers.length }} result(s)</p>
                 </div>
               </div>
               <div class="lista-wrapper">
                 <table class="client-table">
                   <thead>
                     <tr>
-                      <th>Nombre</th>
-                      <th>Rol</th>
+                      <th>Name</th>
+                      <th>Role</th>
                       <th>Email</th>
-                      <th>Teléfono</th>
-                      <th>Acciones</th>
+                      <th>Phone</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     @if (filteredManagedUsers.length === 0) {
                     <tr>
-                      <td colspan="5" class="empty-row">No hay usuarios con ese filtro.</td>
+                      <td colspan="5" class="empty-row">No users match that filter.</td>
                     </tr>
                     } @for (user of filteredManagedUsers; track user.id) {
                     <tr>
@@ -628,7 +628,7 @@
                           <strong>{{ user.nombre }}</strong>
                           @if (user.fecha_registro) {
                           <span class="small-muted">
-                            Alta: {{ user.fecha_registro | date : 'shortDate' }}
+                            Registered: {{ user.fecha_registro | date : 'shortDate' }}
                           </span>
                           }
                         </div>
@@ -649,7 +649,7 @@
                           class="btn btn-reject"
                           (click)="confirmDeleteManagedUser(user)"
                         >
-                          Excluir
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -660,10 +660,10 @@
             </div>
 
             <div class="clients-card form-card">
-              <h3>Añadir usuario</h3>
+              <h3>Add User</h3>
               <form class="user-form" (ngSubmit)="submitUserForm()">
                 <label>
-                  Nombre
+                  Name
                   <input
                     type="text"
                     name="userName"
@@ -671,7 +671,7 @@
                     required
                     minlength="3"
                   />
-                  <small class="small-muted">Mínimo 3 letras, sin caracteres especiales.</small>
+                  <small class="small-muted">Minimum 3 letters, no special characters.</small>
                 </label>
                 <label>
                   Email
@@ -681,10 +681,10 @@
                     [(ngModel)]="createUserForm.email"
                     required
                   />
-                  <small class="small-muted">Debe ser un correo válido.</small>
+                  <small class="small-muted">Must be a valid email.</small>
                 </label>
                 <label>
-                  Teléfono
+                  Phone
                   <input
                     type="tel"
                     name="userPhone"
@@ -692,17 +692,17 @@
                     maxlength="20"
                     placeholder="+52 123 456 7890"
                   />
-                  <small class="small-muted">Solo dígitos, espacios, +, -, ()</small>
+                  <small class="small-muted">Digits, spaces, +, -, () only</small>
                 </label>
                 <label>
-                  Rol
+                  Role
                   <select name="userRole" [(ngModel)]="createUserForm.rol">
-                    <option value="cliente">Cliente</option>
-                    <option value="arquitecto">Arquitecto</option>
+                    <option value="cliente">Client</option>
+                    <option value="arquitecto">Architect</option>
                   </select>
                 </label>
                 <label>
-                  Contraseña
+                  Password
                   <input
                     type="password"
                     name="userPassword"
@@ -711,12 +711,12 @@
                     minlength="6"
                   />
                   <small class="small-muted">
-                    Al menos 6 caracteres, con una mayúscula, un número y un carácter especial.
+                    At least 6 characters, with one uppercase letter, one number, and one special character.
                   </small>
                 </label>
                 <div class="form-actions">
                   <button class="btn btn-primary" type="submit" [disabled]="savingUser">
-                    {{ savingUser ? 'Guardando...' : 'Añadir usuario' }}
+                    {{ savingUser ? 'Saving...' : 'Add User' }}
                   </button>
                 </div>
               </form>
@@ -764,7 +764,7 @@
                     {{ formatMessageStatus(msg.status) }}
                   </span>
                   @if (isMessageUnread(msg)) {
-                  <span class="unread-indicator">Nuevo</span>
+                  <span class="unread-indicator">New</span>
                   }
                 </div>
               </div>
@@ -774,7 +774,7 @@
               <p class="message-body">{{ msg.message }}</p>
               <div class="message-status-actions">
                 <button type="button" class="btn btn-ghost" (click)="markMessageStatus(msg, 'read')" [disabled]="!isMessageUnread(msg)">
-                  Marcar como leído
+                  Mark as Read
                 </button>
                 <button
                   type="button"
@@ -782,7 +782,7 @@
                   (click)="markMessageStatus(msg, 'new')"
                   [disabled]="isMessageUnread(msg)"
                 >
-                  Marcar como no leído
+                  Mark as Unread
                 </button>
               </div>
               @if (msg.response) {

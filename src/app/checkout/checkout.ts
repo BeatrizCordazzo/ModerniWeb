@@ -98,8 +98,8 @@ export class Checkout implements OnInit, OnDestroy {
     const cartSnapshot = [...this.cartItems];
 
     const payload: any = {
-      title: 'Pedido desde carrito - ' + new Date().toISOString(),
-      description: 'Pedido generado desde el carrito de compras',
+      title: 'Order from cart - ' + new Date().toISOString(),
+      description: 'Order generated from shopping cart',
       furniture: this.cartItems.map(it => ({
         name: it.name,
         quantity: it.quantity || 1,
@@ -124,7 +124,7 @@ export class Checkout implements OnInit, OnDestroy {
         // success: clear cart and navigate home
         this.cartService.clear();
         this.toastType = 'success';
-        this.toastMessage = 'Pago confirmado. Tu pedido fue enviado correctamente.';
+        this.toastMessage = 'Payment confirmed. Your order has been successfully shipped..';
         this.toastVisible = true;
         // give the toast a bit of time then navigate
         setTimeout(() => {
@@ -136,7 +136,7 @@ export class Checkout implements OnInit, OnDestroy {
         this.loading = false;
         console.error('Error creating order', err);
         this.toastType = 'error';
-        this.toastMessage = 'Error al procesar el pago. Intenta nuevamente.';
+        this.toastMessage = 'Error processing payment. Please try again.';
         this.toastVisible = true;
       }
     });
@@ -161,7 +161,7 @@ export class Checkout implements OnInit, OnDestroy {
         this.loggedUser?.nombre ||
         this.loggedUser?.name ||
         this.cardName ||
-        'Cliente Moderni';
+        'Moderni Client';
       const userPhone = this.loggedUser?.telefono || this.loggedUser?.phone || null;
       const billingAddress =
         this.loggedUser?.direccion || this.loggedUser?.address || null;
@@ -175,8 +175,8 @@ export class Checkout implements OnInit, OnDestroy {
           phone: userPhone,
         },
         paymentInfo: {
-          method: 'Tarjeta de credito',
-          cardHolder: this.cardName || this.loggedUser?.nombre || 'Cliente Moderni',
+          method: 'Credit Card',
+          cardHolder: this.cardName || this.loggedUser?.nombre || 'Moderni Client',
           lastDigits: this.extractCardDigits(this.cardNumber),
         },
         items: items.map(item => ({
@@ -191,12 +191,12 @@ export class Checkout implements OnInit, OnDestroy {
         total: subtotal,
         notes:
           orderNotes ||
-          'Factura generada automaticamente desde el checkout de Moderni. Conserva este comprobante.',
+          'Invoice automatically generated from Moderni checkout. Keep this receipt.',
         spaceDimensions: dims,
         billingAddress,
       });
     } catch (error) {
-      console.error('Error generando la factura del pedido', error);
+      console.error('Error generating order invoice', error);
     }
   }
 

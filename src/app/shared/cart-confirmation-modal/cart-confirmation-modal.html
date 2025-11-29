@@ -20,13 +20,13 @@
               }
               @if (adminMode) {
                 <div class="admin-edit-form">
-                  <label>Nombre
+                  <label>Name
                     <input type="text" [(ngModel)]="editItem.name">
                   </label>
-                  <label>Precio (&euro;)
+                  <label>Price (&euro;)
                     <input type="number" step="0.01" [(ngModel)]="editItem.price">
                   </label>
-                  <label>Imagen (URL)
+                  <label>Image (URL)
                     <input type="text" [(ngModel)]="editItem.image">
                   </label>
                   <label>Color name
@@ -45,25 +45,25 @@
                     <input type="text" [(ngModel)]="editItem.dimensions.depth">
                   </label>
                   @if (editItem?.isCustomFurniture) {
-                    <label>Tipo
+                    <label>Type
                       <input type="text" [(ngModel)]="editItem.type">
                     </label>
-                    <label>Ancho (min cm)
+                    <label>Width (min cm)
                       <input type="number" [(ngModel)]="editItem.minWidth">
                     </label>
-                    <label>Ancho (max cm)
+                    <label>Width (max cm)
                       <input type="number" [(ngModel)]="editItem.maxWidth">
                     </label>
-                    <label>Alto (min cm)
+                    <label>Height (min cm)
                       <input type="number" [(ngModel)]="editItem.minHeight">
                     </label>
-                    <label>Alto (max cm)
+                    <label>Height (max cm)
                       <input type="number" [(ngModel)]="editItem.maxHeight">
                     </label>
-                    <label>Profundidad (cm)
+                    <label>Depth (cm)
                       <input type="number" [(ngModel)]="editItem.depth">
                     </label>
-                    <label>Colores (Nombre:#HEX)
+                    <label>Colors (Name:#HEX)
                       <input type="text" [(ngModel)]="editItem.colors">
                     </label>
                   }

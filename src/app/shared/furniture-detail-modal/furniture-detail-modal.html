@@ -17,52 +17,52 @@
             </div>
           }
           <div class="details">
-            <p><strong>Pedido ID:</strong> {{ getOrderId() }}</p>
-            <p><strong>Estado:</strong> {{ getStatus() }}</p>
-            <p><strong>Fecha:</strong> {{ getDate() }}</p>
-            <p><strong>Cliente:</strong> {{ getClientName() }}</p>
+            <p><strong>Order ID:</strong> {{ getOrderId() }}</p>
+            <p><strong>Status:</strong> {{ getStatus() }}</p>
+            <p><strong>Date:</strong> {{ getDate() }}</p>
+            <p><strong>Client:</strong> {{ getClientName() }}</p>
             @if (getContactInfo().email) {
               <p><strong>Email:</strong> {{ getContactInfo().email }}</p>
             }
             @if (getContactInfo().telefono) {
-              <p><strong>Teléfono:</strong> {{ getContactInfo().telefono }}</p>
+              <p><strong>Phone:</strong> {{ getContactInfo().telefono }}</p>
             }
             @if (getContactInfo().direccion) {
-              <p><strong>Dirección:</strong> {{ getContactInfo().direccion }}</p>
+              <p><strong>Address:</strong> {{ getContactInfo().direccion }}</p>
             }
-            <p><strong>Proyecto / Título:</strong> {{ getTitle() }}</p>
-            <p><strong>Precio final:</strong> @if (getBudget()) {
+            <p><strong>Project / Title:</strong> {{ getTitle() }}</p>
+            <p><strong>Final Price:</strong> @if (getBudget()) {
             <span>{{ getBudget() }}</span>
             }@if (!getBudget()) {
             <span>-</span>
           }</p>
           @if (getSpaceDimensions()) {
             <div class="space-dims">
-              <h4>Medidas del espacio</h4>
+              <h4>Space Dimensions</h4>
               @if (getSpaceDimensions().width) {
-                <p>Ancho: {{ getSpaceDimensions().width }} cm</p>
+                <p>Width: {{ getSpaceDimensions().width }} cm</p>
               }
               @if (getSpaceDimensions().height) {
-                <p>Altura: {{ getSpaceDimensions().height }} cm</p>
+                <p>Height: {{ getSpaceDimensions().height }} cm</p>
               }
               @if (getSpaceDimensions().depth) {
-                <p>Profundidad: {{ getSpaceDimensions().depth }} cm</p>
+                <p>Depth: {{ getSpaceDimensions().depth }} cm</p>
               }
             </div>
           }
           @if (getItems().length) {
             <div class="items-list">
-              <h4>Muebles / Items</h4>
+              <h4>Furniture / Items</h4>
               <div class="items-table-wrapper">
                 <table class="items-table">
                   <thead>
                     <tr>
-                      <th>Imagen</th>
-                      <th>Nombre</th>
-                      <th>Precio unitario</th>
-                      <th>Cantidad</th>
-                      <th>Medidas</th>
-                      <th>Notas</th>
+                      <th>Image</th>
+                      <th>Name</th>
+                      <th>Unit price</th>
+                      <th>Quantity</th>
+                      <th>Measures</th>
+                      <th>Notes</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -96,10 +96,10 @@
                                 }</div>
                               }
                               @if (extraObj.price) {
-                                <div>Precio: {{ extraObj.price }}</div>
+                                <div>Price: {{ extraObj.price }}</div>
                               }
                               @if (extraObj.notes) {
-                                <div>Notas: {{ extraObj.notes }}</div>
+                                <div>Notes: {{ extraObj.notes }}</div>
                               }
                             </div>
                           }
@@ -118,7 +118,7 @@
       </div>
     </div>
     <div class="actions">
-      <button class="btn btn-ghost" (click)="onCancel()">Cerrar</button>
+      <button class="btn btn-ghost" (click)="onCancel()">Close</button>
     </div>
   </div>
 </div>

@@ -1,11 +1,11 @@
 <div class="modal-backdrop" (click)="$event.target === $event.currentTarget ? onCancel() : null">
   <div class="modal" role="dialog" aria-labelledby="rejection-title">
-    <h3 id="rejection-title">Rechazo del presupuesto</h3>
-    <label for="rejection-motivo">Motivo:</label>
-    <textarea id="rejection-motivo" class="motivo-input" [(ngModel)]="motivo" (ngModelChange)="motivoChange.emit($event)" rows="6" placeholder="Explica por qué se rechaza el presupuesto"></textarea>
+    <h3 id="rejection-title">Rejection of the budget</h3>
+    <label for="rejection-motivo">Reason:</label>
+    <textarea id="rejection-motivo" class="motivo-input" [(ngModel)]="motivo" (ngModelChange)="motivoChange.emit($event)" rows="6" placeholder="Explain why the budget is being rejected"></textarea>
     <div class="actions">
-      <button class="btn btn-primary" (click)="onConfirm()">Enviar y notificar</button>
-      <button class="btn btn-ghost" (click)="onCancel()">Cancelar</button>
+      <button class="btn btn-primary" (click)="onConfirm()">Send and notify</button>
+      <button class="btn btn-ghost" (click)="onCancel()">Cancel</button>
     </div>
   </div>
 </div>

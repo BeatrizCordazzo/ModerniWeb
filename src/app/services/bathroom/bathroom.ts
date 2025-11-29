@@ -750,8 +750,8 @@ export class Bathroom implements OnInit {
         const names = this.customSelections.map((s) => s.furniture.name).filter(Boolean);
         const setName = this.selectedSet?.name;
         const base =
-          setName || (names.length ? names.slice(0, 3).join(', ') : 'Pedido personalizado');
-        return `Pedido personalizado - ${base}`;
+          setName || (names.length ? names.slice(0, 3).join(', ') : 'Custom order');
+        return `Custom order - ${base}`;
       })(),
       type: 'custom-bathroom',
       spaceDimensions: {
@@ -807,7 +807,7 @@ export class Bathroom implements OnInit {
       },
       error: (err) => {
         console.error('Error submitting custom order', err);
-        alert('Error enviando el pedido personalizado. Intenta de nuevo.');
+        alert('Error submitting custom order. Please try again.');
       },
     });
   }
@@ -933,7 +933,7 @@ export class Bathroom implements OnInit {
 
     const targetId = this.modalProductId ?? (this.selectedSet ? this.selectedSet.id : null);
     if (targetId == null) {
-      this.toastMessage = 'Cambios guardados';
+      this.toastMessage = 'Changes saved';
       this.showToast = true;
       setTimeout(() => {
         this.showToast = false;
@@ -943,7 +943,7 @@ export class Bathroom implements OnInit {
 
     const idx = this.bathroomSets.findIndex((s) => s.id === targetId);
     if (idx === -1) {
-      this.toastMessage = 'Cambios guardados';
+      this.toastMessage = 'Changes saved';
       this.showToast = true;
       setTimeout(() => {
         this.showToast = false;
@@ -988,7 +988,7 @@ export class Bathroom implements OnInit {
     console.log('Bathroom.saveModified: calling updateProduct with payload', payload);
     this.datosService.updateProduct(payload).subscribe({
       next: () => {
-        this.toastMessage = 'Cambios guardados en el servidor.';
+        this.toastMessage = 'Changes saved on the server.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -996,7 +996,7 @@ export class Bathroom implements OnInit {
       },
       error: (err) => {
         console.error('Error updating product', err);
-        this.toastMessage = 'Error guardando en el servidor. Los cambios quedaron locales.';
+        this.toastMessage = 'Error saving on the server. Changes remain local.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -1023,7 +1023,7 @@ export class Bathroom implements OnInit {
       next: () => {
         this.showDeleteConfirm = false;
         this.productToDelete = null;
-        this.toastMessage = 'Producto eliminado correctamente.';
+        this.toastMessage = 'Product deleted successfully.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;
@@ -1031,8 +1031,8 @@ export class Bathroom implements OnInit {
         this.loadBathroomSets(); // << recarga bathroom
       },
       error: (err) => {
-        console.error('Error eliminando producto', err);
-        this.toastMessage = 'Error eliminando el producto.';
+        console.error('Error deleting product', err);
+        this.toastMessage = 'Error deleting product.';
         this.showToast = true;
         setTimeout(() => {
           this.showToast = false;

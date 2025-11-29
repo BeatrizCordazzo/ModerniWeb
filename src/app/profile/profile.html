@@ -6,20 +6,20 @@
     @if (isLoading) {
     <div class="loading-container">
       <div class="spinner"></div>
-      <p>Verificando usuario...</p>
+      <p>Verifying user...</p>
     </div>
     }
 
     <!-- Not Logged In State -->
     @if (notLogged && !isLoading) {
     <div class="not-logged-container">
-      <h2>Debes iniciar sesión para ver tu perfil</h2>
-      <p>Por favor, inicia sesión o regístrate para acceder a tu perfil y pedidos.</p>
+      <h2>You must log in to view your profile.</h2>
+      <p>Please log in or sign up to access your profile and orders.</p>
       <div class="not-logged-actions">
         <a [routerLink]="['/login']" [queryParams]="{ returnUrl: '/profile' }" class="login-btn"
-          >Iniciar Sesión</a
+          >Log In</a
         >
-        <a routerLink="/sign-up" class="signup-btn">Registrarse</a>
+        <a routerLink="/sign-up" class="signup-btn">Sign Up</a>
       </div>
     </div>
     }
@@ -851,7 +851,7 @@
                   {{ formatAdminMessageStatus(msg.status) }}
                 </span>
                 @if (isAdminMessageUnread(msg)) {
-                <span class="unread-indicator">Nuevo</span>
+                <span class="unread-indicator">New</span>
                 }
               </div>
             </div>
@@ -862,7 +862,7 @@
             <div class="message-status-actions">
               <button
                 type="button"
-                class="btn btn-ghost"
+                class="btn btn-ghost mark-read-btn"
                 (click)="markAdminMessageStatus(msg, 'read')"
                 [disabled]="!isAdminMessageUnread(msg)"
               >
@@ -870,7 +870,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-ghost"
+                class="btn btn-ghost mark-unread-btn"
                 (click)="markAdminMessageStatus(msg, 'new')"
                 [disabled]="isAdminMessageUnread(msg)"
               >
@@ -987,10 +987,10 @@
     <!-- logout confirmation modal -->
     <app-confirmation-modal
       [isOpen]="showLogoutConfirmModal"
-      title="Cerrar sesión"
-      message="¿Seguro que quieres cerrar sesión?"
-      confirmLabel="Cerrar sesión"
-      cancelLabel="Cancelar"
+      title="Log out"
+      message="Are you sure you want to log out?"
+      confirmLabel="Log out"
+      cancelLabel="Cancel"
       (confirm)="onConfirmLogout()"
       (cancel)="onCancelLogout()"
     >

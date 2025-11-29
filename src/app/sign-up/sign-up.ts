@@ -89,18 +89,18 @@ export class SignUp {
       ).subscribe({
         next: (response) => {
           if (response.success) {
-            console.log('Usuario registrado exitosamente:', response.mensaje);
+            console.log('User successfully registered:', response.mensaje);
             // Navegar a la página de login después del registro exitoso
             this.router.navigate(['/login']);
           } else {
-            console.error('Error en registro:', response.mensaje);
+            console.error('Registration error:', response.mensaje);
             // Aquí podrías mostrar un mensaje de error al usuario
             alert(response.mensaje);
           }
         },
         error: (error) => {
-          console.error('Error en la petición de registro:', error);
-          alert('Error al registrar usuario. Por favor, intenta de nuevo.');
+          console.error('Error in registration request:', error);
+          alert('Error registering user. Please try again.');
         }
       });
     } else {

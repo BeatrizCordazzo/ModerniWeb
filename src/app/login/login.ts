@@ -73,7 +73,7 @@ export class Login implements OnInit {
               try {
                 localStorage.setItem('loggedUser', JSON.stringify((response as any).user));
               } catch (e) {
-                console.warn('No se pudo guardar usuario en localStorage:', e);
+                console.warn('Could not save user in localStorage:', e);
               }
             }
 
@@ -89,29 +89,29 @@ export class Login implements OnInit {
                     const dest = this.returnUrl || '/profile';
                     this.router.navigate([dest]);
                   } else {
-                    alert('Inicio de sesión registrado, pero no se pudo validar la sesión en el servidor. Intenta recargar.');
+                    alert('Login registered, but the session could not be validated on the server. Please try reloading..');
                   }
                 }
               },
               error: (err) => {
-                console.error('Error validando sesión tras login:', err);
+                console.error('Error validating session after login:', err);
                 const stored = localStorage.getItem('loggedUser');
                 if (stored) {
                   const dest = this.returnUrl || '/profile';
                   this.router.navigate([dest]);
                 } else {
-                  alert('Inicio de sesión registrado, pero no se pudo validar la sesión. Intenta recargar la página.');
+                  alert('Login registered, but the session could not be validated. Please try reloading the page.');
                 }
               }
             });
           } else {
-            console.error('Error en login:', response.mensaje);
+            console.error('Error in login:', response.mensaje);
             alert(response.mensaje);
           }
         },
         error: (error) => {
-          console.error('Error en la petición de login:', error);
-          alert('Error al iniciar sesión. Por favor, intenta de nuevo.');
+          console.error('Error in login request:', error);
+          alert('Error logging in. Please try again.');
         }
       });
     } else {

@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class PriceModal {
   @Input() isOpen = false;
-  @Input() title = 'Aceptar presupuesto';
+  @Input() title = 'Accept quote';
   @Input() presupuesto: any = null;
   @Output() confirm = new EventEmitter<number>();
   @Output() cancel = new EventEmitter<void>();
@@ -22,7 +22,7 @@ export class PriceModal {
   onConfirm(): void {
     const p = Number(this.finalPrice || 0);
     if (!p || p <= 0) {
-      this.invalid.emit('Por favor ingresa el precio final antes de aceptar');
+      this.invalid.emit('Please enter the final price before accepting.');
       return;
     }
     this.confirm.emit(p);

@@ -4,21 +4,21 @@
       <h3>{{ title }}</h3>
       @if (presupuesto) {
         <div class="details">
-          <p><strong>Cliente:</strong> {{ presupuesto.cliente_nombre || presupuesto.nombre_cliente || '-' }}</p>
-          <p><strong>Proyecto:</strong> {{ presupuesto.proyecto_nombre || presupuesto.titulo || '-' }}</p>
+          <p><strong>Client:</strong> {{ presupuesto.cliente_nombre || presupuesto.nombre_cliente || '-' }}</p>
+          <p><strong>Project:</strong> {{ presupuesto.proyecto_nombre || presupuesto.titulo || '-' }}</p>
           @if (presupuesto.detalle) {
-            <p><strong>Detalle:</strong></p>
+            <p><strong>Details:</strong></p>
           }
           @if (presupuesto.detalle) {
             <pre class="detalle-block">{{ presupuesto.detalle | json }}</pre>
           }
         </div>
       }
-      <label>Precio final (ARS)</label>
+      <label>Final price (ARS)</label>
       <input type="number" [(ngModel)]="finalPrice" min="0" step="0.01" />
       <div class="actions">
-        <button class="btn btn-ghost" (click)="onCancel()">Cancelar</button>
-        <button class="btn btn-primary" (click)="onConfirm()">Aceptar y enviar</button>
+        <button class="btn btn-ghost" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-primary" (click)="onConfirm()">Accept and send</button>
       </div>
     </div>
   </div>

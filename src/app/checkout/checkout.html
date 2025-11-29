@@ -12,7 +12,7 @@
             <div class="info">
               <h3>{{ it.name }}</h3>
               <p>{{ it.description }}</p>
-              <div class="meta">Cantidad: {{ it.quantity || 1 }} · Precio unitario: ${{ it.price.toLocaleString() }}</div>
+              <div class="meta">Quantity: {{ it.quantity || 1 }} · Unit price: ${{ it.price.toLocaleString() }}</div>
             </div>
             <div class="line-total">${{ ((it.price || 0) * (it.quantity || 1)).toLocaleString() }}</div>
           </article>
@@ -21,22 +21,22 @@
     }
 
     <aside class="checkout-summary">
-      <h2>Resumen</h2>
+      <h2>Summary</h2>
       <div class="row"><span>Subtotal</span><span>${{ getSubtotal().toLocaleString() }}</span></div>
       <!-- Shipping removed per request -->
       <div class="row total"><span>Total</span><span>${{ getTotal().toLocaleString() }}</span></div>
 
       <div class="payment-form">
-        <label>Nombre en la tarjeta</label>
+        <label>Name on card</label>
         <input type="text" [(ngModel)]="cardName" />
 
-        <label>Número de tarjeta</label>
+        <label>Card number</label>
         <input type="text" [(ngModel)]="cardNumber" />
 
         <div class="two-col">
           <div>
-            <label>Vencimiento</label>
-            <input type="text" [(ngModel)]="cardExpiry" placeholder="MM/AA" />
+            <label>Expiration</label>
+            <input type="text" [(ngModel)]="cardExpiry" placeholder="MM/YY" />
           </div>
           <div>
             <label>CVV</label>
@@ -46,10 +46,10 @@
 
         <button class="confirm-btn" (click)="confirmPayment()" [disabled]="loading">
           @if (!loading) {
-            <span>Confirmar pago</span>
+            <span>Confirm payment</span>
           }
           @if (loading) {
-            <span>Procesando...</span>
+            <span>Processing...</span>
           }
         </button>
       </div>
@@ -57,8 +57,8 @@
 
     @if (cartItems.length === 0) {
       <div class="empty">
-        <h3>Tu carrito está vacío</h3>
-        <p>Agrega servicios y vuelve a esta página para completar el pago.</p>
+        <h3>Your cart is empty</h3>
+        <p>Add services and return to this page to complete the payment.</p>
       </div>
     }
 

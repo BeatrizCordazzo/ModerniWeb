@@ -54,7 +54,7 @@ interface OrderItem {
 
 interface Order {
   id: number;
-  type: 'pedido' | 'custom';
+  type: 'order' | 'custom';
   name?: string | null;
   description?: string | null;
   date: string;
@@ -250,7 +250,7 @@ export class Profile implements OnInit, OnDestroy {
             return;
           }
         } catch (e) {
-          console.warn('Error leyendo loggedUser desde localStorage:', e);
+          console.warn('Error reading loggedUser from localStorage:', e);
         }
 
         this.notLogged = true;
@@ -407,7 +407,7 @@ export class Profile implements OnInit, OnDestroy {
         localStorage.setItem('loggedUser', JSON.stringify(raw));
       }
     } catch (e) {
-      console.warn('No se pudo actualizar loggedUser en localStorage:', e);
+      console.warn('Could not update loggedUser in localStorage:', e);
     }
   }
 
@@ -564,7 +564,7 @@ export class Profile implements OnInit, OnDestroy {
 
       return {
         id: Number(o.id),
-        type: o.type === 'custom' ? 'custom' : 'pedido',
+        type: o.type === 'custom' ? 'custom' : 'order',
         name: o.name ?? null,
         description: o.description ?? null,
         date: displayDate,
@@ -675,7 +675,7 @@ export class Profile implements OnInit, OnDestroy {
     if (!order || !order.pendingReview || !order.canReview) return;
     const payload: OrderReviewPayload = {
       order_id: order.id,
-      order_type: order.type,
+      order_type: order.type === 'custom' ? 'custom' : 'pedido',
       rating: order.pendingReview.rating,
       comment: order.pendingReview.comment?.trim() || '',
     };
@@ -890,7 +890,7 @@ export class Profile implements OnInit, OnDestroy {
         console.error('Error loading admin messages', err);
         this.messagesLoading = false;
         if (err && err.status === 403) {
-          this.messagesError = 'Solo los administradores pueden ver estos mensajes.';
+          this.messagesError = 'Only administrators can see these messages..';
         } else if (err && err.status === 401) {
           this.messagesError = 'Please log in to view the inbox.';
         } else {

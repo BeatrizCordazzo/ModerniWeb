@@ -199,17 +199,17 @@ export class AdminCarpintero implements OnInit {
   sendReject(): void {
     if (!this.rejectionTargetId) return;
     if (!this.rejectionMotivo.trim()) {
-      this.showToast('Por favor escribir el motivo del rechazo', 'warning');
+      this.showToast('Please state the reason for rejection.', 'warning');
       return;
     }
     this.datos.rejectPresupuesto(this.rejectionTargetId, this.rejectionMotivo).subscribe({
       next: (res: any) => {
         this.closeModal();
         this.loadPending();
-        this.showToast('Presupuesto rechazado y cliente notificado', 'success');
+        this.showToast('Quote rejected and customer notified', 'success');
       },
       error: (err) => {
-        this.showToast('Error rechazando presupuesto', 'error');
+        this.showToast('Error rejecting quote', 'error');
       },
     });
   }
@@ -273,7 +273,7 @@ export class AdminCarpintero implements OnInit {
       },
       error: (err) => {
         console.error('Error loading managed users', err);
-        this.managedUsersError = 'No se pudieron cargar los usuarios.';
+        this.managedUsersError = 'Failed to load users.';
         this.managedUsersLoading = false;
       },
     });
@@ -301,10 +301,10 @@ export class AdminCarpintero implements OnInit {
       error: (err) => {
         console.error('Error loading architect projects', err);
         if (isPending) {
-          this.architectPendingError = 'No se pudieron cargar los proyectos de arquitecto.';
+          this.architectPendingError = 'Failed to load architect projects.';
           this.architectPendingLoading = false;
         } else {
-          this.architectAcceptedError = 'No se pudieron cargar los aceptados.';
+          this.architectAcceptedError = 'Failed to load accepted projects.';
           this.architectAcceptedLoading = false;
         }
       },
@@ -320,7 +320,7 @@ export class AdminCarpintero implements OnInit {
     this.datos.updateArchitectProjectStatus(project.id, decision, comment).subscribe({
       next: () => {
         this.showToast(
-          decision === 'accepted' ? 'Proyecto aceptado' : 'Proyecto rechazado',
+          decision === 'accepted' ? 'Project accepted' : 'Project rejected',
           'success'
         );
         delete this.architectDecisionSaving[project.id];
@@ -330,7 +330,7 @@ export class AdminCarpintero implements OnInit {
       },
       error: (err) => {
         console.error('Error updating architect project', err);
-        this.showToast('No se pudo actualizar el proyecto.', 'error');
+        this.showToast('Failed to update project.', 'error');
         delete this.architectDecisionSaving[project.id];
       },
     });
@@ -360,7 +360,7 @@ export class AdminCarpintero implements OnInit {
       },
       error: (err) => {
         console.error('Error loading SketchUp projects', err);
-        this.sketchupError = 'No se pudieron cargar los modelos.';
+        this.sketchupError = 'Failed to load models.';
         this.sketchupLoading = false;
       },
     });
@@ -374,7 +374,7 @@ export class AdminCarpintero implements OnInit {
       return;
     }
     if (!file.name.toLowerCase().endsWith('.skp')) {
-      this.sketchupError = 'Solo se permiten archivos .skp.';
+      this.sketchupError = 'Only .skp files are allowed.';
       this.sketchupFile = null;
       return;
     }
@@ -384,7 +384,7 @@ export class AdminCarpintero implements OnInit {
 
   uploadSketchupModel(): void {
     if (!this.sketchupFile) {
-      this.sketchupError = 'Selecciona un archivo .skp para subir.';
+      this.sketchupError = 'Select an .skp file to upload.';
       return;
     }
     this.sketchupUploading = true;
@@ -406,15 +406,15 @@ export class AdminCarpintero implements OnInit {
             this.sketchupNotes = '';
             this.sketchupEmbedCode = '';
             this.sketchupFile = null;
-            this.showToast('Modelo SketchUp subido', 'success');
+            this.showToast('SketchUp model uploaded', 'success');
           } else {
-            this.sketchupError = 'No se pudo registrar el modelo.';
+            this.sketchupError = 'Failed to register the model.';
           }
           this.sketchupUploading = false;
         },
         error: (err) => {
           console.error('Error uploading SketchUp model', err);
-          const msg = err?.error?.error || 'No se pudo subir el modelo.';
+          const msg = err?.error?.error || 'Failed to upload the model.';
           this.sketchupError = msg;
           this.sketchupUploading = false;
         },
@@ -441,20 +441,20 @@ export class AdminCarpintero implements OnInit {
       this.sketchupViewerUrl = null;
       this.sketchupSelectedName = null;
       this.sketchupViewerProjectId = null;
-      this.sketchupError = 'Agrega el iframe de 3D Warehouse para este modelo.';
+      this.sketchupError = 'Add the 3D Warehouse iframe for this model.';
       return;
     }
     this.sketchupError = '';
     this.sketchupViewerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
     this.sketchupSelectedName =
-      project.title || project.file_original_name || `Modelo #${project.id}`;
+      project.title || project.file_original_name || `Model #${project.id}`;
     this.sketchupViewerProjectId = project?.id ?? null;
   }
 
   confirmDeleteSketchup(project: SketchupProject): void {
     if (!project || !project.id) return;
-    const name = project.title || project.file_original_name || `Modelo #${project.id}`;
-    this.confirmMessage = `¿Deseas excluir "${name}"?`;
+    const name = project.title || project.file_original_name || `Model #${project.id}`;
+    this.confirmMessage = `Do you want to delete "${name}"?`;
     this.confirmAction = 'deleteSketchupProject';
     this.confirmTargetId = project.id;
     this.showConfirmModal = true;
@@ -472,12 +472,12 @@ export class AdminCarpintero implements OnInit {
           this.sketchupViewerUrl = null;
           this.sketchupSelectedName = null;
         }
-        this.showToast('Modelo excluido', 'success');
+        this.showToast('Model deleted', 'success');
       },
       error: (err) => {
         console.error('Error deleting SketchUp project', err);
         delete this.sketchupDeleting[projectId];
-        const msg = err?.error?.error || 'No se pudo excluir el modelo.';
+        const msg = err?.error?.error || 'Failed to delete the model.';
         this.showToast(msg, 'error');
       },
     });
@@ -529,22 +529,22 @@ export class AdminCarpintero implements OnInit {
     const email = form.email.trim();
     const telefono = form.telefono.trim();
     if (!nombre || !email) {
-      this.showToast('Nombre y email son obligatorios', 'warning');
+      this.showToast('Name and email are required', 'warning');
       return;
     }
 
     if (!this.isValidName(nombre)) {
-      this.showToast('El nombre debe tener al menos 3 letras y sin caracteres especiales', 'warning');
+      this.showToast('Name must have at least 3 letters and no special characters', 'warning');
       return;
     }
 
     if (!this.isValidEmail(email)) {
-      this.showToast('Ingresa un email valido', 'warning');
+      this.showToast('Enter a valid email', 'warning');
       return;
     }
 
     if (telefono && !this.isValidPhone(telefono)) {
-      this.showToast('Ingresa un telefono valido (solo digitos, espacios, +, -, parentesis)', 'warning');
+      this.showToast('Enter a valid phone number (digits, spaces, +, -, parentheses only)', 'warning');
       return;
     }
 
@@ -560,7 +560,7 @@ export class AdminCarpintero implements OnInit {
       hashedPassword = await this.hashPassword(passwordValue);
     } catch (error) {
       console.error('Error hashing password', error);
-      this.showToast('No se pudo procesar la contrasena', 'error');
+      this.showToast('Failed to process the password', 'error');
       return;
     }
 
@@ -580,15 +580,15 @@ export class AdminCarpintero implements OnInit {
     this.savingUser = true;
     this.datos.createManagedUser(payload).subscribe({
       next: () => {
-        this.showToast('Usuario creado', 'success');
+        this.showToast('User created', 'success');
         this.savingUser = false;
         // Reset model for the form (button 'Nuevo' and helper removed)
         this.createUserForm = this.createEmptyUserForm();
         this.loadManagedUsers();
       },
       error: (err: any) => {
-        console.error('Error guardando usuario', err);
-        const message = err?.error?.error || 'No se pudo crear el usuario';
+        console.error('Error saving user', err);
+        const message = err?.error?.error || 'Failed to create the user';
         this.showToast(message, 'error');
         this.savingUser = false;
       },
@@ -597,7 +597,7 @@ export class AdminCarpintero implements OnInit {
 
   confirmDeleteManagedUser(user: ManagedUser): void {
     if (!user || !user.id) return;
-    this.confirmMessage = `¿Deseas excluir a ${user.nombre}?`;
+    this.confirmMessage = `Do you want to delete ${user.nombre}?`;
     this.confirmAction = 'deleteManagedUser';
     this.confirmTargetId = user.id;
     this.showConfirmModal = true;
@@ -606,12 +606,12 @@ export class AdminCarpintero implements OnInit {
   private deleteManagedUser(id: number): void {
     this.datos.deleteManagedUser(id).subscribe({
       next: () => {
-        this.showToast('Usuario excluido', 'success');
+        this.showToast('User deleted', 'success');
         this.managedUsers = this.managedUsers.filter((u) => u.id !== id);
       },
       error: (err) => {
         console.error('Error deleting user', err);
-        this.showToast('No se pudo excluir el usuario', 'error');
+        this.showToast('Failed to delete the user', 'error');
       },
     });
   }
@@ -630,20 +630,20 @@ export class AdminCarpintero implements OnInit {
 
   private getPasswordValidationError(value: string, optional = false): string | null {
     if (!value) {
-      return optional ? null : 'La contrasena es obligatoria';
+      return optional ? null : 'Password is required';
     }
 
     if (value.length < 6) {
-      return 'La contrasena debe tener al menos 6 caracteres';
+      return 'Password must be at least 6 characters long';
     }
     if (!/[A-Z]/.test(value)) {
-      return 'La contrasena debe incluir al menos una letra mayuscula';
+      return 'Password must include at least one uppercase letter';
     }
     if (!/\d/.test(value)) {
-      return 'La contrasena debe incluir al menos un numero';
+      return 'Password must include at least one number';
     }
     if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)) {
-      return 'La contrasena debe incluir al menos un caracter especial';
+      return 'Password must include at least one special character';
     }
 
     return null;
@@ -655,7 +655,7 @@ export class AdminCarpintero implements OnInit {
     }
 
     if (!crypto?.subtle) {
-      throw new Error('Crypto API no disponible');
+      throw new Error('Crypto API not available');
     }
 
     const encoder = new TextEncoder();
@@ -698,7 +698,7 @@ export class AdminCarpintero implements OnInit {
   get orderDoneList(): any[] {
     return this.orders.filter((o) => {
       const s = (o.estado || o.status || '').toString().toLowerCase();
-      return s === 'done' || s === 'finalizado' || s === 'done' || s.includes('done');
+      return s === 'done' || s === 'finalized' || s === 'done' || s.includes('done');
     });
   }
 
@@ -764,18 +764,18 @@ export class AdminCarpintero implements OnInit {
     if ((proj.carpintero_estado || '').toLowerCase() === (newStatus || '').toLowerCase()) {
       // nothing to do
       delete proj.pendingEstado;
-      this.showToast('No hay cambios para guardar', 'info');
+      this.showToast('No changes to save', 'info');
       return;
     }
     this.datos.updateProjectProgress(proj.proyecto_id, newStatus).subscribe({
       next: () => {
         proj.carpintero_estado = newStatus;
         delete proj.pendingEstado;
-        this.showToast('Estado actualizado', 'success');
+        this.showToast('Status updated', 'success');
         // refresh lists to move project between columns
         this.loadAcceptedProjects();
       },
-      error: () => this.showToast('Error guardando estado', 'error'),
+      error: () => this.showToast('Error saving status', 'error'),
     });
   }
 
@@ -787,7 +787,7 @@ export class AdminCarpintero implements OnInit {
       (order.estado || '').toString().toLowerCase() === (newStatus || '').toString().toLowerCase()
     ) {
       delete order.pendingEstado;
-      this.showToast('No hay cambios para guardar', 'info');
+      this.showToast('No changes to save', 'info');
       return;
     }
     // Persist the order status via API
@@ -796,13 +796,13 @@ export class AdminCarpintero implements OnInit {
       next: (res: any) => {
         order.estado = newStatus;
         delete order.pendingEstado;
-        this.showToast('Estado del pedido guardado', 'success');
+        this.showToast('Order status saved', 'success');
         // refresh orders so item moves between columns if needed
         this.loadOrders();
       },
       error: (err) => {
         console.error('Error saving order status', err);
-        this.showToast('Error guardando estado del pedido', 'error');
+        this.showToast('Error saving order status', 'error');
       },
     });
   }
@@ -810,7 +810,7 @@ export class AdminCarpintero implements OnInit {
   // Request confirmation before saving a single project
   requestSaveProject(proj: any): void {
     if (!proj || !proj.proyecto_id) return;
-    this.confirmMessage = 'Deseas guardar los cambios en este proyecto?';
+    this.confirmMessage = 'Do you want to save the changes to this project?';
     this.confirmAction = 'saveProject';
     this.confirmTargetId = proj.proyecto_id;
     this.showConfirmModal = true;
@@ -831,10 +831,10 @@ export class AdminCarpintero implements OnInit {
   // Request confirmation before saving all accepted projects
   requestSaveAll(): void {
     if (!this.acceptedProjects || this.acceptedProjects.length === 0) {
-      this.showToast('No hay proyectos para guardar', 'info');
+      this.showToast('No projects to save', 'info');
       return;
     }
-    this.confirmMessage = 'Deseas guardar los cambios en todos los proyectos aceptados?';
+    this.confirmMessage = 'Do you want to save the changes to all accepted projects?';
     this.confirmAction = 'saveAllAccepted';
     this.confirmTargetId = null;
     this.showConfirmModal = true;
@@ -865,14 +865,14 @@ export class AdminCarpintero implements OnInit {
     });
     Promise.all(saves).then(() => {
       this.loadAcceptedProjects();
-      this.showToast('Todos los cambios guardados', 'success');
+      this.showToast('All changes saved', 'success');
     });
   }
 
   updateProgress(proyectoId: number, estado: string): void {
     this.datos.updateProjectProgress(proyectoId, estado).subscribe({
       next: () => this.loadTodoList(),
-      error: (err) => this.showToast('Error actualizando progreso', 'error'),
+      error: (err) => this.showToast('Error updating progress', 'error'),
     });
   }
 
@@ -888,9 +888,9 @@ export class AdminCarpintero implements OnInit {
       this.datos.acceptPresupuesto(target).subscribe({
         next: () => {
           this.loadPending();
-          this.showToast('Presupuesto aceptado', 'success');
+          this.showToast('Budget accepted', 'success');
         },
-        error: () => this.showToast('Error aceptando presupuesto', 'error'),
+        error: () => this.showToast('Error accepting budget', 'error'),
       });
       } else if (action === 'saveProject' && target) {
         const proj = this.acceptedProjects.find((p: any) => p.proyecto_id === target);
@@ -898,8 +898,8 @@ export class AdminCarpintero implements OnInit {
           this.saveProject(proj);
         } else {
         this.datos.updateProjectProgress(target, 'to-do').subscribe({
-          next: () => this.showToast('Estado actualizado', 'success'),
-          error: () => this.showToast('Error guardando estado', 'error'),
+          next: () => this.showToast('Status updated', 'success'),
+          error: () => this.showToast('Error saving status', 'error'),
         });
       }
       } else if (action === 'saveAllAccepted') {
@@ -963,13 +963,13 @@ export class AdminCarpintero implements OnInit {
         }
         this.updateUnreadCountFromMessages();
         this.showToast(
-          state === 'read' ? 'Mensaje marcado como leído' : 'Mensaje marcado como no leído',
+          state === 'read' ? 'Message marked as read' : 'Message marked as unread',
           'info'
         );
       },
       error: (err) => {
         console.error('Error updating message status', err);
-        this.showToast('No se pudo actualizar el estado del mensaje', 'error');
+        this.showToast('Unable to update message status', 'error');
       },
     });
   }
@@ -985,20 +985,20 @@ export class AdminCarpintero implements OnInit {
 
   sendResponse(msg: ContactMessage & { pendingResponse?: string }): void {
     if (!msg || !msg.id || !msg.pendingResponse?.trim()) {
-      this.showToast('Por favor escribe una respuesta antes de enviar.', 'warning');
+      this.showToast('Please write a response before sending.', 'warning');
       return;
     }
     const responseText = msg.pendingResponse.trim();
     this.datos.replyToMessage(msg.id, responseText).subscribe({
       next: () => {
-        this.showToast('Respuesta enviada al cliente', 'success');
+        this.showToast('Response sent to client', 'success');
         msg.response = responseText;
         msg.pendingResponse = '';
         this.loadMessages();
       },
       error: (err) => {
         console.error('Error sending response', err);
-        this.showToast('No se pudo enviar la respuesta', 'error');
+        this.showToast('Unable to send response', 'error');
       },
     });
   }
@@ -1018,9 +1018,9 @@ export class AdminCarpintero implements OnInit {
     this.datos.acceptPresupuesto(id, finalPrice).subscribe({
       next: () => {
         this.loadPending();
-        this.showToast('Presupuesto aceptado y precio enviado al cliente', 'success');
+        this.showToast('Budget accepted and price sent to client', 'success');
       },
-      error: () => this.showToast('Error aceptando presupuesto', 'error'),
+      error: () => this.showToast('Error accepting budget', 'error'),
     });
   }
 
